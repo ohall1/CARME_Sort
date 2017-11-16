@@ -1,0 +1,8 @@
+#Include Single AIDA Fil
+AIDAFile	/mnt/c/Users/oscar/Documents/LinuxCode/data/R7_0
+
+#Include multiple AIDA files format "String before run number" <run number> <sub-run start> <sub-run end>
+#AIDAList R 6 17 20
+
+#AIDA Parameters file
+AIDAConfig values.dat
