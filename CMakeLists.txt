@@ -36,17 +36,12 @@ include(${ROOT_USE_FILE})
 
 include_directories(${CMAKE_SOURCE_DIR} ${ROOT_INCLUDE_DIRS})
 add_definitions(${ROOT_CXX_FLAGS} -lTreePlayer )
-ROOT_GENERATE_DICTIONARY(G__data2Tree data2Tree.hpp BRIKENTreeData.h LINKDEF data2TreeLinkDef.hpp)
+#ROOT_GENERATE_DICTIONARY(G__data2Tree data2Tree.hpp BRIKENTreeData.h LINKDEF data2TreeLinkDef.hpp)
 
-#---Create a shared library with geneated dictionary
-add_library(data2TreeLib SHARED data2Tree.cxx G__data2Tree.cxx)
-target_link_libraries(data2TreeLib ${ROOT_LIBRARIES}  -lTreePlayer)
-
-add_library(myTemplates template_bigrips.cpp template_aida.cpp )
 
 #---Create  a main program using the library
 add_executable(AIDASort main.cpp)
-target_link_libraries(AIDASort ${ROOT_LIBRARIES} data2TreeLib myTemplates)
+target_link_libraries(AIDASort ${ROOT_LIBRARIES})
 
 # Library threads
 find_package (Threads)

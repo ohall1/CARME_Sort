@@ -3,6 +3,11 @@
 
 #include <fstream>
 #include <list>
+#include <utility>
+#include <thread>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
 
 class DataReader{
 	private:
@@ -14,7 +19,20 @@ class DataReader{
 
 		//Stream for reading in data file
 		std::ifstream inputFile;
-		std::list <std::string> AIDAFileList;
+		std::list <std::string> AIDAFileList; //List of the files to be sorted
+
+		//Variables used to output the data words
+		std::list <std::pair<unsigned int, unsigned int>> dataWordBuffer; //List to be used as a buffer between reader and unpacker
+		std::pair <unsigned int, unsigned int> dataWords;
+
+		//Variables used for synchronising data threads
+		std::mutex bufProtect;
+
+		std::condition_variable bufferFull;
+		std::condition_variable bufferEmpty;
+
+		bool bufferFullCheck;
+		bool bufferEmptyCheck;
 
 		//Paramerters describing size of data file
 		int fileSize = 0;
@@ -33,11 +51,12 @@ class DataReader{
 		char blockData[MAIN_SIZE];
 
 		void OpenInputFile();
-		void BeginReader();
+
 		void CalculateFileSize();
 		void ReadBlock();
 		void CloseInputFile();
 		void SetInputFileList(std::list <std::string> fileList);
+		void AddToBuffer(std::pair<unsigned int, unsigned int> dataIn);
 
 	public:
 
@@ -46,6 +65,8 @@ class DataReader{
 		~DataReader(){};
 
 		void InitialiseReader(std::list <std::string> inputFileList);
+		void BeginReader();
+		std::pair<unsigned int, unsigned int> ReadFromBuffer();
 
 };
 #endif

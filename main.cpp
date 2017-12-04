@@ -12,10 +12,13 @@
 #include <list>
 #include<vector>
 #include<map>
+#include<thread>
+#include<mutex>
 
 #define DEB
 
 #include "DataReader.cpp"
+#include "DataUnpacker.cpp"
 
 void Usage(char *progname){
 	std::cout << "Usage: AIDASort -c configFile -o OutputFile" << std::endl;
@@ -126,9 +129,24 @@ int main(int argc, char **argv){
 		return -1;
 	}
 
-	DataReader myData;
-	myData.InitialiseReader(AIDAFileList);
+	//Initialise data reader
+	DataReader myDataReader;
+	DataUnpacker myDataUnpacker;
 
+	DataReader *DataReaderPoint;
+	DataUnpacker *DataUnpackerPoint;
+
+	DataReaderPoint = &myDataReader;
+	DataUnpackerPoint = &myDataUnpacker;
+
+	myDataReader.InitialiseReader(AIDAFileList);
+
+	std::thread th1 (&DataReader::BeginReader,DataReaderPoint);
+
+	std::thread th2 (&DataUnpacker::BeginDataUnpacker,DataUnpackerPoint,std::ref(myDataReader));
+
+	th1.join();
+	th2.join();
 
 
 }

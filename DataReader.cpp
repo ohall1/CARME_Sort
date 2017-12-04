@@ -1,4 +1,5 @@
 #include "DataReader.hpp"
+#include "DataUnpacker.hpp"
 
 DataReader::DataReader(){};
 
@@ -11,8 +12,8 @@ void DataReader::InitialiseReader(std::list <std::string> inputFileList){
 	}
 	else{
 		std::cout << "AIDASort sorting offline data" << std::endl;
+
 		SetInputFileList(inputFileList);
-		BeginReader();
 	}
 }
 
@@ -52,14 +53,17 @@ void DataReader::BeginReader(){
 					//If one of the words == 0xFFFFFFFF we reject all the data
 					if (word0 == 0xFFFFFFFF || word1 == 0xFFFFFFFF){
 						#ifdef DEB
-							std::cout << "Reached end of data block. Data ended with word 0xFFFFFFFF" << std::endl;
+							//std::cout << "Reached end of data block. Data ended with word 0xFFFFFFFF" << std::endl;
 						#endif
 
 						continue;
 					}
 					else{
-						//Pass on data words to be unpacked
+						//Pass on data words to the buffer
+						dataWords.first = word0;
+						dataWords.second = word1;
 
+						AddToBuffer(dataWords);
 					}
 
 				}//End loop over data words
@@ -172,4 +176,100 @@ void DataReader::CloseInputFile(){
 		std::cout << "Something went wrong with closing file. No file open to be closed." << std::endl;
 		return;
 	}
+}
+
+void DataReader::AddToBuffer(std::pair<unsigned int, unsigned int> dataIn){
+
+	//Aqquire bufProtect mutex lock to modify list
+	std::unique_lock<std::mutex> addLock(bufProtect);
+	#ifdef DEB_THREAD
+		std::cout << "Mutex lock acquire for AddToBuffer" << std::endl;
+	#endif
+
+	//Wait if list size exceeds maximum buffer
+	while(dataWordBuffer.size()>=20){
+		bufferFullCheck = true;
+		#ifdef DEB_THREAD
+			std::cout << "Buffer list is fulle. BufferFulCheck = " << bufferFullCheck <<std::endl;
+		#endif
+		bufferFull.wait(addLock);
+	}
+
+	dataWordBuffer.push_back(dataIn);
+	#ifdef DEB_THREAD
+		std::cout << "Data pair added to back of buffer." << std::endl;
+	#endif
+
+
+	#ifdef DEB_THREAD
+		std::cout << "Checking bufferEmptyCheck = " << bufferEmptyCheck << std::endl;
+	#endif
+
+	if(bufferEmptyCheck){
+		bufferEmptyCheck = false;
+		#ifdef DEB_THREAD
+			std::cout << "Buffer no longer empty. Notifying ReadFromBufferThread" << std::endl;
+		#endif
+		bufferEmpty.notify_all();
+	}
+
+	//Unlock the bufProtect mutex lock
+	addLock.unlock();
+	#ifdef DEB_THREAD
+		std::cout << "Mutext lock on AddToBuffer released" <<std::endl;
+		std::cout << " " << std::endl;
+	#endif
+
+	return;
+}
+
+std::pair<unsigned int, unsigned int> DataReader::ReadFromBuffer(){
+
+	std::pair<unsigned int, unsigned int> bufferOut;
+
+	//Aqquire bufProtect mutex lock to modify list
+	std::unique_lock<std::mutex> popLock(bufProtect);
+	#ifdef DEB_THREAD
+		std::cout << "Mutex lock acquired for ReadFromBuffer" <<std::endl;
+	#endif
+
+	//Check if the list size is empty
+	while(dataWordBuffer.size()<1){
+		bufferEmptyCheck = true;
+		#ifdef DEB_THREAD
+			std::cout << "Buffer list is empty, thread waiting. bufferEmptyCheck = " << bufferEmptyCheck << std::endl;
+		#endif
+		bufferEmpty.wait(popLock);
+	}
+
+	bufferOut = dataWordBuffer.front();
+	dataWordBuffer.pop_front();
+
+	#ifdef DEB_THREAD
+		std::cout << "Buffer popped from front. First word = " << bufferOut.first << " Second word = " << bufferOut.second << std::endl;
+		std::cout << "Current list buffer size " << dataWordBuffer.size() << " items." << std::endl;
+	#endif
+
+
+	#ifdef DEB_THREAD
+		std::cout << "Checking bufferFullCheck = " << bufferFullCheck << std::endl;
+	#endif
+
+	if(bufferFullCheck){
+		bufferFullCheck=false;
+		#ifdef DEB_THREAD
+			std::cout << "Buffer no longer full. Notifying AddToBufferThread" << std::endl;
+		#endif
+		bufferFull.notify_all();
+	}
+
+	popLock.unlock();
+
+	#ifdef DEB_THREAD
+		std::cout << "Releasing mutex lock on ReadFromBuffer" << std::endl;
+		std::cout << " " <<std::endl;
+	#endif
+
+	return bufferOut;
+
 }
