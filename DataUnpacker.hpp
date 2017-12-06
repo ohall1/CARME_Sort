@@ -11,40 +11,55 @@ class ADCDataItem{
 
 	private:
 
-		unsigned long timeStamp;    //Internal AIDA time stamp
-		unsigned long timeStampLSB; // Least significant bits of timestamp
+		unsigned long timestamp;    //Internal AIDA time stamp
+		unsigned long timestampLSB; // Least significant bits of timestamp
 
 		unsigned int adcData;       //ADC value
 		unsigned int sampleLength;
 
-		unsigned char dataType;     // Data type: 0 = Sample waveform, 1 = Sample Length, 2 = Info Data, 3 = ADC Data
-		unsigned char fee64ID;      //FEE64 ID
-		unsigned char channelID;	// Channel ID
-		unsigned char adcRange;		// ADC range: 0 = low energy, 1 = high energy
+		unsigned int dataType;     // Data type: 0 = Sample waveform, 1 = Sample Length, 2 = Info Data, 3 = ADC Data
+		int fee64ID;      //FEE64 ID
+		unsigned int channelID;	// Channel ID
+		unsigned int adcRange;		// ADC range: 0 = low energy, 1 = high energy
 
 	public:
-		ADCDataItem::ADCDataItem(std::pair < unsigned int, unsigned int> inData);
+		ADCDataItem();
+		~ADCDataItem(){};
+		ADCDataItem(std::pair < unsigned int, unsigned int> inData);
+
+		void SetTimestamp(unsigned long MSB);
 };
 
 class InformationDataItem{
 
 	private:
 
-		unsigned long timeStamp;    		//Internal AIDA time stamp
-		unsigned long timeStampLSB; 		// Least significant bits of timestamp
-		unsigned long timeStampMSB;			// Most significant bits of timestamp
+		unsigned long timestamp;    		//Internal AIDA time stamp
+		unsigned long timestampLSB; 		// Least significant bits of timestamp
+		unsigned long timestampMSB;			// Most significant bits of timestamp
 		unsigned long infoField;    		//Iformation field of AIDA data word
 
 		unsigned int sampleLength;
 
-		unsigned char dataType;     		// Data type: 0 = Sample waveform, 1 = Sample Length, 2 = Info Data, 3 = ADC Data
-		unsigned char fee64ID;      		//FEE64 ID
-		unsigned char infoCode;				//Info code of AIDA "information" word
+		unsigned int dataType;     		// Data type: 0 = Sample waveform, 1 = Sample Length, 2 = Info Data, 3 = ADC Data
+		unsigned int fee64ID;      		//FEE64 ID
+		unsigned int infoCode;				//Info code of AIDA "information" word
 		unsigned char corrScalerIndex;		//Index of correlation scaler
-		unsigned char corrScalerTimeStamp;	//Timestamp of correlation scaler
+		unsigned long corrScalerTimestamp;	//Timestamp of correlation scaler
 
 	public:
-		InformationDataItem::InformationDataItem(std::pair < unsigned int, unsigned int> inData);
+		InformationDataItem();
+		~InformationDataItem(){};
+		InformationDataItem(std::pair < unsigned int, unsigned int> inData);
+		unsigned int GetInfoCode();
+		unsigned long GetTimestampMSB();
+		unsigned int GetCorrScalerIndex();
+		unsigned long GetCorrScalerTimestamp();
+		unsigned int GetFEE64ID();
+		unsigned long GetTimestamp();
+		unsigned long GetTimestampLSB();
+
+		void SetTimestamp(unsigned long MSB);
 };
 
 class DataUnpacker{
@@ -57,28 +72,25 @@ class DataUnpacker{
 		unsigned long correlationScalerData0[24];		//Used in calculating the correlation scaler
 		unsigned long correlationScalerData1[24];		//
 		unsigned long correlationScaler;				//Correlation scaler between AIDA and other DAQs
-		unsigned long timeStampMSB;						//Most significant bit of the timestamp
+		long int correlationScalerOffset;
+		unsigned long timestampMSB;						//Most significant bit of the timestamp
 
 		unsigned int pauseItemCounter[24];
 		unsigned int resumeItemCounter[24];
 		unsigned int sync100Counter[24];
 
-		unsigned char dataType;		//Data type of data words
+		unsigned int dataType;		//Data type of data words
 
 		bool correlationStatus;		//Bool to keep track of whether correlation scaler has been measured
-		bool timeStampMSBStatus;	//Bool to keep track of whether timeStampMSB has been set
+		bool timestampMSBStatus;	//Bool to keep track of whether timeStampMSB has been set
 
-		DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn)
+		void UnpackWords(std::pair < unsigned int, unsigned int> wordsIn);
 
 	public:
 		DataUnpacker();
 		~DataUnpacker(){};
 		void BeginDataUnpacker(DataReader & dataReader);
-
-		unsigned long GetTimeStampMSB();
-		unsigned char GetInfoCode();
-		unsigned char GetCorrScalerIndex();
-		unsigned char GetCorrScalerTimeStamp();
+		void InitialiseDataUnpacker();
 
 };
 

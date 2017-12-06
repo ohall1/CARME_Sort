@@ -37,16 +37,20 @@ void DataReader::BeginReader(){
 
 					//Assemble data words from block data
 					//All data comes split between two words
-					word0 = (blockData[itrData] & 0xFF) | (blockData[itrData+1] & 0xFF << 8) |
-							(blockData[itrData+2] & 0xFF) << 16 | (blockData[itrData+3] & 0xFF << 24);
+					word0 = (blockData[itrData] & 0xFF) | (blockData[itrData+1] & 0xFF) << 8 |
+							(blockData[itrData+2] & 0xFF) << 16 | (blockData[itrData+3] & 0xFF) << 24;
 
-					word1 = (blockData[itrData+4] & 0xFF) | (blockData[itrData+5] & 0xFF << 8) |
-							(blockData[itrData+6] & 0xFF) << 16 | (blockData[itrData+7] & 0xFF << 24);
+					word1 = (blockData[itrData+4] & 0xFF) | (blockData[itrData+5] & 0xFF) << 8 |
+							(blockData[itrData+6] & 0xFF) << 16 | (blockData[itrData+7] & 0xFF) << 24;
 
 					#ifdef DEB
 						if(itrData < 17){
 							std::cout << "itrData - " << itrData << " Word0 - " << word0 << std::endl;
 							std::cout << "Word1 - " << word1 << std::endl;
+							std::cout << 1* (blockData[itrData] & 0xFF) << " block 1" <<std::endl;
+							std::cout << 1* (blockData[itrData+1] & 0xFF) << " block 2" <<std::endl;
+							std::cout << 1* (blockData[itrData+2] & 0xFF) << " block 3" <<std::endl;
+							std::cout << 1* (blockData[itrData+3] & 0xFF) << " block 4" <<std::endl;
 						}
 					#endif
 

@@ -140,6 +140,7 @@ int main(int argc, char **argv){
 	DataUnpackerPoint = &myDataUnpacker;
 
 	myDataReader.InitialiseReader(AIDAFileList);
+	myDataUnpacker.InitialiseDataUnpacker();
 
 	std::thread th1 (&DataReader::BeginReader,DataReaderPoint);
 
