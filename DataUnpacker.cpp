@@ -14,8 +14,23 @@ ADCDataItem::ADCDataItem(std::pair < unsigned int, unsigned int> inData){
 	timestampLSB = (inData.second & 0x0FFFFFFF);				//Word 1, bits 0:27 - Timestamp LSB
 
 }
-void ADCDataItem::SetTimestamp(unsigned long MSB){
+void ADCDataItem::BuildTimestamp(unsigned long MSB){
 	timestamp = (MSB << 28) | timestampLSB;
+}
+void ADCDataItem::SetTimestamp(unsigned long newTimestamp){
+	timestamp = newTimestamp;
+}
+unsigned long ADCDataItem::GetTimestamp(){
+	return timestamp;
+}
+int ADCDataItem::GetFEE64ID(){
+	return fee64ID;
+}
+unsigned int ADCDataItem::GetADCRange(){
+	return adcRange;
+}
+unsigned int ADCDataItem::GetChannelID(){
+	return channelID;
 }
 
 InformationDataItem::InformationDataItem(std::pair < unsigned int, unsigned int> inData){
@@ -67,6 +82,11 @@ unsigned long InformationDataItem::GetTimestampLSB(){
 	return timestampLSB;
 }
 void DataUnpacker::InitialiseDataUnpacker(){
+
+	//Define and construct the EventBuilder class
+	EventBuilder myEventBuilder;
+
+	//Initialise all the values that will be used in the unpacker process
 	for (int i = 0; i < 24; i++){
 		pauseItemCounter[i] = 0;
 		resumeItemCounter[i] = 0;
@@ -74,6 +94,8 @@ void DataUnpacker::InitialiseDataUnpacker(){
 		correlationScalerData0[i] = 0;
 		correlationScalerData1[i] = 0;
 	}
+
+	correlationScalerStatus = false;
 }
 void DataUnpacker::BeginDataUnpacker(DataReader & dataReader){
 
@@ -95,8 +117,11 @@ void DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		//ADC data item - Unpack into ADCDataItem format
 		ADCDataItem adcDataItem(wordsIn);
 
-		if (timestampMSBStatus){//If timestampMSB has been obtained from inforation data set the timestamp of the adc data
-			adcDataItem.SetTimestamp(timestampMSB);
+		if (timestampMSBStatus && correlationScalerStatus){//If timestampMSB has been obtained from inforation data set the timestamp of the adc data
+			adcDataItem.BuildTimestamp(timestampMSB);
+
+			//Send ADC item to the event builder to be built
+			myEventBuilder.AddADCEvent(adcDataItem);
 		}
 
 		
@@ -148,7 +173,19 @@ void DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 					correlationScaler = (informationDataItem.GetCorrScalerTimestamp() << 32) | (correlationScalerData1[informationDataItem.GetFEE64ID()] << 16)
 										| (correlationScalerData0[informationDataItem.GetFEE64ID()]);	
 
-					correlationScalerOffset = (4 * correlationScaler) - informationDataItem.GetTimestamp();	
+					correlationScalerOffset = (4 * correlationScaler) - informationDataItem.GetTimestamp();
+
+					if(myEventBuilder.GetCorrScalerTimestamp()==0){
+						//Set the correlation scaler offset in the event builder
+						myEventBuilder.SetCorrelationScaler(correlationScalerOffset);
+
+						std::cout << "Setting the correlation scaler offset to: " << correlationScalerOffset << std::endl;
+						correlationScalerStatus = true;
+					}
+					else if (myEventBuilder.GetCorrelationScalerOffset() != correlationScalerOffset){
+						std::cout << "Warning correlation scaler offset changed mid run. Old Offset = " << myEventBuilder.GetCorrelationScalerOffset()
+								  << " - New offset = " << correlationScalerOffset << ". Was a sync pulse sent in the middle of a run?" <<std::endl;
+					}
 
 					#ifdef DEB_CORRELATION
 						std::cout << "Correlation scaler " << correlationScaler << " Offset = " << correlationScalerOffset << std::endl;

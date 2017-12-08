@@ -19,6 +19,7 @@
 
 #include "DataReader.cpp"
 #include "DataUnpacker.cpp"
+#include "EventBuilder.cpp"
 
 void Usage(char *progname){
 	std::cout << "Usage: AIDASort -c configFile -o OutputFile" << std::endl;
