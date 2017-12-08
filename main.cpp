@@ -2,10 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
-//ROOT Libraries
-#include "TFile.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -15,11 +11,17 @@
 #include<thread>
 #include<mutex>
 
-#define DEB
+//ROOT Libraries
+#include "TFile.h"
+
+
+
 
 #include "DataReader.cpp"
 #include "DataUnpacker.cpp"
+#include "DataItems.cpp"
 #include "EventBuilder.cpp"
+#include "Calibrator.cpp"
 
 void Usage(char *progname){
 	std::cout << "Usage: AIDASort -c configFile -o OutputFile" << std::endl;

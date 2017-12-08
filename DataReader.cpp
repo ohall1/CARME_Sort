@@ -1,5 +1,4 @@
 #include "DataReader.hpp"
-#include "DataUnpacker.hpp"
 
 DataReader::DataReader(){};
 
@@ -191,7 +190,7 @@ void DataReader::AddToBuffer(std::pair<unsigned int, unsigned int> dataIn){
 	#endif
 
 	//Wait if list size exceeds maximum buffer
-	while(dataWordBuffer.size()>=20){
+	while(dataWordBuffer.size()>=10000){
 		bufferFullCheck = true;
 		#ifdef DEB_THREAD
 			std::cout << "Buffer list is fulle. BufferFulCheck = " << bufferFullCheck <<std::endl;

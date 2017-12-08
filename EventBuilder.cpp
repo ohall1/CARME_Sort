@@ -1,5 +1,4 @@
 #include "EventBuilder.hpp"
-#include "DataUnpacker.hpp"
 
 EventBuilder::EventBuilder(){
 	//Ensure event is initialised when class is first created
@@ -12,8 +11,9 @@ void EventBuilder::InitialiseEvent(){
 
 	//Reset the ADC item counter to 0
 	for(int i = 0; i < 24; i++){
-		for(int j = 0, j < 4; j++){
+		for(int j = 0; j < 4; j++){
 			adcItemCounts[i][j] = 0;
+			adcLastTimestamp[i][j] = 0;
 		}
 	}
 
@@ -29,10 +29,19 @@ void EventBuilder::CorrectMultiplexer(ADCDataItem & adcItem){
 
 	//Check the FEE and channel of the DSSD and determine how many events from that ADC have been recoreded.
 	//Correct the timestamp for the multiplexing
-	itemADC = ((adcItem.GetChannelID() - 1) / 16);
-	timestampCorrection = (200 * adcItemCounts[adcItem.GetFEE64ID()-1][itemADC]);
-	adcItem.SetTimestamp((adcItem.GetTimestamp()-timestampCorrection));
- 	adcItemCounts[adcItem.GetFEE64ID()-1][itemADC] += 1;
+	itemADC = ((adcItem.GetChannelID()) / 16);
+	itemFEE = adcItem.GetFEE64ID()-1;
+	itemTimestamp = adcItem.GetTimestamp();
+	if((itemTimestamp-adcLastTimestamp[itemFEE][itemADC] > 250 ) &&adcLastTimestamp[itemFEE][itemADC]!=0){
+		//If two seperate ADC events within same window reset the adc counter
+		adcItemCounts[itemFEE][itemADC]=0;
+	}
+	adcLastTimestamp[itemFEE][itemADC]=itemTimestamp;
+	normalItems++;
+	timestampCorrection = (200 * adcItemCounts[itemFEE][itemADC]);
+
+	adcItem.SetTimestamp((itemTimestamp-timestampCorrection));
+ 	adcItemCounts[itemFEE][itemADC]++;
  	return;
 
 }
@@ -50,23 +59,24 @@ void EventBuilder::CloseEvent(){
 	//Second check: If size of implant map > 0 - Define as implant event. Will currently veto all decays
 	//Thir check: If implant map == 0 and decay map > 0 define as decay event
 
-	#ifdef DEB_EVENTBUILDER
-		std::cout << "Difference between adjacent tiestamps greater than event window closing event" << std::endl;
-	#endif
+
 	if(decayEvents.size() > 800){
 		#ifdef DEB_EVENTBUILDER
-			std::cout << "Size of decay list > 800. Event being defined as a pulser event." <<std::endl;
+			std::cout << "End of event window." <<std::endl;
+			std::cout << "Size of decay list > 800. Event being defined as a pulser event. Multiplicity = " << decayEvents.size() << "\n" << std::endl;
 		#endif
 	}
-	else if(implantEvents.size() > 0){
+	else if(implantEvents.size() > 1){//Need at least two events to make a front back pair
 		#ifdef DEB_EVENTBUILDER
-			std::cout << "Size of implant events > 0. Event defined as implant event" <<std::endl;
-			std::cout << "Implant events being passed onto calibrator." <<std::endl;
+			std::cout << "End of event window." <<std::endl;
+			std::cout << "Size of implant events > 0. Event defined as implant event. Implant size = " << implantEvents.size() <<std::endl;
+			std::cout << "Implant events being passed onto calibrator.\n" <<std::endl;
 		#endif
 	}
-	else if(decayEvents.size() > 0){
+	else if(decayEvents.size() > 1){//Need at least two items to make a front back pair
 		#ifdef DEB_EVENTBUILDER
-			std::cout << "Event defined as a decay event. Decays passed onto calibrator." << std::endl;
+			std::cout << "End of event window." <<std::endl;
+			std::cout << "Event defined as a decay event. Decays passed onto calibrator. Decay size = " <<decayEvents.size() << "\n" << std::endl;
 		#endif
 	}
 
@@ -79,11 +89,12 @@ void EventBuilder::CloseEvent(){
 void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
 
 	//Check if event is still within event window
-	if((adcItem.GetTimestamp()-previousTimestamp)>=250 && previousTimestamp != 0){
+	if((adcItem.GetTimestamp()-previousTimestamp)>=220 && previousTimestamp != 0){
 		//Gap between items greater than multiplexed time period. New item is the start of a new event close the old event
 		CloseEvent();
 		InitialiseEvent();
 	}
+	previousTimestamp = adcItem.GetTimestamp();
 
 	CorrectMultiplexer(adcItem);
 
