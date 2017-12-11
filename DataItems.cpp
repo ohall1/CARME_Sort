@@ -78,3 +78,24 @@ unsigned long InformationDataItem::GetTimestamp(){
 unsigned long InformationDataItem::GetTimestampLSB(){
 	return timestampLSB;
 }
+
+short CalibratedADCDataItem::GetDSSD(){
+	return dssd;
+}
+short CalibratedADCDataItem::GetSide(){
+	return side;
+}
+short CalibratedADCDataItem::GetStrip(){
+	return strip;
+}
+int CalibratedADCDataItem::GetEnergy(){
+	return energy;
+}
+unsigned long CalibratedADCDataItem::GetTimestamp(){
+	return timestamp;
+}
+
+bool CalibratedADCDataItem::operator<(CalibratedADCDataItem &dataItem) {
+	return dssd < dataItem.GetDSSD() || (dssd == dataItem.GetDSSD() && side < dataItem.GetSide())
+			|| (dssd == dataItem.GetDSSD() && side == dataItem.GetSide() && strip < dataItem.GetStrip());
+}

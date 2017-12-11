@@ -6,6 +6,7 @@ void DataUnpacker::InitialiseDataUnpacker(){
 
 	//Initialise event builder class
 	EventBuilder myEventBuilder;
+	dataCheck = true;
 
 	//Initialise all the values that will be used in the unpacker process
 	for (int i = 0; i < 24; i++){
@@ -20,16 +21,16 @@ void DataUnpacker::InitialiseDataUnpacker(){
 }
 void DataUnpacker::BeginDataUnpacker(DataReader & dataReader){
 
-	for(;;){
+	while(dataCheck){
 	dataWords = dataReader.ReadFromBuffer();
-	//std::cout << "first word " << dataWords.first << " second word " << dataWords.second << std::endl;
-
-	UnpackWords(dataWords);
+	 dataCheck = UnpackWords(dataWords);
 
 	}
+
+	return;
 }
 
-void DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
+bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 	//Takes the data Words that have been read in and determines the data type and
 	//unpacks the data accordingly.
 	//Determines the data type of the two words. If 3 adc data and 2 is information data
@@ -45,7 +46,7 @@ void DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			myEventBuilder.AddADCEvent(adcDataItem);
 		}
 
-		
+		return true;
 	}
 	else if (dataType == 2){
 		//Information data item
@@ -115,6 +116,12 @@ void DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			} 
 
 		}
+		return true;
 
+	}
+	else if (dataType == 0){
+		//Have reached the end of the data file break out of the while loop
+		std::cout << "Reached the end of reading in the data" << std::endl;
+		return false;
 	}
 }

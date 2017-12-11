@@ -62,4 +62,26 @@ class InformationDataItem{
 
 		void SetTimestamp(unsigned long MSB);
 };
+
+class CalibratedADCDataItem{
+
+	private:
+		short dssd;
+		short side;
+		short strip;
+		short adcRange;
+		int energy;
+		unsigned long timestamp;
+
+	public:
+
+		short GetDSSD();
+		short GetSide();
+		short GetStrip();
+		int GetEnergy();
+		unsigned long GetTimestamp();
+
+		//Comparrison operators
+		bool operator<(CalibratedADCDataItem &dataItem);
+};
 #endif

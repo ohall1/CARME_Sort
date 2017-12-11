@@ -11,6 +11,8 @@ class Calibrator{
 
 		void InitialiseCalibrator();
 
-}
+		
+
+};
 
 #endif

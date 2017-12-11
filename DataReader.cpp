@@ -4,14 +4,15 @@ DataReader::DataReader(){};
 
 void DataReader::InitialiseReader(std::list <std::string> inputFileList){
 
+
 	//Check whether input file list is filled
 	if (inputFileList.size() <= 0){
 		std::cout << "No input files given, program ending" << std::endl;
+		dataFinishedCheck = true;
 		return;
 	}
 	else{
 		std::cout << "AIDASort sorting offline data" << std::endl;
-
 		SetInputFileList(inputFileList);
 	}
 }
@@ -77,6 +78,18 @@ void DataReader::BeginReader(){
 		//Should have reached end of file. Close input file.
 		CloseInputFile();
 
+	}
+
+	//All files should have been emptied and closed
+	std::cout << "All data files read in." <<std::endl;
+	dataFinishedCheck = true;
+
+	dataWords.first = 0x0000;
+	dataWords.second = 0x0000;
+	AddToBuffer(dataWords);
+
+	if(bufferEmptyCheck){
+		bufferEmpty.notify_all();
 	}
 }
 
@@ -242,6 +255,7 @@ std::pair<unsigned int, unsigned int> DataReader::ReadFromBuffer(){
 		#ifdef DEB_THREAD
 			std::cout << "Buffer list is empty, thread waiting. bufferEmptyCheck = " << bufferEmptyCheck << std::endl;
 		#endif
+
 		bufferEmpty.wait(popLock);
 	}
 

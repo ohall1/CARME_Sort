@@ -15,6 +15,8 @@ class DataUnpacker{
 
 		EventBuilder myEventBuilder;
 
+		bool dataCheck;
+
 		std::pair < unsigned int, unsigned int> dataWords;
 		unsigned int word0, word1;
 
@@ -34,7 +36,7 @@ class DataUnpacker{
 		bool correlationStatus;		//Bool to keep track of whether correlation scaler has been measured
 		bool timestampMSBStatus;	//Bool to keep track of whether timeStampMSB has been set
 
-		void UnpackWords(std::pair < unsigned int, unsigned int> wordsIn);
+		bool UnpackWords(std::pair < unsigned int, unsigned int> wordsIn);
 
 	public:
 		DataUnpacker();

@@ -33,6 +33,7 @@ class DataReader{
 
 		bool bufferFullCheck;
 		bool bufferEmptyCheck;
+		bool dataFinishedCheck = false;
 
 		//Paramerters describing size of data file
 		int fileSize = 0;
