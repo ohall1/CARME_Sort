@@ -135,19 +135,22 @@ int main(int argc, char **argv){
 	//Initialise data reader
 	DataReader myDataReader;
 	DataUnpacker myDataUnpacker;
+	Calibrator myCalibrator;
 
-	DataReader *DataReaderPoint;
-	DataUnpacker *DataUnpackerPoint;
+	DataReader *dataReaderPoint;
+	DataUnpacker *dataUnpackerPoint;
+	Calibrator *calibratorPoint;
 
-	DataReaderPoint = &myDataReader;
-	DataUnpackerPoint = &myDataUnpacker;
+	dataReaderPoint = &myDataReader;
+	dataUnpackerPoint = &myDataUnpacker;
 
 	myDataReader.InitialiseReader(AIDAFileList);
 	myDataUnpacker.InitialiseDataUnpacker();
+	myCalibrator.InitialiseCalibrator(aidaParameters);
 
-	std::thread th1 (&DataReader::BeginReader,DataReaderPoint);
+	std::thread th1 (&DataReader::BeginReader,dataReaderPoint);
 
-	std::thread th2 (&DataUnpacker::BeginDataUnpacker,DataUnpackerPoint,std::ref(myDataReader));
+	std::thread th2 (&DataUnpacker::BeginDataUnpacker,dataUnpackerPoint,std::ref(myDataReader));
 
 	th1.join();
 	th2.join();

@@ -75,13 +75,13 @@ class CalibratedADCDataItem{
 
 	public:
 
-		short GetDSSD();
-		short GetSide();
-		short GetStrip();
-		int GetEnergy();
-		unsigned long GetTimestamp();
+		short GetDSSD() const;
+		short GetSide() const;
+		short GetStrip() const;
+		int GetEnergy() const;
+		unsigned long GetTimestamp() const;
 
 		//Comparrison operators
-		bool operator<(CalibratedADCDataItem &dataItem);
+		bool operator<( const CalibratedADCDataItem &dataItem) const;
 };
 #endif

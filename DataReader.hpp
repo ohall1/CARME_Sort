@@ -36,11 +36,11 @@ class DataReader{
 		bool dataFinishedCheck = false;
 
 		//Paramerters describing size of data file
-		int fileSize = 0;
-		int numBlocks = 0;
-		int endLocation = 0;
-		int startLocation = 0;
-		int dataLength = 0;
+		long int fileSize = 0;
+		long int numBlocks = 0;
+		long int endLocation = 0;
+		long int startLocation = 0;
+		long int dataLength = 0;
 
 		unsigned int word0;
 		unsigned int word1;

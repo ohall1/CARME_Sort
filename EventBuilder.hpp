@@ -13,7 +13,9 @@ private:
 
 	//Lists to store data events
 	std::list <ADCDataItem> decayEvents;		//list to store decay events
-	std::list <ADCDataItem> implantEvents;	//list to store implant events
+	std::list <ADCDataItem> implantEvents;		//list to store implant events
+
+	std::list <std::list<ADCDataItem>> eventsList;			//List to store events to be calibrated
 
 	unsigned long normalItems = 0;
 	unsigned long lateItems = 0;
