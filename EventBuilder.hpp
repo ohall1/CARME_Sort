@@ -3,6 +3,8 @@
 #include "DataItems.hpp"
 
 #include <list>
+#include <mutex>
+#include <condition_variable>
 
 class EventBuilder{
 
@@ -29,12 +31,22 @@ private:
 	unsigned long previousTimestamp;		//Keeps track of previous timestamp in event
 	unsigned long correlationScalerOffset; 	//Offset applied to timestamp to sync with BRIKEN and BigRIPS timestamps
 
+	//Mutex locks and variables used for protecting the buffer
+	std::mutex bufProtect;
+
+	std::condition_variable bufferFull;
+	std::condition_variable bufferEmpty;
+
+	bool bufferFullCheck;
+	bool bufferEmptyCheck;
+
 	void AddDecayItem(ADCDataItem decayItem);					//Add decay item to decay list
 	void AddImplantItem(ADCDataItem implantItem);				//Add implant item to implant list
 	void InitialiseEvent();										//Initialise event, clears lists and resets counters
 	void CorrectMultiplexer(ADCDataItem & adcItem);				//Corrects the timestamp for the multiplexing of ADC data
 	void ApplyCorrelationScalerOffset(ADCDataItem & adcItem);	//Applys the correlation scaler offset to the timestamp
 	void CloseEvent();											//End of current event, send decay/implant events to be processed
+	void AddEventToBuffer(std::list <ADCDataItem> closedEvent);
 
 public:
 	EventBuilder();
@@ -44,6 +56,8 @@ public:
 	void SetCorrelationScaler(unsigned long corrOffset);		//Sets the correlation scaler offset
 
 	unsigned long GetCorrelationScalerOffset();					//Returns the correlation scaler offset
+
+	std::list<ADCDataItem> GetEventFromBuffer();							//Gets the event at the front of the buffer
 
 };
 #endif

@@ -14,7 +14,7 @@
 //ROOT Libraries
 #include "TFile.h"
 
-
+#define DEB_CALIBRATOR
 
 
 #include "DataReader.cpp"
@@ -139,21 +139,25 @@ int main(int argc, char **argv){
 
 	DataReader *dataReaderPoint;
 	DataUnpacker *dataUnpackerPoint;
+	EventBuilder *eventBuilderPoint;
 	Calibrator *calibratorPoint;
 
 	dataReaderPoint = &myDataReader;
 	dataUnpackerPoint = &myDataUnpacker;
+	calibratorPoint = &myCalibrator;
 
 	myDataReader.InitialiseReader(AIDAFileList);
-	myDataUnpacker.InitialiseDataUnpacker();
-	myCalibrator.InitialiseCalibrator(aidaParameters);
+	eventBuilderPoint = myDataUnpacker.InitialiseDataUnpacker();
+	myCalibrator.InitialiseCalibrator(aidaParameters, eventBuilderPoint);
 
 	std::thread th1 (&DataReader::BeginReader,dataReaderPoint);
 
 	std::thread th2 (&DataUnpacker::BeginDataUnpacker,dataUnpackerPoint,std::ref(myDataReader));
 
+	std::thread th3 (&Calibrator::ProcessEvents,calibratorPoint);
+
 	th1.join();
 	th2.join();
-
+	th3.join();
 
 }

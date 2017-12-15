@@ -2,11 +2,13 @@
 
 DataUnpacker::DataUnpacker(){};
 
-void DataUnpacker::InitialiseDataUnpacker(){
+EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 
 	//Initialise event builder class
-	EventBuilder myEventBuilder;
 	dataCheck = true;
+	EventBuilder *myEventBuilderPoint;
+	myEventBuilderPoint = &myEventBuilder;
+
 
 	//Initialise all the values that will be used in the unpacker process
 	for (int i = 0; i < 24; i++){
@@ -18,6 +20,8 @@ void DataUnpacker::InitialiseDataUnpacker(){
 	}
 
 	correlationScalerStatus = false;
+
+	return myEventBuilderPoint;
 }
 void DataUnpacker::BeginDataUnpacker(DataReader & dataReader){
 

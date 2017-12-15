@@ -29,6 +29,9 @@ unsigned int ADCDataItem::GetADCRange(){
 unsigned int ADCDataItem::GetChannelID(){
 	return channelID;
 }
+unsigned int ADCDataItem::GetADCData(){
+	return adcData;
+}
 
 InformationDataItem::InformationDataItem(std::pair < unsigned int, unsigned int> inData){
 
@@ -79,6 +82,40 @@ unsigned long InformationDataItem::GetTimestampLSB(){
 	return timestampLSB;
 }
 
+CalibratedADCDataItem::CalibratedADCDataItem(){};
+CalibratedADCDataItem::CalibratedADCDataItem(ADCDataItem &adcDataItem){
+	energy = adcDataItem.GetADCData();
+	timestamp = adcDataItem.GetTimestamp();
+	#ifdef DEB_CALIBRATOR
+		//std::cout << "\nadcDataItem " << adcDataItem.GetADCData() << " - Non-calibratedItem " << energy << std::endl;
+		//std::cout << "\nadcDataItem " << adcDataItem.GetTimestamp() << " - Non-calibratedItem " << timestamp << std::endl;
+		#endif
+};
+
+void CalibratedADCDataItem::SetDSSD(short dssdIn){
+	dssd = dssdIn;
+	return;
+}
+void CalibratedADCDataItem::SetSide(short sideIn){
+	side = sideIn;
+	return;
+}
+void CalibratedADCDataItem::SetStrip(short stripIn){
+	dssd = stripIn;
+	return;
+}
+void CalibratedADCDataItem::SetADCRange(short adcRangeIn){
+	adcRange = adcRangeIn;
+	return;
+}
+void CalibratedADCDataItem::SetEnergy(int EnergyIn){
+	energy = EnergyIn;
+	return;
+}
+void CalibratedADCDataItem::SetTimestamp(unsigned long timestampIn){
+	timestamp = timestampIn;
+	return;
+}
 short CalibratedADCDataItem::GetDSSD() const{
 	return dssd;
 }
@@ -87,6 +124,9 @@ short CalibratedADCDataItem::GetSide() const{
 }
 short CalibratedADCDataItem::GetStrip() const{
 	return strip;
+}
+short CalibratedADCDataItem::GetADCRange() const{
+	return adcRange;
 }
 int CalibratedADCDataItem::GetEnergy() const{
 	return energy;

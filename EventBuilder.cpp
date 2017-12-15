@@ -72,12 +72,14 @@ void EventBuilder::CloseEvent(){
 			std::cout << "Size of implant events > 0. Event defined as implant event. Implant size = " << implantEvents.size() <<std::endl;
 			std::cout << "Implant events being passed onto calibrator.\n" <<std::endl;
 		#endif
+		AddEventToBuffer(implantEvents);
 	}
 	else if(decayEvents.size() > 1){//Need at least two items to make a front back pair
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Event defined as a decay event. Decays passed onto calibrator. Decay size = " <<decayEvents.size() << "\n" << std::endl;
 		#endif
+		AddEventToBuffer(decayEvents);
 	}
 
 
@@ -119,4 +121,95 @@ void EventBuilder::SetCorrelationScaler(unsigned long corrOffset){
 }
 unsigned long EventBuilder::GetCorrelationScalerOffset(){
 	return correlationScalerOffset;
+}
+void EventBuilder::AddEventToBuffer(std::list<ADCDataItem> closedEvent){
+	//Aqquire bufProtect mutex lock to modify list
+	std::unique_lock<std::mutex> addLock(bufProtect);
+	#ifdef DEB_EVENTBUILDER_THREAD
+		std::cout << "Mutex lock acquire for AddToBuffer" << std::endl;
+	#endif
+
+	//Wait if list size exceeds maximum buffer
+	while(eventsList.size()>=100){
+		bufferFullCheck = true;
+		#ifdef DEBv_THREAD
+			std::cout << "Buffer list is fulle. BufferFulCheck = " << bufferFullCheck <<std::endl;
+		#endif
+		bufferFull.wait(addLock);
+	}
+
+	eventsList.push_back(closedEvent);
+	#ifdef DEB_EVENTBUILDER_THREAD
+		std::cout << "Data pair added to back of buffer." << std::endl;
+	#endif
+
+
+	#ifdef DEB_EVENTBUILDER_THREAD
+		std::cout << "Checking bufferEmptyCheck = " << bufferEmptyCheck << std::endl;
+	#endif
+
+	if(bufferEmptyCheck){
+		bufferEmptyCheck = false;
+		#ifdef DEB_EVENTBUILDER_THREAD
+			std::cout << "Buffer no longer empty. Notifying ReadFromBufferThread" << std::endl;
+		#endif
+		bufferEmpty.notify_all();
+	}
+
+	//Unlock the bufProtect mutex lock
+	addLock.unlock();
+	#ifdef DEB_EVENTBUILDER_THREAD
+		std::cout << "Mutext lock on AddToBuffer released" <<std::endl;
+		std::cout << " " << std::endl;
+	#endif
+
+	return;
+}
+std::list<ADCDataItem> EventBuilder::GetEventFromBuffer(){
+	std::list<ADCDataItem> bufferOut;
+
+	//Aqquire bufProtect mutex lock to modify list
+	std::unique_lock<std::mutex> popLock(bufProtect);
+	#ifdef DEB_EVENTBUILDER_THREAD
+		std::cout << "Mutex lock acquired for ReadFromBuffer" <<std::endl;
+	#endif
+
+	//Check if the list size is empty
+	while(eventsList.size()<1){
+		bufferEmptyCheck = true;
+		#ifdef DEB_EVENTBUILDER_THREAD
+			std::cout << "Buffer list is empty, thread waiting. bufferEmptyCheck = " << bufferEmptyCheck << std::endl;
+		#endif
+
+		bufferEmpty.wait(popLock);
+	}
+
+	bufferOut = eventsList.front();
+	eventsList.pop_front();
+
+	#ifdef DEB_EVENTBUILDER_THREAD
+		std::cout << "Current list buffer size " << eventsList.size() << " items." << std::endl;
+	#endif
+
+
+	#ifdef DEB_EVENTBUILDER_THREAD
+		std::cout << "Checking bufferFullCheck = " << bufferFullCheck << std::endl;
+	#endif
+
+	if(bufferFullCheck){
+		bufferFullCheck=false;
+		#ifdef DEB_EVENTBUILDER_THREAD
+			std::cout << "Buffer no longer full. Notifying AddToBufferThread" << std::endl;
+		#endif
+		bufferFull.notify_all();
+	}
+
+	popLock.unlock();
+
+	#ifdef DEB_EVENTBUILDER_THREAD
+		std::cout << "Releasing mutex lock on ReadFromBuffer" << std::endl;
+		std::cout << " " <<std::endl;
+	#endif
+
+	return bufferOut;
 }

@@ -29,6 +29,7 @@ class ADCDataItem{
 		int GetFEE64ID();
 		unsigned int GetChannelID();
 		unsigned int GetADCRange();
+		unsigned int GetADCData();
 };
 
 class InformationDataItem{
@@ -75,9 +76,21 @@ class CalibratedADCDataItem{
 
 	public:
 
+		CalibratedADCDataItem();
+		~CalibratedADCDataItem(){};
+		CalibratedADCDataItem(ADCDataItem &adcDataItem);
+
+		void SetDSSD(short dssdIn);
+		void SetSide(short sideIn);
+		void SetStrip(short stripIn);
+		void SetADCRange(short adcRangeIn);
+		void SetEnergy(int energyIn);
+		void SetTimestamp(unsigned long timestampIn);
+
 		short GetDSSD() const;
 		short GetSide() const;
 		short GetStrip() const;
+		short GetADCRange() const;
 		int GetEnergy() const;
 		unsigned long GetTimestamp() const;
 

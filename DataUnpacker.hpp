@@ -14,7 +14,6 @@ class DataUnpacker{
 	private:
 
 		EventBuilder myEventBuilder;
-
 		bool dataCheck;
 
 		std::pair < unsigned int, unsigned int> dataWords;
@@ -42,7 +41,7 @@ class DataUnpacker{
 		DataUnpacker();
 		~DataUnpacker(){};
 		void BeginDataUnpacker(DataReader & dataReader);
-		void InitialiseDataUnpacker();
+		EventBuilder * InitialiseDataUnpacker();
 
 };
 
