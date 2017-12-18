@@ -30,6 +30,10 @@ private:
 	unsigned long timestampCorrection;		//Value to subtract from the timestamp to correct for multiplexing
 	unsigned long previousTimestamp;		//Keeps track of previous timestamp in event
 	unsigned long correlationScalerOffset; 	//Offset applied to timestamp to sync with BRIKEN and BigRIPS timestamps
+	unsigned long totalDecayWords;
+	unsigned long totalImplantWords;
+	unsigned long totalPulserWords;
+	unsigned int pulserEvents;
 
 	//Mutex locks and variables used for protecting the buffer
 	std::mutex bufProtect;
@@ -54,6 +58,11 @@ public:
 
 	void AddADCEvent(ADCDataItem & adcItem);					//Determine whether decay/implant and add correct timestamp
 	void SetCorrelationScaler(unsigned long corrOffset);		//Sets the correlation scaler offset
+
+	unsigned long GetDecayWords();								//Gets the total amount of decay words
+	unsigned long GetImplantWords();
+	unsigned long GetPulserWords();
+	unsigned int GetPulserEvents();
 
 	unsigned long GetCorrelationScalerOffset();					//Returns the correlation scaler offset
 

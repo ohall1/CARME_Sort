@@ -5,4 +5,4 @@ AIDAFile	/mnt/c/Users/oscar/Documents/Code/data/R6_237
 #AIDAList R 6 17 20
 
 #AIDA Parameters file
-AIDAConfig values.dat
+AIDAConfig /mnt/c/Users/oscar/Documents/Code/AIDASort/ExampleParameters.csv

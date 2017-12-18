@@ -30,12 +30,20 @@ class DataUnpacker{
 		unsigned int resumeItemCounter[24];
 		unsigned int sync100Counter[24];
 
+		unsigned int totalPauseItem;
+		unsigned int totalResumeItem;
+		unsigned int totalSYNC100;
+		unsigned long totalDataWords;
+		unsigned long totalImplantWords;
+		unsigned long totalDecayWords;
 		unsigned int dataType;		//Data type of data words
 
 		bool correlationStatus;		//Bool to keep track of whether correlation scaler has been measured
 		bool timestampMSBStatus;	//Bool to keep track of whether timeStampMSB has been set
 
 		bool UnpackWords(std::pair < unsigned int, unsigned int> wordsIn);
+
+		void CloseUnpacker();
 
 	public:
 		DataUnpacker();

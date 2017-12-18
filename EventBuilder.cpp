@@ -21,6 +21,11 @@ void EventBuilder::InitialiseEvent(){
 	decayEvents.clear();
 	implantEvents.clear();
 
+	totalPulserWords = 0;
+	totalDecayWords = 0;
+	totalImplantWords = 0;
+	pulserEvents = 0;
+
 	//Reset previousTimestamp to zero
 	previousTimestamp = 0;
 	return;
@@ -65,6 +70,8 @@ void EventBuilder::CloseEvent(){
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Size of decay list > 800. Event being defined as a pulser event. Multiplicity = " << decayEvents.size() << "\n" << std::endl;
 		#endif
+		pulserEvents++;
+		totalPulserWords += decayEvents.size();
 	}
 	else if(implantEvents.size() > 1){//Need at least two events to make a front back pair
 		#ifdef DEB_EVENTBUILDER
@@ -82,6 +89,8 @@ void EventBuilder::CloseEvent(){
 		AddEventToBuffer(decayEvents);
 	}
 
+	totalDecayWords +=decayEvents.size();
+	totalImplantWords+=implantEvents.size();
 
 	//Once lists have been copied and are being processed initialise a new event
 
@@ -212,4 +221,16 @@ std::list<ADCDataItem> EventBuilder::GetEventFromBuffer(){
 	#endif
 
 	return bufferOut;
+}
+unsigned long EventBuilder::GetDecayWords(){
+	return totalDecayWords;
+}
+unsigned long EventBuilder::GetImplantWords(){
+	return totalImplantWords;
+}
+unsigned int EventBuilder::GetPulserEvents(){
+	return pulserEvents;
+}
+unsigned long EventBuilder::GetPulserWords(){
+	return totalPulserWords;
 }

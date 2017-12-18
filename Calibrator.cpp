@@ -1,7 +1,4 @@
 #include "Calibrator.hpp"
-
-Calibrator::Calibrator(){};
-
 void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *eventBuilderPointIn){
 
 	ReadInVariables(variablesFile);
@@ -67,12 +64,12 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 				iss >> value;
 				feePolarityMap[fee64-1] = value;
 			}
-			else{
-				std::cout << "Problem in reading in variables file. Unrecognised parameter type." <<std::endl;
+			/*else{
+				std::cout << "Problem in reading in variables file. Unrecognised parameter type - " << dummyVar.data() << "."<<std::endl;
 				std::cout << "Program exiting" << std::endl;
 				exit(-1);
 				return;
-			}
+			}*/
 
 		}
 	}

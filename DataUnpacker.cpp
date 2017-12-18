@@ -18,6 +18,12 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 		correlationScalerData0[i] = 0;
 		correlationScalerData1[i] = 0;
 	}
+	totalSYNC100 = 0;
+	totalPauseItem = 0;
+	totalResumeItem = 0;
+	totalDataWords = 0;
+	totalDecayWords = 0;
+	totalImplantWords = 0;
 
 	correlationScalerStatus = false;
 
@@ -30,6 +36,8 @@ void DataUnpacker::BeginDataUnpacker(DataReader & dataReader){
 	 dataCheck = UnpackWords(dataWords);
 
 	}
+
+	CloseUnpacker();
 
 	return;
 }
@@ -48,6 +56,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 
 			//Send ADC item to the event builder to be built
 			myEventBuilder.AddADCEvent(adcDataItem);
+			totalDataWords++;
 		}
 
 		return true;
@@ -128,4 +137,26 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		std::cout << "Reached the end of reading in the data" << std::endl;
 		return false;
 	}
+}
+void DataUnpacker::CloseUnpacker(){
+	//Reached the end of reading in data.
+	//Calculate the total of data items
+	for(int i = 0; i < 24; i++){
+		totalPauseItem += pauseItemCounter[i];
+		totalResumeItem += resumeItemCounter[i];
+		totalSYNC100 += sync100Counter[i];
+	}
+
+	totalDataWords = myEventBuilder.GetImplantWords() + myEventBuilder.GetDecayWords();
+
+	std::cout << "Unpacker stage finished." << std::endl;
+	std::cout << "Total number of data words unpacked - " << totalDataWords <<std::endl;
+	std::cout << "Total number of implant words unpacked - " << myEventBuilder.GetImplantWords() <<std::endl;
+	std::cout << "Total number of decay words unpacked - " << myEventBuilder.GetDecayWords() << std::endl;
+	std::cout << "Of which " << myEventBuilder.GetPulserWords() << " were pulser items in " 
+			  << myEventBuilder.GetPulserEvents() << " pulser events." <<std::endl;
+	std::cout << "With " << totalDecayWords-myEventBuilder.GetPulserWords() << " words being identified as low energy events." << std::endl;
+	std::cout << "Total number of PUASE statements - " << totalPauseItem << std::endl;
+	std::cout << "Total number of RESUME statements - " << totalResumeItem << std::endl;
+	std::cout << "Total number of SYNC100 pulses - " << totalSYNC100 << std::endl;
 }

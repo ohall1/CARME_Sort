@@ -14,8 +14,6 @@
 //ROOT Libraries
 #include "TFile.h"
 
-#define DEB_CALIBRATOR
-
 
 #include "DataReader.cpp"
 #include "DataUnpacker.cpp"
