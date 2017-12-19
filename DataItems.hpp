@@ -97,4 +97,34 @@ class CalibratedADCDataItem{
 		//Comparrison operators
 		bool operator<( const CalibratedADCDataItem &dataItem) const;
 };
+
+class Cluster{
+
+	private:
+
+		short dssd;
+		short side;
+		short stripMin;
+		short stripMax;
+		short adcRange;
+		int Energy;
+		unsigned long timestampMin;
+		unsigned long timestampMax;
+		short clusterMultiplicity;
+		short eventMultiplicity;
+
+	public:
+
+		Cluster();
+		Cluster(CalibratedADCDataItem & dataItem);
+		~Cluster(){};
+
+		void AddEventToCluster(CalibratedADCDataItem & dataItem);
+		short GetDSSD() const;
+		short GetSide() const;
+		short GetStrip() const;
+		int GetEnergy() const;
+		unsigned long GetTimestampDifference(unsigned long timestampIn) const;
+
+};
 #endif

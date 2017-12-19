@@ -1,4 +1,5 @@
 #include "Calibrator.hpp"
+Calibrator::Calibrator(){};
 void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *eventBuilderPointIn){
 
 	ReadInVariables(variablesFile);
@@ -79,12 +80,16 @@ void Calibrator::ProcessEvents(){
 	while(true){
 		//Read in events list from buffer
 		eventList = myEventBuilder->GetEventFromBuffer();
+		myClustering.InitialiseClustering();
 		while(eventList.size()>0){
 
 			CalibratedADCDataItem calibratedItem(eventList.front());
 			CalibrateData(eventList.front(),calibratedItem);
 			eventList.pop_front();
-		} 
+			std::cout << calibratedItem.GetEnergy()<<std::endl;
+			myClustering.AddEventToMap(calibratedItem);
+		}
+		myClustering.ProcessMaps();
 	}
 
 	return;

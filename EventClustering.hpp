@@ -11,13 +11,14 @@ class EventClustering{
 		std::multimap<CalibratedADCDataItem,int>::iterator clusterIt; 	//Iterator to loop through the maps to be clustered
 
 	public:
-		EventClustering(){};
+		EventClustering();
 		~EventClustering(){};
 		void ProcessDecays();										//Process the decay map
 		void ProcessImplants();										//Process the implant map
 
+		void InitialiseClustering();
 		void AddEventToMap(CalibratedADCDataItem & dataItem);		//Add event to the applicable map to the event type
-		void PrcessMap();											//Reached the end of the event process the maps
+		void ProcessMaps();											//Reached the end of the event process the maps
 
 };
 

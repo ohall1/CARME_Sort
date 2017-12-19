@@ -20,6 +20,7 @@
 #include "DataItems.cpp"
 #include "EventBuilder.cpp"
 #include "Calibrator.cpp"
+#include "EventClustering.cpp"
 
 void Usage(char *progname){
 	std::cout << "Usage: AIDASort -c configFile -o OutputFile" << std::endl;

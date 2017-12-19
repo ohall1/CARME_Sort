@@ -139,3 +139,99 @@ bool CalibratedADCDataItem::operator<(const CalibratedADCDataItem &dataItem) con
 	return dssd < dataItem.GetDSSD() || (dssd == dataItem.GetDSSD() && side < dataItem.GetSide())
 			|| (dssd == dataItem.GetDSSD() && side == dataItem.GetSide() && strip < dataItem.GetStrip());
 }
+Cluster::Cluster(){
+	dssd = -5;
+	side = -5;
+	stripMin = -5;
+	stripMax = -5;
+	Energy = -5;
+	timestampMin = 0;
+	timestampMax = 0;
+	clusterMultiplicity = -5;
+	eventMultiplicity = -5;
+};
+Cluster::Cluster(CalibratedADCDataItem &dataItem){
+	dssd = dataItem.GetDSSD();
+	side = dataItem.GetSide();
+	stripMin = dataItem.GetStrip();
+	stripMax = stripMin;
+	Energy = dataItem.GetEnergy();
+	adcRange = dataItem.GetADCRange();
+	timestampMin = dataItem.GetTimestamp();
+	timestampMax = timestampMin;
+	clusterMultiplicity = 1;
+	eventMultiplicity = 0;
+}
+void Cluster::AddEventToCluster(CalibratedADCDataItem & dataItem){
+
+	unsigned long timestampIn = dataItem.GetTimestamp();
+	short stripIn = dataItem.GetStrip();
+
+	if(timestampIn < timestampMin){
+		timestampMin = timestampIn;
+	}
+	else if(timestampIn > timestampMax && timestampMax != -5){
+		timestampMax = timestampIn;
+	}
+	else if(timestampIn == timestampMin || timestampIn == timestampMax){}
+	else if(timestampMin == -5 || timestampMax == -5){
+		timestampMin = timestampIn;
+		timestampMax = timestampIn;
+	}
+
+	if(stripIn < stripMin){
+		stripMin = stripIn;
+	}
+	else if (stripIn > stripMax && stripMax != -5){
+		stripMax = stripIn;
+	}
+	else if (stripMin == -5 || stripMax == -5){
+		stripMin = stripIn;
+		stripMax = stripIn;
+	}
+	if(clusterMultiplicity == -5){
+
+		dssd = dataItem.GetDSSD();
+		side = dataItem.GetSide();
+		Energy = 0;
+		adcRange = dataItem.GetADCRange();
+		clusterMultiplicity = 0;
+	}
+	Energy += dataItem.GetEnergy();
+	clusterMultiplicity++;
+}
+short Cluster::GetDSSD() const{
+	return dssd;
+}
+short Cluster::GetSide() const{
+	return side;
+}
+short Cluster::GetStrip() const{
+	return stripMax;
+}
+int Cluster::GetEnergy() const{
+	return Energy;
+}
+unsigned long Cluster::GetTimestampDifference(unsigned long timestampIn) const{
+	unsigned long timestampDifMin;
+	unsigned long timestampDifMax;
+
+	timestampDifMin = abs(timestampMin-timestampIn);
+	timestampDifMax = abs(timestampMax-timestampIn);
+
+	if(timestampDifMin < timestampDifMax){
+		return timestampDifMin;
+	}
+	else if(timestampDifMax < timestampDifMin){
+		return timestampDifMax;
+	}
+	else if( timestampDifMin == timestampDifMax && timestampMin != -5){
+		return timestampDifMin;
+	}
+	else if( timestampMin == -5){
+		return 0;
+	}
+	else{
+		return 0;
+	}
+}

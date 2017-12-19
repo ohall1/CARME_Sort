@@ -14,10 +14,11 @@ class Calibrator{
 
 	private:
 
+		EventClustering myClustering;
+
 		std::string variablesFile;
 		EventBuilder *myEventBuilder;
 		std::list <ADCDataItem> eventList;		//Event list read in from buffer
-		EventClustering myClustering;			//Clustering class for the program
 
 		const unsigned int feeChannelOrder[64]={62, 63, 59, 60, 61, 56, 57, 58, 52, 53, 54, 55, 49, 50, 51, 45,
 												46, 47, 48, 42, 43, 44, 38, 39, 40, 41, 35, 36, 37, 31, 32, 33,
@@ -42,7 +43,7 @@ class Calibrator{
 		unsigned int GetOrder(int channelID) const;
 
 	public:
-		Calibrator(){};
+		Calibrator();
 		~Calibrator(){};
 
 		void InitialiseCalibrator(std::string valirablesFile, EventBuilder * eventBuilderPointIn);
