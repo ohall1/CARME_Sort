@@ -101,7 +101,7 @@ void CalibratedADCDataItem::SetSide(short sideIn){
 	return;
 }
 void CalibratedADCDataItem::SetStrip(short stripIn){
-	dssd = stripIn;
+	strip = stripIn;
 	return;
 }
 void CalibratedADCDataItem::SetADCRange(short adcRangeIn){
@@ -162,7 +162,7 @@ Cluster::Cluster(CalibratedADCDataItem &dataItem){
 	clusterMultiplicity = 1;
 	eventMultiplicity = 0;
 }
-void Cluster::AddEventToCluster(CalibratedADCDataItem & dataItem){
+void Cluster::AddEventToCluster(CalibratedADCDataItem dataItem){
 
 	unsigned long timestampIn = dataItem.GetTimestamp();
 	short stripIn = dataItem.GetStrip();

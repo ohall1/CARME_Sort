@@ -86,7 +86,6 @@ void Calibrator::ProcessEvents(){
 			CalibratedADCDataItem calibratedItem(eventList.front());
 			CalibrateData(eventList.front(),calibratedItem);
 			eventList.pop_front();
-			std::cout << calibratedItem.GetEnergy()<<std::endl;
 			myClustering.AddEventToMap(calibratedItem);
 		}
 		myClustering.ProcessMaps();
@@ -100,6 +99,7 @@ unsigned int Calibrator::GetOrder(int channelID) const{
 void Calibrator::CalibrateData(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
 
 	SetGeometry(adcDataItemIn, calibratedItemOut);
+	CalibrateEnergy(adcDataItemIn, calibratedItemOut);
 
 }
 void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
@@ -114,7 +114,7 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 	else{
 		std::cout << "Warning! FEE mapped to strip map improperly check variables file." << std::endl;
 	}
-	calibratedItemOut.SetSide(feeStripMap[adcDataItemIn.GetFEE64ID()-1]);
+	calibratedItemOut.SetSide(feeSideMap[adcDataItemIn.GetFEE64ID()-1]);
 }
 void Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
 
