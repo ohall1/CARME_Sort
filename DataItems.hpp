@@ -120,6 +120,7 @@ class Cluster{
 		~Cluster(){};
 
 		void AddEventToCluster(CalibratedADCDataItem dataItem);
+		void ResetCluster();
 		short GetDSSD() const;
 		short GetSide() const;
 		short GetStrip() const;

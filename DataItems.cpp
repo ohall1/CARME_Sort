@@ -200,6 +200,17 @@ void Cluster::AddEventToCluster(CalibratedADCDataItem dataItem){
 	Energy += dataItem.GetEnergy();
 	clusterMultiplicity++;
 }
+void Cluster::ResetCluster(){
+	dssd = -5;
+	side = -5;
+	stripMin = -5;
+	stripMax = -5;
+	Energy = -5;
+	timestampMin = 0;
+	timestampMax = 0;
+	clusterMultiplicity = -5;
+	eventMultiplicity = -5;
+}
 short Cluster::GetDSSD() const{
 	return dssd;
 }
