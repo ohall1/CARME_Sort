@@ -14,7 +14,7 @@
 //ROOT Libraries
 #include "TFile.h"
 
-#define CLUSTER_DECAY_DEB
+#define DEB_IMPLANT_STOPPING
 
 
 #include "DataReader.cpp"

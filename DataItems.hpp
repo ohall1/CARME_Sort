@@ -124,6 +124,7 @@ class Cluster{
 		short GetDSSD() const;
 		short GetSide() const;
 		short GetStrip() const;
+		short GetADCRange() const;
 		int GetEnergy() const;
 		unsigned long GetTimestampDifference(unsigned long timestampIn) const;
 

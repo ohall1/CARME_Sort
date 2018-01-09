@@ -82,12 +82,13 @@ void Calibrator::ProcessEvents(){
 		eventList = myEventBuilder->GetEventFromBuffer();
 		myClustering.InitialiseClustering();
 		while(eventList.size()>0){
-
+			//Reads event from the front of the event list and initialises it as a calibrated data item
 			CalibratedADCDataItem calibratedItem(eventList.front());
 			CalibrateData(eventList.front(),calibratedItem);
 			eventList.pop_front();
 			myClustering.AddEventToMap(calibratedItem);
 		}
+		//Once all items from an event has been read in and stored in maps. Begin clustering
 		myClustering.ProcessMaps();
 	}
 
@@ -104,6 +105,8 @@ void Calibrator::CalibrateData(ADCDataItem & adcDataItemIn, CalibratedADCDataIte
 }
 void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
 
+	//FEE channel does not map perfectly to strip channels. Instead need to set the geometry of each detector depending on which FEE position and which channel.
+
 	calibratedItemOut.SetDSSD(feeDSSDMap[adcDataItemIn.GetFEE64ID()-1]);
 	if(feeStripMap[adcDataItemIn.GetFEE64ID()-1] == 1){
 		calibratedItemOut.SetStrip(GetOrder(adcDataItemIn.GetChannelID()));
@@ -117,6 +120,8 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 	calibratedItemOut.SetSide(feeSideMap[adcDataItemIn.GetFEE64ID()-1]);
 }
 void Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
+
+	//Takes the raw ADC data and applies the offsets and the polarity of the signal.
 
 	if(adcDataItemIn.GetADCRange() == 0){
 		//Low energy event

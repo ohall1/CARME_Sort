@@ -220,6 +220,9 @@ short Cluster::GetSide() const{
 short Cluster::GetStrip() const{
 	return stripMax;
 }
+short Cluster::GetADCRange() const{
+	return adcRange;
+}
 int Cluster::GetEnergy() const{
 	return Energy;
 }
