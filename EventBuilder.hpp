@@ -1,6 +1,7 @@
 #ifndef _EVENTBUILDER_HPP
 #define _EVENTBUILDER_HPP
 #include "DataItems.hpp"
+#include "Common.hpp"
 
 #include <list>
 #include <mutex>
@@ -22,8 +23,8 @@ private:
 	unsigned long normalItems = 0;
 	unsigned long lateItems = 0;
 
-	unsigned short adcItemCounts[24][4];	//2D array: 1st dimension is FEE, 2nd dimension is ADC
-	unsigned long adcLastTimestamp[24][4]; //2D array: 1st dimension is FEE, 2nd dimension is ADCs
+	unsigned short adcItemCounts[Common::noFEE64][4];	//2D array: 1st dimension is FEE, 2nd dimension is ADC
+	unsigned long adcLastTimestamp[Common::noFEE64][4]; //2D array: 1st dimension is FEE, 2nd dimension is ADCs
 	unsigned short itemADC;					//Which ADC was the item recorded in
 	unsigned short itemFEE;					//Which FEE does the item belong to
 	unsigned long itemTimestamp; 			//What is the timestamp of the item

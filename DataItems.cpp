@@ -108,7 +108,7 @@ void CalibratedADCDataItem::SetADCRange(short adcRangeIn){
 	adcRange = adcRangeIn;
 	return;
 }
-void CalibratedADCDataItem::SetEnergy(int EnergyIn){
+void CalibratedADCDataItem::SetEnergy(double EnergyIn){
 	energy = EnergyIn;
 	return;
 }
@@ -128,7 +128,7 @@ short CalibratedADCDataItem::GetStrip() const{
 short CalibratedADCDataItem::GetADCRange() const{
 	return adcRange;
 }
-int CalibratedADCDataItem::GetEnergy() const{
+double CalibratedADCDataItem::GetEnergy() const{
 	return energy;
 }
 unsigned long CalibratedADCDataItem::GetTimestamp() const{
@@ -167,17 +167,18 @@ void Cluster::AddEventToCluster(CalibratedADCDataItem dataItem){
 	unsigned long timestampIn = dataItem.GetTimestamp();
 	short stripIn = dataItem.GetStrip();
 
-	if(timestampIn < timestampMin){
+
+	if(timestampMin == 0 || timestampMax == 0){
+		timestampMin = timestampIn;
+		timestampMax = timestampIn;
+	}
+	else if(timestampIn < timestampMin){
 		timestampMin = timestampIn;
 	}
-	else if(timestampIn > timestampMax && timestampMax != -5){
+	else if(timestampIn > timestampMax){
 		timestampMax = timestampIn;
 	}
 	else if(timestampIn == timestampMin || timestampIn == timestampMax){}
-	else if(timestampMin == -5 || timestampMax == -5){
-		timestampMin = timestampIn;
-		timestampMax = timestampIn;
-	}
 
 	if(stripIn < stripMin){
 		stripMin = stripIn;
@@ -223,8 +224,14 @@ short Cluster::GetStrip() const{
 short Cluster::GetADCRange() const{
 	return adcRange;
 }
-int Cluster::GetEnergy() const{
+double Cluster::GetEnergy() const{
 	return Energy;
+}
+unsigned long Cluster::GetTimestampMin() const{
+	return timestampMin;
+}
+unsigned long Cluster::GetTimestampMax() const{
+	return timestampMax;
 }
 unsigned long Cluster::GetTimestampDifference(unsigned long timestampIn) const{
 	unsigned long timestampDifMin;
@@ -239,10 +246,10 @@ unsigned long Cluster::GetTimestampDifference(unsigned long timestampIn) const{
 	else if(timestampDifMax < timestampDifMin){
 		return timestampDifMax;
 	}
-	else if( timestampDifMin == timestampDifMax && timestampMin != -5){
+	else if( timestampDifMin == timestampDifMax && timestampMin != 0){
 		return timestampDifMin;
 	}
-	else if( timestampMin == -5){
+	else if( timestampMin == 0){
 		return 0;
 	}
 	else{

@@ -11,7 +11,7 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 
 
 	//Initialise all the values that will be used in the unpacker process
-	for (int i = 0; i < 24; i++){
+	for (int i = 0; i < Common::noFEE64; i++){
 		pauseItemCounter[i] = 0;
 		resumeItemCounter[i] = 0;
 		sync100Counter[i] = 0;
@@ -141,7 +141,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 void DataUnpacker::CloseUnpacker(){
 	//Reached the end of reading in data.
 	//Calculate the total of data items
-	for(int i = 0; i < 24; i++){
+	for(int i = 0; i < Common::noFEE64; i++){
 		totalPauseItem += pauseItemCounter[i];
 		totalResumeItem += resumeItemCounter[i];
 		totalSYNC100 += sync100Counter[i];

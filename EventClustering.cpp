@@ -6,7 +6,7 @@ void EventClustering::InitialiseClustering(){
 	decayMap.clear();
 	implantMap.clear();
 
-	for (int i = 0; i < 6; i++){
+	for (int i = 0; i < Common::noDSSD; i++){
 		for (int j = 0; j <2; j++){
 			dssdDecayLists[i][j].clear();
 			dssdImplantLists[i][j].clear();
@@ -33,28 +33,39 @@ void EventClustering::ProcessMaps(){
 		//Do not expect many clusters here but just in case
 		ClusterMap(implantMap);
 		implantStoppingLayer = ImplantStoppingLayer();
+		//PairClusters(implantStoppingLayer, implantEnergyDifference, dssdImplantLists);
 
 		#ifdef DEB_IMPLANT_STOPPING
-		if(implantStoppingLayer > -1){
-			positiveStopping ++;
-		}
-		else if(implantStoppingLayer == -1){
-			negativeStopping++;
-		}
+			if(implantStoppingLayer > -1){
+				positiveStopping ++;
+			}
+			else if(implantStoppingLayer == -1){
+				negativeStopping++;
+			}	
 
-		std::cout << "Ne event" << std::endl;
+			std::cout << "Ne event" << std::endl;
+			int Etest = 0;
+			int Etest2 = 0;	
 
-		for(int i = 0; i<6 ;i++){
-			std::cout << "Detector " << i << " Side0 Mult: " << dssdImplantLists[i][0].size() << " Side1 Mult: " << dssdImplantLists[i][1].size() << std::endl;
-		}
-		std::cout << "Implant stopped in layer: " << implantStoppingLayer << " Percentage of implant events with positive stopping layer: " <<
-					(double)positiveStopping / ((double)negativeStopping + (double)positiveStopping) <<std::endl;
+			for(int i = 0; i<Common::noDSSD ;i++){	
+
+				Etest = dssdImplantLists[i][0].front().GetEnergy();
+				Etest2 = dssdImplantLists[i][1].front().GetEnergy();
+				std::cout << "Detector " << i << " Side0 Mult: " << dssdImplantLists[i][0].size() << " " << Etest
+						  << " Side1 Mult: " << dssdImplantLists[i][1].size() << " " << Etest2 << std::endl;
+			}
+
+			std::cout << "Implant stopped in layer: " << implantStoppingLayer << " Percentage of implant events with positive stopping layer: " <<
+						(double)positiveStopping / ((double)negativeStopping + (double)positiveStopping) <<std::endl;
 		#endif
 
 	}
 	if(decayMap.size() > 0){
 		//If there are events in the decay map begin clustering.
 		ClusterMap(decayMap);
+		for(int dssd = 0; dssd<Common::noDSSD;dssd++){
+			PairClusters(dssd, decayEnergyDifference,dssdDecayLists);
+		}
 	}
 }
 void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & eventMap){
@@ -161,7 +172,7 @@ void EventClustering::CloseCluster(Cluster & eventCluster){
 	switch(eventCluster.GetADCRange()){
 		case 0:
 			//decay event cluster, store with decay clusters
-			dssdDecayLists[eventCluster.GetDSSD()-1][eventCluster.GetSide()].push_back(eventCluster);
+			dssdDecayLists[eventCluster.GetDSSD()][eventCluster.GetSide()].push_back(eventCluster);
 			eventCluster.ResetCluster();
 
 			#ifdef CLUSTER_DECAY_DEB
@@ -172,7 +183,7 @@ void EventClustering::CloseCluster(Cluster & eventCluster){
 
 		case 1:
 			//implant event cluster, store with implant clusters
-			dssdImplantLists[eventCluster.GetDSSD()-1][eventCluster.GetSide()].push_back(eventCluster);
+			dssdImplantLists[eventCluster.GetDSSD()][eventCluster.GetSide()].push_back(eventCluster);
 			eventCluster.ResetCluster();
 
 			#ifdef CLUSTER_DECAY_DEB
@@ -195,7 +206,7 @@ short EventClustering::ImplantStoppingLayer(){
 	//3. A cluster in at least one side of all upstream detectors
 	//Loop through the implant lists to find the layer where these conditions are satisfied
 
-	for (int stoppingLayer = 0; stoppingLayer < 6; stoppingLayer++){
+	for (int stoppingLayer = 0; stoppingLayer < Common::noDSSD; stoppingLayer++){
 		//Loops through detectors.
 		bool downstreamEvents = false;
 		bool upstreamEvents = true;
@@ -204,7 +215,7 @@ short EventClustering::ImplantStoppingLayer(){
 			//If an implant cluster in both sides
 			if(stoppingLayer < 5){
 				//Current layer is not the last layer
-				for(int downstreamDet = stoppingLayer + 1; downstreamDet < 6; downstreamDet++){
+				for(int downstreamDet = stoppingLayer + 1; downstreamDet < Common::noDSSD; downstreamDet++){
 					if(dssdImplantLists[downstreamDet][0].size() > 0 || dssdImplantLists[downstreamDet][1].size() > 0){
 						//Downstream dssd contain implant events. Not stopping layer
 						downstreamEvents = true;
@@ -229,4 +240,59 @@ short EventClustering::ImplantStoppingLayer(){
 	}
 	//Has looped through all clusters in the event and doesnt have a positive implant
 	return -1;
+}
+void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<Cluster> clusterLists[][2]){
+	//Loop through the clusters in the event map and pair front and back clusters based on equal energy and time difference
+
+	if(clusterLists[dssd][0].size() > 0 && clusterLists[dssd][1].size() > 0){
+		//If clusters in both sides of the detector loop through and pair them
+
+		for(clusterSide0It = clusterLists[dssd][0].begin(); clusterSide0It != clusterLists[dssd][0].end();clusterSide0It++){
+			//Loops through side 0 cluster list
+			#ifdef DEB_CLUSTER_PAIR
+				std::cout << "New cluster" << std::endl;
+				bool clusterPairT = false;
+				bool clusterPairE = false;
+				clusterTotal++;
+			#endif
+			for(clusterSide1It = clusterLists[dssd][1].begin();clusterSide1It != clusterLists[dssd][1].end();clusterSide1It++){
+				//Loops through side 1 cluster list
+				if(abs(clusterSide0It->GetEnergy()-clusterSide1It->GetEnergy()) <= equalEnergyRange){
+					//Is the difference between the two clusters less than the equal energy cuts
+
+					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<250) ||
+						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<250) ){
+					#ifdef DEB_CLUSTER_PAIR
+						if(!clusterPairT){
+							pairedTime++;
+							clusterPairT = true;
+							if(clusterPairE){
+								pairedEnergy--;
+							}
+							clusterPairE=true;
+							std::cout << "Pecentage of clusters being paired " << (double)pairedTime/(double)clusterTotal << std::endl;
+						}
+						//std::cout << "Cluster paired" << " time difference " << abs(clusterSide0It->GetTimestampMin()-clusterSide1It->GetTimestampMin()) <<  std::endl;
+					#endif
+					}
+					#ifdef DEB_CLUSTER_PAIR
+					else{
+						if(!clusterPairE){
+							pairedEnergy++;
+							clusterPairE = true;
+						}
+						//std::cout << "Cluster not paired" << " time difference " << abs(clusterSide0It->GetTimestampMin()-clusterSide1It->GetTimestampMin()) << std::endl;
+						std::cout << "Percentage of paired event making E " << (double)pairedEnergy/clusterTotal<< std::endl;
+					}
+					#endif
+				}
+				#ifdef DEB_CLUSTER_PAIR
+				else{
+					std::cout << "Cluster not paired" << " energy difference " << abs(clusterSide0It->GetEnergy()-clusterSide1It->GetEnergy()) << std::endl;
+				}
+				#endif
+
+			}//Side 1 cluster list close
+		}//Side 0 cluster list close
+	}//If cluster list size >0 close
 }

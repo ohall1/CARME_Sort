@@ -1,5 +1,6 @@
 #ifndef _DataReader_HPP
 #define _DataReader_HPP
+#include "Common.hpp"
 
 #include <fstream>
 #include <list>

@@ -1,6 +1,8 @@
 #ifndef _DATAITEMS_HPP
 #define _DATAITEMS_HPP
 
+#include "Common.hpp"
+
 class ADCDataItem{
 
 	private:
@@ -71,7 +73,7 @@ class CalibratedADCDataItem{
 		short side;
 		short strip;
 		short adcRange;
-		int energy;
+		double energy;
 		unsigned long timestamp;
 
 	public:
@@ -84,14 +86,14 @@ class CalibratedADCDataItem{
 		void SetSide(short sideIn);
 		void SetStrip(short stripIn);
 		void SetADCRange(short adcRangeIn);
-		void SetEnergy(int energyIn);
+		void SetEnergy(double energyIn);
 		void SetTimestamp(unsigned long timestampIn);
 
 		short GetDSSD() const;
 		short GetSide() const;
 		short GetStrip() const;
 		short GetADCRange() const;
-		int GetEnergy() const;
+		double GetEnergy() const;
 		unsigned long GetTimestamp() const;
 
 		//Comparrison operators
@@ -107,7 +109,7 @@ class Cluster{
 		short stripMin;
 		short stripMax;
 		short adcRange;
-		int Energy;
+		double Energy;
 		unsigned long timestampMin;
 		unsigned long timestampMax;
 		short clusterMultiplicity;
@@ -125,7 +127,9 @@ class Cluster{
 		short GetSide() const;
 		short GetStrip() const;
 		short GetADCRange() const;
-		int GetEnergy() const;
+		double GetEnergy() const;
+		unsigned long GetTimestampMin() const;
+		unsigned long GetTimestampMax() const;
 		unsigned long GetTimestampDifference(unsigned long timestampIn) const;
 
 };

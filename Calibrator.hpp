@@ -9,6 +9,7 @@
 #include "DataItems.hpp"
 #include "EventBuilder.hpp"
 #include "EventClustering.hpp"
+#include "Common.hpp"
 
 class Calibrator{
 
@@ -25,16 +26,16 @@ class Calibrator{
 			    								34, 28, 29, 30, 24, 25, 26, 27, 21, 22, 23, 17, 18, 19, 20, 14,
 												15, 16, 10, 11, 12,  7,  3,  0,  8,  4,  1,  9,  5,  2, 13,  6};
 
-		const int adcZero = 23768; 				//2**15
+		const double adcZero = 32768; 				//2**15
 
-		int feeDSSDMap[24];						//Which DSSD does a FEE correspond to
-		int feeSideMap[24];						//What side of the detector is a FEE64
-		int feeStripMap[24]; 					//How does the FEE Map to the DSSD (1:Left/Bottom or 2: Right/Top)
-		int feePolarityMap[24];					//What is the polarity of the FEE;
-		int channelADCOffsets[24][64];			//Whats the channel ADC offset
+		int feeDSSDMap[Common::noFEE64];						//Which DSSD does a FEE correspond to
+		int feeSideMap[Common::noFEE64];						//What side of the detector is a FEE64
+		int feeStripMap[Common::noFEE64]; 					//How does the FEE Map to the DSSD (1:Left/Bottom or 2: Right/Top)
+		int feePolarityMap[Common::noFEE64];					//What is the polarity of the FEE;
+		int channelADCOffsets[Common::noFEE64][Common::noChannel];			//Whats the channel ADC offset
 
-		int adcLowEnergyGain[24][64];			//Gain applied to low energy channels. Defaults to 0.7keV/ch
-		int adcHighEnergyGain[24][64];			//Gain applied to high energy channels. Defaults to 0.7MeV/ch
+		double adcLowEnergyGain[Common::noFEE64][Common::noChannel];			//Gain applied to low energy channels. Defaults to 0.7keV/ch
+		double adcHighEnergyGain[Common::noFEE64][Common::noChannel];			//Gain applied to high energy channels. Defaults to 0.7MeV/ch
 
 		void ReadInVariables(std::string variablesFile);
 		void SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut);

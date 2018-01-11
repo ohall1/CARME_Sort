@@ -3,6 +3,7 @@
 #include "DataReader.hpp"
 #include "DataItems.hpp"
 #include "EventBuilder.hpp"
+#include "Common.hpp"
 
 #include <utility>
 #include <thread>
@@ -19,16 +20,16 @@ class DataUnpacker{
 		std::pair < unsigned int, unsigned int> dataWords;
 		unsigned int word0, word1;
 
-		unsigned long correlationScalerData0[24];		//Used in calculating the correlation scaler
-		unsigned long correlationScalerData1[24];		//
+		unsigned long correlationScalerData0[Common::noFEE64];		//Used in calculating the correlation scaler
+		unsigned long correlationScalerData1[Common::noFEE64];		//
 		unsigned long correlationScaler;				//Correlation scaler between AIDA and other DAQs
 		long int correlationScalerOffset;				//Offset between correlation scaler and AIDA timstamp
 		bool correlationScalerStatus;					//Status off correlation scaler
 		unsigned long timestampMSB;						//Most significant bit of the timestamp
 
-		unsigned int pauseItemCounter[24];
-		unsigned int resumeItemCounter[24];
-		unsigned int sync100Counter[24];
+		unsigned int pauseItemCounter[Common::noFEE64];
+		unsigned int resumeItemCounter[Common::noFEE64];
+		unsigned int sync100Counter[Common::noFEE64];
 
 		unsigned int totalPauseItem;
 		unsigned int totalResumeItem;

@@ -5,8 +5,8 @@ void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *e
 	ReadInVariables(variablesFile);
 	myEventBuilder = eventBuilderPointIn;
 
-	for(int i =0; i < 24 ; i++){
-		for(int j =0; j<64; j++){
+	for(int i =0; i < Common::noFEE64 ; i++){
+		for(int j =0; j<Common::noChannel; j++){
 			adcLowEnergyGain[i][j] = 0.7;	//keV/ch
 			adcHighEnergyGain[i][j] = 0.7; 	//MeV/ch
 		}
@@ -107,7 +107,7 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 
 	//FEE channel does not map perfectly to strip channels. Instead need to set the geometry of each detector depending on which FEE position and which channel.
 
-	calibratedItemOut.SetDSSD(feeDSSDMap[adcDataItemIn.GetFEE64ID()-1]);
+	calibratedItemOut.SetDSSD(feeDSSDMap[adcDataItemIn.GetFEE64ID()-1]-1);
 	if(feeStripMap[adcDataItemIn.GetFEE64ID()-1] == 1){
 		calibratedItemOut.SetStrip(GetOrder(adcDataItemIn.GetChannelID()));
 			}
@@ -126,13 +126,13 @@ void Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataI
 	if(adcDataItemIn.GetADCRange() == 0){
 		//Low energy event
 		calibratedItemOut.SetADCRange(0);
-		calibratedItemOut.SetEnergy((adcDataItemIn.GetADCData()-adcZero - channelADCOffsets[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()])
-				*feePolarityMap[adcDataItemIn.GetFEE64ID()-1]*adcLowEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
+		calibratedItemOut.SetEnergy(((double)adcDataItemIn.GetADCData()-adcZero - (double)channelADCOffsets[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()])
+				*(double)feePolarityMap[adcDataItemIn.GetFEE64ID()-1]*adcLowEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
 	}
 	else if(adcDataItemIn.GetADCRange() == 1){
 		//High energy event
 		calibratedItemOut.SetADCRange(1);
-		calibratedItemOut.SetEnergy((	adcDataItemIn.GetADCData()-adcZero)*feePolarityMap[adcDataItemIn.GetFEE64ID()-1]
+		calibratedItemOut.SetEnergy((	(double)adcDataItemIn.GetADCData()-adcZero)*(double)feePolarityMap[adcDataItemIn.GetFEE64ID()-1]
 										*adcHighEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
 	}
 }
