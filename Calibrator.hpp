@@ -34,13 +34,15 @@ class Calibrator{
 		int feePolarityMap[Common::noFEE64];					//What is the polarity of the FEE;
 		int channelADCOffsets[Common::noFEE64][Common::noChannel];			//Whats the channel ADC offset
 
+		bool eventBuilderStatus;											//Bool to keep track of the status of the unpacker
+
 		double adcLowEnergyGain[Common::noFEE64][Common::noChannel];			//Gain applied to low energy channels. Defaults to 0.7keV/ch
 		double adcHighEnergyGain[Common::noFEE64][Common::noChannel];			//Gain applied to high energy channels. Defaults to 0.7MeV/ch
 
 		void ReadInVariables(std::string variablesFile);
 		void SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut);
 		void CalibrateData(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut);
-		void CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut);
+		bool CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut);
 		unsigned int GetOrder(int channelID) const;
 
 	public:
@@ -49,6 +51,7 @@ class Calibrator{
 
 		void InitialiseCalibrator(std::string valirablesFile, EventBuilder * eventBuilderPointIn);
 		void ProcessEvents();
+		void CloseCalibrator();
 
 		
 

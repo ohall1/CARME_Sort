@@ -59,6 +59,7 @@ public:
 
 	void AddADCEvent(ADCDataItem & adcItem);					//Determine whether decay/implant and add correct timestamp
 	void SetCorrelationScaler(unsigned long corrOffset);		//Sets the correlation scaler offset
+	void UnpackerFinished();
 
 	unsigned long GetDecayWords();								//Gets the total amount of decay words
 	unsigned long GetImplantWords();

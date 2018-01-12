@@ -234,3 +234,11 @@ unsigned int EventBuilder::GetPulserEvents(){
 unsigned long EventBuilder::GetPulserWords(){
 	return totalPulserWords;
 }
+void EventBuilder::UnpackerFinished(){
+
+	decayEvents.clear();
+	decayItem.SetADCRange(2);
+	decayEvents.push_back(decayItem);
+	AddEventToBuffer(decayEvents);
+	return;
+}

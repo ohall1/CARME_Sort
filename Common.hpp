@@ -7,5 +7,8 @@ namespace Common{
 	const int noFEE64 = 24;
 	const int noDSSD = 6;
 	const int noChannel = 64;
+
+	//Pointer used by ROOT to access output file
+	TFile * fOutRoot;
 }
 #endif

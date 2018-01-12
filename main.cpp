@@ -14,7 +14,7 @@
 //ROOT Libraries
 #include "TFile.h"
 
-#define DEB_CLUSTER_PAIR
+#define HISTOGRAMMING
 
 #include "Common.hpp"
 #include "DataReader.cpp"
@@ -127,8 +127,8 @@ int main(int argc, char **argv){
 
 	}// End of reading in configuration file
 
-	TFile * fOutRoot = new TFile(userOutFile.data(),"RECREATE");
-	if (!fOutRoot){
+	Common::fOutRoot = new TFile(userOutFile.data(),"RECREATE");
+	if (!Common::fOutRoot){
 		std::cout << "Problem opening output file check input for file name" << std::endl;
 		return -1;
 	}
@@ -160,5 +160,9 @@ int main(int argc, char **argv){
 	th1.join();
 	th2.join();
 	th3.join();
+
+	myDataUnpacker.CloseUnpacker();
+	myCalibrator.CloseCalibrator();
+	Common::fOutRoot->Close();
 
 }

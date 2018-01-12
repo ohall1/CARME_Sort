@@ -4,6 +4,7 @@ void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *e
 
 	ReadInVariables(variablesFile);
 	myEventBuilder = eventBuilderPointIn;
+	eventBuilderStatus = true;
 
 	for(int i =0; i < Common::noFEE64 ; i++){
 		for(int j =0; j<Common::noChannel; j++){
@@ -77,7 +78,7 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 }
 void Calibrator::ProcessEvents(){
 	
-	while(true){
+	while(eventBuilderStatus){
 		//Read in events list from buffer
 		eventList = myEventBuilder->GetEventFromBuffer();
 		myClustering.InitialiseClustering();
@@ -89,7 +90,13 @@ void Calibrator::ProcessEvents(){
 			myClustering.AddEventToMap(calibratedItem);
 		}
 		//Once all items from an event has been read in and stored in maps. Begin clustering
-		myClustering.ProcessMaps();
+		if(eventBuilderStatus){
+			myClustering.ProcessMaps();
+		}
+		else{
+			std::cout << "I'm out " << std::endl;
+		}
+
 	}
 
 	return;
@@ -100,7 +107,7 @@ unsigned int Calibrator::GetOrder(int channelID) const{
 void Calibrator::CalibrateData(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
 
 	SetGeometry(adcDataItemIn, calibratedItemOut);
-	CalibrateEnergy(adcDataItemIn, calibratedItemOut);
+	eventBuilderStatus = CalibrateEnergy(adcDataItemIn, calibratedItemOut);
 
 }
 void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
@@ -119,7 +126,7 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 	}
 	calibratedItemOut.SetSide(feeSideMap[adcDataItemIn.GetFEE64ID()-1]);
 }
-void Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
+bool Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
 
 	//Takes the raw ADC data and applies the offsets and the polarity of the signal.
 
@@ -128,11 +135,26 @@ void Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataI
 		calibratedItemOut.SetADCRange(0);
 		calibratedItemOut.SetEnergy(((double)adcDataItemIn.GetADCData()-adcZero - (double)channelADCOffsets[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()])
 				*(double)feePolarityMap[adcDataItemIn.GetFEE64ID()-1]*adcLowEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
+
+		/*std::cout << "ADCData: " << adcDataItemIn.GetADCData() << std::endl;
+		std::cout << "FEE: " << adcDataItemIn.GetFEE64ID() << " Channel: " << adcDataItemIn.GetChannelID() << " Offset: " << channelADCOffsets[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()] << std::endl;
+		std::cout << "Calibrated Energy: " << calibratedItemOut.GetEnergy() <<std::endl;	*/	
+
+		return true;
 	}
 	else if(adcDataItemIn.GetADCRange() == 1){
 		//High energy event
 		calibratedItemOut.SetADCRange(1);
 		calibratedItemOut.SetEnergy((	(double)adcDataItemIn.GetADCData()-adcZero)*(double)feePolarityMap[adcDataItemIn.GetFEE64ID()-1]
 										*adcHighEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
+
+		return true;
 	}
+	else if(adcDataItemIn.GetADCRange() == 2){
+		return false;
+	}
+}
+void Calibrator::CloseCalibrator(){
+	std::cout << "Calibrator thread finished" <<std::endl;
+	myClustering.CloseClustering();
 }

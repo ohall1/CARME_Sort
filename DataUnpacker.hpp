@@ -5,8 +5,15 @@
 #include "EventBuilder.hpp"
 #include "Common.hpp"
 
+//C++ INCLUDES
 #include <utility>
 #include <thread>
+
+//ROOT INCLUDES
+#include "TFile.h"
+#include "TTree.h"
+#include "TH1D.h"
+#include "TH2D.h"
 
 //class DataReader; //Let DataUnpacker know about the existence of DataReader so it can access it
 
@@ -42,16 +49,27 @@ class DataUnpacker{
 		bool correlationStatus;		//Bool to keep track of whether correlation scaler has been measured
 		bool timestampMSBStatus;	//Bool to keep track of whether timeStampMSB has been set
 
+		//Histrogramming declarations
+		#ifdef HISTOGRAMMING
+
+		TH1D * timestampADCData;
+		TH1D * timestampLowEnergy;
+		TH1D * timestampHighEnergy;
+		TH2D * lowEnergyChannelADC;
+		TH2D * highEnergyChannelADC;
+
+		#endif
+
 		bool UnpackWords(std::pair < unsigned int, unsigned int> wordsIn);
 
-		void CloseUnpacker();
+		
 
 	public:
 		DataUnpacker();
 		~DataUnpacker(){};
 		void BeginDataUnpacker(DataReader & dataReader);
 		EventBuilder * InitialiseDataUnpacker();
-
+		void CloseUnpacker();
 };
 
 

@@ -25,6 +25,7 @@ class ADCDataItem{
 		void BuildTimestamp(unsigned long MSB);
 
 		void SetTimestamp(unsigned long newTimestamp);
+		void SetADCRange(short range);
 
 
 		unsigned long GetTimestamp();

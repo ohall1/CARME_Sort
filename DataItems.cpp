@@ -32,6 +32,9 @@ unsigned int ADCDataItem::GetChannelID(){
 unsigned int ADCDataItem::GetADCData(){
 	return adcData;
 }
+void ADCDataItem::SetADCRange(short range){
+	adcRange = range;
+}
 
 InformationDataItem::InformationDataItem(std::pair < unsigned int, unsigned int> inData){
 

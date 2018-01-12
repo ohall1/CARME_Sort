@@ -1,6 +1,19 @@
 #include "EventClustering.hpp"
 
-EventClustering::EventClustering(){};
+EventClustering::EventClustering(){
+
+	#ifdef HISTOGRAMMING
+		for (int i = 0; i < Common::noDSSD;i++){
+			char hname[50];
+			sprintf(hname,"lowEnergyExEyDSSD%d",i);
+			lowEnergyExEy[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+
+			hname[0] = '\0';
+			sprintf(hname,"highEnergyExEyDSSD%d",i);
+			highEnergyExEy[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+		}
+	#endif
+};
 
 void EventClustering::InitialiseClustering(){
 	decayMap.clear();
@@ -33,7 +46,7 @@ void EventClustering::ProcessMaps(){
 		//Do not expect many clusters here but just in case
 		ClusterMap(implantMap);
 		implantStoppingLayer = ImplantStoppingLayer();
-		//PairClusters(implantStoppingLayer, implantEnergyDifference, dssdImplantLists);
+		PairClusters(implantStoppingLayer, implantEnergyDifference, dssdImplantLists);
 
 		#ifdef DEB_IMPLANT_STOPPING
 			if(implantStoppingLayer > -1){
@@ -63,7 +76,7 @@ void EventClustering::ProcessMaps(){
 	if(decayMap.size() > 0){
 		//If there are events in the decay map begin clustering.
 		ClusterMap(decayMap);
-		for(int dssd = 0; dssd<Common::noDSSD;dssd++){
+		for(int dssd = 0; dssd < Common::noDSSD; dssd++){
 			PairClusters(dssd, decayEnergyDifference,dssdDecayLists);
 		}
 	}
@@ -87,7 +100,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 				//If the current event is within 2us of events within the cluster proceed
 
 				if(eventCluster.GetDSSD() == clusterIt->first.GetDSSD() && eventCluster.GetSide() == clusterIt->first.GetSide()){
-					//If decay event is on the DSSD and Side as the cluster add event to cluster 
+					//If decay event is on the same DSSD and Side as the cluster add event to cluster 
 
 					eventCluster.AddEventToCluster(clusterIt->first);
 
@@ -257,6 +270,14 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 			#endif
 			for(clusterSide1It = clusterLists[dssd][1].begin();clusterSide1It != clusterLists[dssd][1].end();clusterSide1It++){
 				//Loops through side 1 cluster list
+				#ifdef HISTOGRAMMING
+					if(clusterSide0It->GetADCRange() == 0){
+						lowEnergyExEy[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
+					}
+					else if(clusterSide0It->GetADCRange() == 1){
+						highEnergyExEy[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
+					}
+				#endif
 				if(abs(clusterSide0It->GetEnergy()-clusterSide1It->GetEnergy()) <= equalEnergyRange){
 					//Is the difference between the two clusters less than the equal energy cuts
 
@@ -295,4 +316,16 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 			}//Side 1 cluster list close
 		}//Side 0 cluster list close
 	}//If cluster list size >0 close
+}
+void EventClustering::CloseClustering(){
+	std::cout << "Clustering finished" <<std::endl;
+
+	#ifdef HISTOGRAMMING
+		for(int i =0; i<Common::noDSSD;i++){
+			lowEnergyExEy[i]->Write();
+		}
+		for(int i =0; i<Common::noDSSD;i++){
+			highEnergyExEy[i]->Write();
+		}
+	#endif
 }

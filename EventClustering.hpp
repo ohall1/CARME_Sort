@@ -1,9 +1,14 @@
 #ifndef _EVENTCLUSTERING_HPP
 #define _EVENTCLUSTERING_HPP
 
+#include "Common.hpp"
+
 #include <map>
 
-#include "Common.hpp"
+#include "TFile.h"
+#include "TTree.h"
+#include "TH1D.h"
+#include "TH2D.h"
 
 class EventClustering{
 	private:
@@ -32,6 +37,12 @@ class EventClustering{
 			int clusterTotal = 0;
 		#endif
 
+		//Variables used if HISTOGRAMMING is enabled
+		#ifdef HISTOGRAMMING
+			TH2D * lowEnergyExEy[Common::noDSSD];
+			TH2D * highEnergyExEy[Common::noDSSD];
+		#endif
+
 		void ClusterMap(std::multimap<CalibratedADCDataItem,int> & eventMap);	//Cluster the maps once ready
 		void CloseCluster(Cluster & decayCluster);								//Close, store and reset cluster when no more events to add
 		short ImplantStoppingLayer();											//Find the stopping layer for an implant event
@@ -44,6 +55,7 @@ class EventClustering{
 		void InitialiseClustering();
 		void AddEventToMap(CalibratedADCDataItem & dataItem);		//Add event to the applicable map to the event type
 		void ProcessMaps();											//Reached the end of the event process the maps
+		void CloseClustering();										//At end of program close clustering
 
 };
 

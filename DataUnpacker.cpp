@@ -27,6 +27,11 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 
 	correlationScalerStatus = false;
 
+	#ifdef HISTOGRAMMING
+		lowEnergyChannelADC = new TH2D("lowEnergyChannelADC","",1536,0,1536,5e2,0,65536);
+		highEnergyChannelADC = new TH2D("highEnergyChannelADC","",1536,0,1536,5e2,0,65536);
+	#endif
+
 	return myEventBuilderPoint;
 }
 void DataUnpacker::BeginDataUnpacker(DataReader & dataReader){
@@ -37,7 +42,7 @@ void DataUnpacker::BeginDataUnpacker(DataReader & dataReader){
 
 	}
 
-	CloseUnpacker();
+	myEventBuilder.UnpackerFinished();
 
 	return;
 }
@@ -53,6 +58,16 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 
 		if (timestampMSBStatus && correlationScalerStatus){//If timestampMSB has been obtained from inforation data set the timestamp of the adc data
 			adcDataItem.BuildTimestamp(timestampMSB);
+
+			//If histogramming turned on add event information to histograms
+			#ifdef HISTOGRAMMING
+				if(adcDataItem.GetADCRange() == 0){
+					lowEnergyChannelADC->Fill((((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID()),adcDataItem.GetADCData());
+				}
+				else if(adcDataItem.GetADCRange() == 1){
+					highEnergyChannelADC->Fill((((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID()),adcDataItem.GetADCData());
+				}
+			#endif
 
 			//Send ADC item to the event builder to be built
 			myEventBuilder.AddADCEvent(adcDataItem);
@@ -159,4 +174,9 @@ void DataUnpacker::CloseUnpacker(){
 	std::cout << "Total number of PUASE statements - " << totalPauseItem << std::endl;
 	std::cout << "Total number of RESUME statements - " << totalResumeItem << std::endl;
 	std::cout << "Total number of SYNC100 pulses - " << totalSYNC100 << std::endl;
+
+	#ifdef HISTOGRAMMING
+		lowEnergyChannelADC->Write();
+		highEnergyChannelADC->Write();
+	#endif
 }
