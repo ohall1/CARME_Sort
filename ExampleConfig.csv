@@ -1,4 +1,4 @@
-#Include Single AIDA Fil
+#Include Single AIDA File
 AIDAFile	/mnt/c/Users/oscar/Documents/Code/data/R6_237
 
 #Include multiple AIDA files format "String before run number" <run number> <sub-run start> <sub-run end>
