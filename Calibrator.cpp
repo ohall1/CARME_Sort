@@ -123,6 +123,8 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 	}
 	else{
 		std::cout << "Warning! FEE mapped to strip map improperly check variables file." << std::endl;
+		std::cout << "FEE " << adcDataItemIn.GetFEE64ID() << std::endl;
+		std::cout << "Channel " << adcDataItemIn.GetChannelID() << std::endl;
 	}
 	calibratedItemOut.SetSide(feeSideMap[adcDataItemIn.GetFEE64ID()-1]);
 }

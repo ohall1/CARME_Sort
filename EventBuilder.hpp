@@ -3,6 +3,8 @@
 #include "DataItems.hpp"
 #include "Common.hpp"
 
+#include "TH2D.h"
+
 #include <list>
 #include <mutex>
 #include <condition_variable>
@@ -35,6 +37,12 @@ private:
 	unsigned long totalImplantWords;
 	unsigned long totalPulserWords;
 	unsigned int pulserEvents;
+
+	#ifdef HISTOGRAMMING
+		TH2D * pulserVsChannel;								//Pulser signal across the channels
+
+		std::list <ADCDataItem>::iterator decayEventsIt;	//Iterator for the decay events list
+	#endif
 
 	//Mutex locks and variables used for protecting the buffer
 	std::mutex bufProtect;

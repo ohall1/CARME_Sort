@@ -170,7 +170,7 @@ void DataUnpacker::CloseUnpacker(){
 	std::cout << "Total number of decay words unpacked - " << myEventBuilder.GetDecayWords() << std::endl;
 	std::cout << "Of which " << myEventBuilder.GetPulserWords() << " were pulser items in " 
 			  << myEventBuilder.GetPulserEvents() << " pulser events." <<std::endl;
-	std::cout << "With " << totalDecayWords-myEventBuilder.GetPulserWords() << " words being identified as low energy events." << std::endl;
+	std::cout << "With " << myEventBuilder.GetDecayWords()-myEventBuilder.GetPulserWords() << " words being identified as low energy events." << std::endl;
 	std::cout << "Total number of PUASE statements - " << totalPauseItem << std::endl;
 	std::cout << "Total number of RESUME statements - " << totalResumeItem << std::endl;
 	std::cout << "Total number of SYNC100 pulses - " << totalSYNC100 << std::endl;

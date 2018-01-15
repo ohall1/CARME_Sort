@@ -4,6 +4,16 @@ EventBuilder::EventBuilder(){
 	//Ensure event is initialised when class is first created
 	InitialiseEvent();
 	correlationScalerOffset = 0;
+	
+	totalPulserWords = 0;
+	totalDecayWords = 0;
+	totalImplantWords = 0;
+	pulserEvents = 0;
+
+	#ifdef HISTOGRAMMING
+		pulserVsChannel = new TH2D("pulserVsChannel","",1536,0,1536,1e3,0,65536);
+		//((FEE*64)+ChannelID  (256*6)), ADCData (2**16))
+	#endif
 	return;
 };
 
@@ -20,11 +30,6 @@ void EventBuilder::InitialiseEvent(){
 	//Clear the event lists
 	decayEvents.clear();
 	implantEvents.clear();
-
-	totalPulserWords = 0;
-	totalDecayWords = 0;
-	totalImplantWords = 0;
-	pulserEvents = 0;
 
 	//Reset previousTimestamp to zero
 	previousTimestamp = 0;
@@ -72,6 +77,13 @@ void EventBuilder::CloseEvent(){
 		#endif
 		pulserEvents++;
 		totalPulserWords += decayEvents.size();
+
+		#ifdef HISTOGRAMMING
+			for(decayEventsIt = decayEvents.begin(); decayEventsIt != decayEvents.end(); decayEventsIt++){
+				//Allows all channels to be plotted on one histogram
+				pulserVsChannel->Fill(((decayEventsIt->GetFEE64ID()-1)*64)+decayEventsIt->GetChannelID(),decayEventsIt->GetADCData());
+			}
+		#endif
 	}
 	else if(implantEvents.size() > 1){//Need at least two events to make a front back pair
 		#ifdef DEB_EVENTBUILDER
@@ -240,5 +252,9 @@ void EventBuilder::UnpackerFinished(){
 	decayItem.SetADCRange(2);
 	decayEvents.push_back(decayItem);
 	AddEventToBuffer(decayEvents);
+
+	#ifdef HISTOGRAMMING
+		pulserVsChannel->Write();
+	#endif
 	return;
 }
