@@ -37,8 +37,13 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 void DataUnpacker::BeginDataUnpacker(DataReader & dataReader){
 
 	while(dataCheck){
-	dataWords = dataReader.ReadFromBuffer();
-	 dataCheck = UnpackWords(dataWords);
+		dataWordsList.clear();
+	dataWordsList = dataReader.ReadFromBuffer();
+
+	for(dataWordsListIt = dataWordsList.begin(); dataWordsListIt != dataWordsList.end(); dataWordsListIt++){
+
+	 	dataCheck = UnpackWords(*dataWordsListIt);
+	}
 
 	}
 
@@ -167,10 +172,12 @@ void DataUnpacker::CloseUnpacker(){
 	std::cout << "Unpacker stage finished." << std::endl;
 	std::cout << "Total number of data words unpacked - " << totalDataWords <<std::endl;
 	std::cout << "Total number of implant words unpacked - " << myEventBuilder.GetImplantWords() <<std::endl;
+	std::cout << "Which were built into " << myEventBuilder.GetImplantEvents() << " events." << std::endl;
 	std::cout << "Total number of decay words unpacked - " << myEventBuilder.GetDecayWords() << std::endl;
 	std::cout << "Of which " << myEventBuilder.GetPulserWords() << " were pulser items in " 
 			  << myEventBuilder.GetPulserEvents() << " pulser events." <<std::endl;
-	std::cout << "With " << myEventBuilder.GetDecayWords()-myEventBuilder.GetPulserWords() << " words being identified as low energy events." << std::endl;
+	std::cout << "With " << myEventBuilder.GetDecayWords()-myEventBuilder.GetPulserWords() << " words being identified as part low energy events." << std::endl;
+	std::cout << "Which were built into " << myEventBuilder.GetDecayEvents() << " events." << std::endl;
 	std::cout << "Total number of PUASE statements - " << totalPauseItem << std::endl;
 	std::cout << "Total number of RESUME statements - " << totalResumeItem << std::endl;
 	std::cout << "Total number of SYNC100 pulses - " << totalSYNC100 << std::endl;
@@ -179,4 +186,6 @@ void DataUnpacker::CloseUnpacker(){
 		lowEnergyChannelADC->Write();
 		highEnergyChannelADC->Write();
 	#endif
+
+	return;
 }

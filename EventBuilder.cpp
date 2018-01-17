@@ -13,6 +13,9 @@ EventBuilder::EventBuilder(){
 	#ifdef HISTOGRAMMING
 		pulserVsChannel = new TH2D("pulserVsChannel","",1536,0,1536,1e3,0,65536);
 		//((FEE*64)+ChannelID  (256*6)), ADCData (2**16))
+
+		lowEnergyMultiplicity = new TH1I("lowEnergyMultiplicity","",1536,0,1536);
+		highEnergyMultiplicity = new TH1I("highEnergyMultiplicity","",1536,0,1536);
 	#endif
 	return;
 };
@@ -70,7 +73,7 @@ void EventBuilder::CloseEvent(){
 	//Thir check: If implant map == 0 and decay map > 0 define as decay event
 
 
-	if(decayEvents.size() > 800){
+	if(decayEvents.size() > 1460){
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Size of decay list > 800. Event being defined as a pulser event. Multiplicity = " << decayEvents.size() << "\n" << std::endl;
@@ -83,6 +86,7 @@ void EventBuilder::CloseEvent(){
 				//Allows all channels to be plotted on one histogram
 				pulserVsChannel->Fill(((decayEventsIt->GetFEE64ID()-1)*64)+decayEventsIt->GetChannelID(),decayEventsIt->GetADCData());
 			}
+			lowEnergyMultiplicity->Fill(decayEvents.size());
 		#endif
 	}
 	else if(implantEvents.size() > 1){//Need at least two events to make a front back pair
@@ -91,14 +95,22 @@ void EventBuilder::CloseEvent(){
 			std::cout << "Size of implant events > 0. Event defined as implant event. Implant size = " << implantEvents.size() <<std::endl;
 			std::cout << "Implant events being passed onto calibrator.\n" <<std::endl;
 		#endif
+		#ifdef HISTOGRAMMING
+			highEnergyMultiplicity->Fill(implantEvents.size());
+		#endif
 		AddEventToBuffer(implantEvents);
+		totalImplantEvents++;
 	}
 	else if(decayEvents.size() > 1){//Need at least two items to make a front back pair
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Event defined as a decay event. Decays passed onto calibrator. Decay size = " <<decayEvents.size() << "\n" << std::endl;
 		#endif
+		#ifdef HISTOGRAMMING
+			//lowEnergyMultiplicity->Fill(decayEvents.size());
+		#endif
 		AddEventToBuffer(decayEvents);
+		totalDecayEvents++;
 	}
 
 	totalDecayWords +=decayEvents.size();
@@ -246,6 +258,12 @@ unsigned int EventBuilder::GetPulserEvents(){
 unsigned long EventBuilder::GetPulserWords(){
 	return totalPulserWords;
 }
+unsigned int EventBuilder::GetDecayEvents(){
+	return totalDecayEvents;
+}
+unsigned int EventBuilder::GetImplantEvents(){
+	return totalImplantEvents;
+}
 void EventBuilder::UnpackerFinished(){
 
 	decayEvents.clear();
@@ -255,6 +273,8 @@ void EventBuilder::UnpackerFinished(){
 
 	#ifdef HISTOGRAMMING
 		pulserVsChannel->Write();
+		lowEnergyMultiplicity->Write();
+		highEnergyMultiplicity->Write();
 	#endif
 	return;
 }

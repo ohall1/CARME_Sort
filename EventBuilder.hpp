@@ -4,6 +4,7 @@
 #include "Common.hpp"
 
 #include "TH2D.h"
+#include "TH2I.h"
 
 #include <list>
 #include <mutex>
@@ -37,9 +38,13 @@ private:
 	unsigned long totalImplantWords;
 	unsigned long totalPulserWords;
 	unsigned int pulserEvents;
+	unsigned int totalDecayEvents;
+	unsigned int totalImplantEvents;
 
 	#ifdef HISTOGRAMMING
 		TH2D * pulserVsChannel;								//Pulser signal across the channels
+		TH1I * lowEnergyMultiplicity;						//Multiplicity of low energy events
+		TH1I * highEnergyMultiplicity;						//Multiplicity of high energy events
 
 		std::list <ADCDataItem>::iterator decayEventsIt;	//Iterator for the decay events list
 	#endif
@@ -73,6 +78,8 @@ public:
 	unsigned long GetImplantWords();
 	unsigned long GetPulserWords();
 	unsigned int GetPulserEvents();
+	unsigned int GetDecayEvents();
+	unsigned int GetImplantEvents();
 
 	unsigned long GetCorrelationScalerOffset();					//Returns the correlation scaler offset
 

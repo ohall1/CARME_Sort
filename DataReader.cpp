@@ -31,6 +31,8 @@ void DataReader::BeginReader(){
 		if (numBlocks > 0){//If file contains data blocks
 			for (int currentBlock = 0; currentBlock <= numBlocks; currentBlock++){//Loop over data blocks
 
+				dataWordList.clear();
+
 				ReadBlock();
 
 				for(int itrData = 0; itrData < dataLength; itrData += 8){//Loop over data words in file
@@ -67,10 +69,15 @@ void DataReader::BeginReader(){
 						dataWords.first = word0;
 						dataWords.second = word1;
 
-						AddToBuffer(dataWords);
+						dataWordList.push_back(dataWords);
+
+						
 					}
 
+
 				}//End loop over data words
+
+				AddToBuffer(dataWordList);
 				
 			}//End loop over data blocks
 		}//End if on if data file has block
@@ -86,7 +93,9 @@ void DataReader::BeginReader(){
 
 	dataWords.first = 0x0000;
 	dataWords.second = 0x0000;
-	AddToBuffer(dataWords);
+	dataWordList.clear();
+	dataWordList.push_back(dataWords);
+	AddToBuffer(dataWordList);
 
 	if(bufferEmptyCheck){
 		bufferEmpty.notify_all();
@@ -194,7 +203,7 @@ void DataReader::CloseInputFile(){
 	}
 }
 
-void DataReader::AddToBuffer(std::pair<unsigned int, unsigned int> dataIn){
+void DataReader::AddToBuffer(std::list<std::pair<unsigned int, unsigned int>> dataIn){
 
 	//Aqquire bufProtect mutex lock to modify list
 	std::unique_lock<std::mutex> addLock(bufProtect);
@@ -203,7 +212,7 @@ void DataReader::AddToBuffer(std::pair<unsigned int, unsigned int> dataIn){
 	#endif
 
 	//Wait if list size exceeds maximum buffer
-	while(dataWordBuffer.size()>=10000){
+	while(dataWordBuffer.size()>=100){
 		bufferFullCheck = true;
 		#ifdef DEB_THREAD
 			std::cout << "Buffer list is fulle. BufferFulCheck = " << bufferFullCheck <<std::endl;
@@ -215,6 +224,7 @@ void DataReader::AddToBuffer(std::pair<unsigned int, unsigned int> dataIn){
 	#ifdef DEB_THREAD
 		std::cout << "Data pair added to back of buffer." << std::endl;
 	#endif
+	//	std::cout << "Item added buffer size " << dataWordBuffer.size() <<std::endl;
 
 
 	#ifdef DEB_THREAD
@@ -239,9 +249,10 @@ void DataReader::AddToBuffer(std::pair<unsigned int, unsigned int> dataIn){
 	return;
 }
 
-std::pair<unsigned int, unsigned int> DataReader::ReadFromBuffer(){
+std::list<std::pair<unsigned int, unsigned int>> DataReader::ReadFromBuffer(){
 
-	std::pair<unsigned int, unsigned int> bufferOut;
+	std::list <std::pair<unsigned int, unsigned int>> bufferOut;
+	bufferOut.clear();
 
 	//Aqquire bufProtect mutex lock to modify list
 	std::unique_lock<std::mutex> popLock(bufProtect);
@@ -256,14 +267,17 @@ std::pair<unsigned int, unsigned int> DataReader::ReadFromBuffer(){
 			std::cout << "Buffer list is empty, thread waiting. bufferEmptyCheck = " << bufferEmptyCheck << std::endl;
 		#endif
 
+		//	std::cout << "Waiting" << dataWordBuffer.size() <<std::endl;
+
 		bufferEmpty.wait(popLock);
 	}
 
 	bufferOut = dataWordBuffer.front();
 	dataWordBuffer.pop_front();
+	//std::cout << "Data read buffer size. " << dataWordBuffer.size() <<std::endl;
 
 	#ifdef DEB_THREAD
-		std::cout << "Buffer popped from front. First word = " << bufferOut.first << " Second word = " << bufferOut.second << std::endl;
+		//std::cout << "Buffer popped from front. First word = " << bufferOut.first << " Second word = " << bufferOut.second << std::endl;
 		std::cout << "Current list buffer size " << dataWordBuffer.size() << " items." << std::endl;
 	#endif
 
