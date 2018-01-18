@@ -133,6 +133,7 @@ class Cluster{
 		short GetStrip() const;
 		short GetADCRange() const;
 		double GetEnergy() const;
+		short GetSize() const;
 		unsigned long GetTimestampMin() const;
 		unsigned long GetTimestampMax() const;
 		unsigned long GetTimestampDifference(unsigned long timestampIn) const;

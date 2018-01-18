@@ -19,6 +19,10 @@ EventClustering::EventClustering(){
 			hname[0] = '\0';
 			sprintf(hname,"highEnergyExEyDSSDPair%d",i);
 			highEnergyExEyPair[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+
+			hname[0] = '\0';
+			sprintf(hname,"xyMultiplicityDSSD%d",i);
+			xyMultiplicity[i] = new TH2I(hname,"",128,0,128,128,0,128);
 		}
 	#endif
 };
@@ -31,6 +35,7 @@ void EventClustering::InitialiseClustering(){
 		for (int j = 0; j <2; j++){
 			dssdDecayLists[i][j].clear();
 			dssdImplantLists[i][j].clear();
+			dssdSideMultiplicity[i][j] = 0;
 		}
 	}
 
@@ -187,6 +192,11 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 		//Cluster isnt empty
 		CloseCluster(eventCluster);
 	}
+	#ifdef HISTOGRAMMING
+		for(int i=0; i < Common::noDSSD;i++){
+			xyMultiplicity[i]->Fill(dssdSideMultiplicity[i][0],dssdSideMultiplicity[i][1]);
+		}
+	#endif
 }
 void EventClustering::CloseCluster(Cluster & eventCluster){
 
@@ -194,6 +204,8 @@ void EventClustering::CloseCluster(Cluster & eventCluster){
 		case 0:
 			//decay event cluster, store with decay clusters
 			dssdDecayLists[eventCluster.GetDSSD()][eventCluster.GetSide()].push_back(eventCluster);
+			//Add 1 to the multiplicity of the event side
+			dssdSideMultiplicity[eventCluster.GetDSSD()][eventCluster.GetSide()] =+ eventCluster.GetSize();
 			eventCluster.ResetCluster();
 
 			#ifdef CLUSTER_DECAY_DEB
@@ -350,6 +362,9 @@ void EventClustering::CloseClustering(){
 		}
 		for(int i =0; i<Common::noDSSD;i++){
 			highEnergyExEyPair[i]->Write();
+		}
+		for(int i =0; i<Common::noDSSD;i++){
+			xyMultiplicity[i]->Write();
 		}
 	#endif
 }

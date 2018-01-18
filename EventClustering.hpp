@@ -9,6 +9,7 @@
 #include "TTree.h"
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TH2I.h"
 
 class EventClustering{
 	private:
@@ -21,6 +22,8 @@ class EventClustering{
 		std::list<Cluster> dssdImplantLists[Common::noDSSD][2];						//Array of lists to store implant clusters in
 		std::list<Cluster>::iterator clusterSide0It;					//Iterator for side 0
 		std::list<Cluster>::iterator clusterSide1It;					//Iterator for clusters on side 1
+
+		short dssdSideMultiplicity[Common::noDSSD][2];					//Stores the multiplicity of each side of the detector
 
 		const double decayEnergyDifference = 300;						//Cluster energy difference in keV for decay clusters
 		const double implantEnergyDifference = 1000;						//Cluster energy difference in MeV for implant clusters
@@ -43,6 +46,7 @@ class EventClustering{
 			TH2D * highEnergyExEy[Common::noDSSD];
 			TH2D * lowEnergyExEyPair[Common::noDSSD];
 			TH2D * highEnergyExEyPair[Common::noDSSD];
+			TH2I * xyMultiplicity[Common::noDSSD];
 		#endif
 
 		void ClusterMap(std::multimap<CalibratedADCDataItem,int> & eventMap);	//Cluster the maps once ready

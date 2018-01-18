@@ -273,6 +273,9 @@ unsigned long Cluster::GetTimestampMin() const{
 unsigned long Cluster::GetTimestampMax() const{
 	return timestampMax;
 }
+short Cluster::GetSize() const{
+	return clusterMultiplicity;
+}
 unsigned long Cluster::GetTimestampDifference(unsigned long timestampIn) const{
 	unsigned long timestampDifMin;
 	unsigned long timestampDifMax;
