@@ -11,6 +11,14 @@ EventClustering::EventClustering(){
 			hname[0] = '\0';
 			sprintf(hname,"highEnergyExEyDSSD%d",i);
 			highEnergyExEy[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+
+			hname[0] = '\0';
+			sprintf(hname,"lowEnergyExEyPairDSSD%d",i);
+			lowEnergyExEyPair[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+
+			hname[0] = '\0';
+			sprintf(hname,"highEnergyExEyDSSDPair%d",i);
+			highEnergyExEyPair[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
 		}
 	#endif
 };
@@ -93,13 +101,13 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 	for(clusterIt = eventMap.begin(); clusterIt != eventMap.end(); clusterIt++){
 		//Iterator that loops through the map of decays from the beginning to the end
 
-		if(abs(clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1){
+		if((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1){
 			//If current event is adjacent to last strip added to the cluster or cluster currently has no events proceed
 
 			if(eventCluster.GetTimestampDifference(clusterIt->first.GetTimestamp())<=200){
 				//If the current event is within 2us of events within the cluster proceed
 
-				if(eventCluster.GetDSSD() == clusterIt->first.GetDSSD() && eventCluster.GetSide() == clusterIt->first.GetSide()){
+				if(eventCluster.GetSide() == clusterIt->first.GetSide() && eventCluster.GetDSSD() == clusterIt->first.GetDSSD()){
 					//If decay event is on the same DSSD and Side as the cluster add event to cluster 
 
 					eventCluster.AddEventToCluster(clusterIt->first);
@@ -158,7 +166,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 				#endif
 
 		}
-		else if (abs(clusterIt->first.GetStrip()-eventCluster.GetStrip()) > 1){
+		else if ((clusterIt->first.GetStrip()-eventCluster.GetStrip()) > 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) < -1){
 			//Cluster is finished
 
 			#ifdef CLUSTER_DECAY_DEB
@@ -226,7 +234,7 @@ short EventClustering::ImplantStoppingLayer(){
 
 		if(dssdImplantLists[stoppingLayer][0].size() > 0 && dssdImplantLists[stoppingLayer][1].size() > 0){
 			//If an implant cluster in both sides
-			if(stoppingLayer < 5){
+			if(stoppingLayer < (Common::noDSSD)){
 				//Current layer is not the last layer
 				for(int downstreamDet = stoppingLayer + 1; downstreamDet < Common::noDSSD; downstreamDet++){
 					if(dssdImplantLists[downstreamDet][0].size() > 0 || dssdImplantLists[downstreamDet][1].size() > 0){
@@ -271,10 +279,10 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 			for(clusterSide1It = clusterLists[dssd][1].begin();clusterSide1It != clusterLists[dssd][1].end();clusterSide1It++){
 				//Loops through side 1 cluster list
 				#ifdef HISTOGRAMMING
-					if(clusterSide0It->GetADCRange() == 0){
+					if(equalEnergyRange == decayEnergyDifference){
 						lowEnergyExEy[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
 					}
-					else if(clusterSide0It->GetADCRange() == 1){
+					else if(equalEnergyRange == implantEnergyDifference){
 						highEnergyExEy[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
 					}
 				#endif
@@ -283,6 +291,16 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 
 					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<250) ||
 						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<250) ){
+						//Clusters paired on both time and energy
+
+						#ifdef HISTOGRAMMING
+							if(equalEnergyRange == decayEnergyDifference){
+								lowEnergyExEyPair[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
+							}
+							else if(equalEnergyRange == implantEnergyDifference){
+								highEnergyExEyPair[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
+							}
+						#endif
 					#ifdef DEB_CLUSTER_PAIR
 						if(!clusterPairT){
 							pairedTime++;
@@ -326,6 +344,12 @@ void EventClustering::CloseClustering(){
 		}
 		for(int i =0; i<Common::noDSSD;i++){
 			highEnergyExEy[i]->Write();
+		}
+		for(int i =0; i<Common::noDSSD;i++){
+			lowEnergyExEyPair[i]->Write();
+		}
+		for(int i =0; i<Common::noDSSD;i++){
+			highEnergyExEyPair[i]->Write();
 		}
 	#endif
 }

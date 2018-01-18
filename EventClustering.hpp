@@ -22,8 +22,8 @@ class EventClustering{
 		std::list<Cluster>::iterator clusterSide0It;					//Iterator for side 0
 		std::list<Cluster>::iterator clusterSide1It;					//Iterator for clusters on side 1
 
-		const double decayEnergyDifference = 100;						//Cluster energy difference in keV for decay clusters
-		const double implantEnergyDifference = 500;						//Cluster energy difference in MeV for implant clusters
+		const double decayEnergyDifference = 300;						//Cluster energy difference in keV for decay clusters
+		const double implantEnergyDifference = 1000;						//Cluster energy difference in MeV for implant clusters
 
 		short implantStoppingLayer;										//DSSD that an implant stops in
 
@@ -41,6 +41,8 @@ class EventClustering{
 		#ifdef HISTOGRAMMING
 			TH2D * lowEnergyExEy[Common::noDSSD];
 			TH2D * highEnergyExEy[Common::noDSSD];
+			TH2D * lowEnergyExEyPair[Common::noDSSD];
+			TH2D * highEnergyExEyPair[Common::noDSSD];
 		#endif
 
 		void ClusterMap(std::multimap<CalibratedADCDataItem,int> & eventMap);	//Cluster the maps once ready

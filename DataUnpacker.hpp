@@ -22,6 +22,8 @@ class DataUnpacker{
 	private:
 
 		EventBuilder myEventBuilder;
+		ADCDataItem adcDataItem;
+		InformationDataItem informationDataItem;
 		bool dataCheck;
 
 

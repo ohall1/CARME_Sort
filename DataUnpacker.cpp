@@ -59,7 +59,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 	dataType = ( (wordsIn.first >>30) & 0x3);
 	if (dataType ==3 ){
 		//ADC data item - Unpack into ADCDataItem format
-		ADCDataItem adcDataItem(wordsIn);
+		adcDataItem.BuildItem(wordsIn);
 
 		if (timestampMSBStatus && correlationScalerStatus){//If timestampMSB has been obtained from inforation data set the timestamp of the adc data
 			adcDataItem.BuildTimestamp(timestampMSB);
@@ -84,7 +84,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 	else if (dataType == 2){
 		//Information data item
 
-		InformationDataItem informationDataItem(wordsIn);
+		informationDataItem.BuildItem(wordsIn);
 
 		if(informationDataItem.GetInfoCode() == 2){				//Pause information item
 			timestampMSB = informationDataItem.GetTimestampMSB();

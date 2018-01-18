@@ -22,6 +22,8 @@ class ADCDataItem{
 		~ADCDataItem(){};
 		ADCDataItem(std::pair < unsigned int, unsigned int> inData);
 
+		void BuildItem(std::pair < unsigned int, unsigned int> inData);
+
 		void BuildTimestamp(unsigned long MSB);
 
 		void SetTimestamp(unsigned long newTimestamp);
@@ -56,6 +58,7 @@ class InformationDataItem{
 		InformationDataItem();
 		~InformationDataItem(){};
 		InformationDataItem(std::pair < unsigned int, unsigned int> inData);
+		void BuildItem(std::pair < unsigned int, unsigned int> inData);
 		unsigned int GetInfoCode();
 		unsigned long GetTimestampMSB();
 		unsigned int GetCorrScalerIndex();
@@ -83,6 +86,7 @@ class CalibratedADCDataItem{
 		~CalibratedADCDataItem(){};
 		CalibratedADCDataItem(ADCDataItem &adcDataItem);
 
+		void BuildItem(ADCDataItem &adcDataItem);
 		void SetDSSD(short dssdIn);
 		void SetSide(short sideIn);
 		void SetStrip(short stripIn);

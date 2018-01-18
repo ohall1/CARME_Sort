@@ -45,15 +45,15 @@ void EventBuilder::CorrectMultiplexer(ADCDataItem & adcItem){
 	itemADC = ((adcItem.GetChannelID()) / 16);
 	itemFEE = adcItem.GetFEE64ID()-1;
 	itemTimestamp = adcItem.GetTimestamp();
-	if((itemTimestamp-adcLastTimestamp[itemFEE][itemADC] > 250 ) &&adcLastTimestamp[itemFEE][itemADC]!=0){
+	if((itemTimestamp-adcLastTimestamp[itemFEE][itemADC] > 250 ) && adcLastTimestamp[itemFEE][itemADC]!=0){
 		//If two seperate ADC events within same window reset the adc counter
 		adcItemCounts[itemFEE][itemADC]=0;
 	}
 	adcLastTimestamp[itemFEE][itemADC]=itemTimestamp;
-	normalItems++;
-	timestampCorrection = (200 * adcItemCounts[itemFEE][itemADC]);
+	//normalItems++;
+	//timestampCorrection = (200 * adcItemCounts[itemFEE][itemADC]);
 
-	adcItem.SetTimestamp((itemTimestamp-timestampCorrection));
+	adcItem.SetTimestamp((itemTimestamp-(200 * adcItemCounts[itemFEE][itemADC])));
  	adcItemCounts[itemFEE][itemADC]++;
  	return;
 
@@ -72,8 +72,19 @@ void EventBuilder::CloseEvent(){
 	//Second check: If size of implant map > 0 - Define as implant event. Will currently veto all decays
 	//Thir check: If implant map == 0 and decay map > 0 define as decay event
 
-
-	if(decayEvents.size() > 1460){
+	if(implantEvents.size() > 1){//Need at least two events to make a front back pair
+		#ifdef DEB_EVENTBUILDER
+			std::cout << "End of event window." <<std::endl;
+			std::cout << "Size of implant events > 0. Event defined as implant event. Implant size = " << implantEvents.size() <<std::endl;
+			std::cout << "Implant events being passed onto calibrator.\n" <<std::endl;
+		#endif
+		#ifdef HISTOGRAMMING
+			highEnergyMultiplicity->Fill(implantEvents.size());
+		#endif
+		AddEventToBuffer(implantEvents);
+		totalImplantEvents++;
+	}
+	else if(decayEvents.size() > 800){
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Size of decay list > 800. Event being defined as a pulser event. Multiplicity = " << decayEvents.size() << "\n" << std::endl;
@@ -89,25 +100,13 @@ void EventBuilder::CloseEvent(){
 			lowEnergyMultiplicity->Fill(decayEvents.size());
 		#endif
 	}
-	else if(implantEvents.size() > 1){//Need at least two events to make a front back pair
-		#ifdef DEB_EVENTBUILDER
-			std::cout << "End of event window." <<std::endl;
-			std::cout << "Size of implant events > 0. Event defined as implant event. Implant size = " << implantEvents.size() <<std::endl;
-			std::cout << "Implant events being passed onto calibrator.\n" <<std::endl;
-		#endif
-		#ifdef HISTOGRAMMING
-			highEnergyMultiplicity->Fill(implantEvents.size());
-		#endif
-		AddEventToBuffer(implantEvents);
-		totalImplantEvents++;
-	}
 	else if(decayEvents.size() > 1){//Need at least two items to make a front back pair
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Event defined as a decay event. Decays passed onto calibrator. Decay size = " <<decayEvents.size() << "\n" << std::endl;
 		#endif
 		#ifdef HISTOGRAMMING
-			//lowEnergyMultiplicity->Fill(decayEvents.size());
+			lowEnergyMultiplicity->Fill(decayEvents.size());
 		#endif
 		AddEventToBuffer(decayEvents);
 		totalDecayEvents++;
@@ -133,7 +132,7 @@ void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
 
 	CorrectMultiplexer(adcItem);
 
-	//ApplyCorrelationScalerOffset(adcDataItem);
+	ApplyCorrelationScalerOffset(adcItem);
 
 
  	if( adcItem.GetADCRange() == 0){
@@ -165,7 +164,7 @@ void EventBuilder::AddEventToBuffer(std::list<ADCDataItem> closedEvent){
 	//Wait if list size exceeds maximum buffer
 	while(eventsList.size()>=100){
 		bufferFullCheck = true;
-		#ifdef DEBv_THREAD
+		#ifdef DEB_EVENTBUILDER_THREAD
 			std::cout << "Buffer list is fulle. BufferFulCheck = " << bufferFullCheck <<std::endl;
 		#endif
 		bufferFull.wait(addLock);

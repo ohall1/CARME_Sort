@@ -17,6 +17,8 @@ class Calibrator{
 
 		EventClustering myClustering;
 
+		CalibratedADCDataItem calibratedItem;	//Calibrated item to store information
+
 		std::string variablesFile;
 		EventBuilder *myEventBuilder;
 		std::list <ADCDataItem> eventList;		//Event list read in from buffer
@@ -32,7 +34,7 @@ class Calibrator{
 		int feeSideMap[Common::noFEE64];						//What side of the detector is a FEE64
 		int feeStripMap[Common::noFEE64]; 					//How does the FEE Map to the DSSD (1:Left/Bottom or 2: Right/Top)
 		int feePolarityMap[Common::noFEE64];					//What is the polarity of the FEE;
-		int channelADCOffsets[Common::noFEE64][Common::noChannel];			//Whats the channel ADC offset
+		double channelADCOffsets[Common::noFEE64][Common::noChannel];			//Whats the channel ADC offset
 
 		bool eventBuilderStatus;											//Bool to keep track of the status of the unpacker
 

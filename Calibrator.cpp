@@ -58,7 +58,9 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 				iss >> fee64;
 				iss >> channelID;
 				iss >> value;
-				channelADCOffsets[fee64-1][channelID] = value;
+				if(value != -9999.99){
+					channelADCOffsets[fee64-1][channelID] = value;
+				}
 
 			}
 			else if (dummyVar == "adcPolarity"){
@@ -84,7 +86,7 @@ void Calibrator::ProcessEvents(){
 		myClustering.InitialiseClustering();
 		while(eventList.size()>0){
 			//Reads event from the front of the event list and initialises it as a calibrated data item
-			CalibratedADCDataItem calibratedItem(eventList.front());
+			calibratedItem.BuildItem(eventList.front());
 			CalibrateData(eventList.front(),calibratedItem);
 			eventList.pop_front();
 			myClustering.AddEventToMap(calibratedItem);
@@ -135,8 +137,14 @@ bool Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataI
 	if(adcDataItemIn.GetADCRange() == 0){
 		//Low energy event
 		calibratedItemOut.SetADCRange(0);
-		calibratedItemOut.SetEnergy(((double)adcDataItemIn.GetADCData()-adcZero - (double)channelADCOffsets[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()])
-				*(double)feePolarityMap[adcDataItemIn.GetFEE64ID()-1]*adcLowEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
+
+		//Calibration method for Chris' offsets
+		//calibratedItemOut.SetEnergy(((double)adcDataItemIn.GetADCData()-adcZero - (double)channelADCOffsets[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()])
+				//*(double)feePolarityMap[adcDataItemIn.GetFEE64ID()-1]*adcLowEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
+
+		//Calibration method for Tom's offsets
+		calibratedItemOut.SetEnergy(((((double)adcDataItemIn.GetADCData()-adcZero)*(double)feePolarityMap[adcDataItemIn.GetFEE64ID()-1])
+				- channelADCOffsets[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()])*adcLowEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
 
 		/*std::cout << "ADCData: " << adcDataItemIn.GetADCData() << std::endl;
 		std::cout << "FEE: " << adcDataItemIn.GetFEE64ID() << " Channel: " << adcDataItemIn.GetChannelID() << " Offset: " << channelADCOffsets[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()] << std::endl;
