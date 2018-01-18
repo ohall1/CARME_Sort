@@ -200,15 +200,15 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 }
 void EventClustering::CloseCluster(Cluster & eventCluster){
 
-				int dssd = eventCluster.GetDSSD();
-			int side = eventCluster.GetSide();
+	int dssd = eventCluster.GetDSSD();
+	int side = eventCluster.GetSide();
 
 	switch(eventCluster.GetADCRange()){
 		case 0:
 			//decay event cluster, store with decay clusters
 			dssdDecayLists[dssd][side].push_back(eventCluster);
 			//Add 1 to the multiplicity of the event side
-			dssdSideMultiplicity[dssd][side] =+ eventCluster.GetSize();
+			dssdSideMultiplicity[dssd][side] += eventCluster.GetSize();
 			eventCluster.ResetCluster();
 
 			#ifdef CLUSTER_DECAY_DEB
