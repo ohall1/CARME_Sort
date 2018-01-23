@@ -120,7 +120,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 		if((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1){
 			//If current event is adjacent to last strip added to the cluster or cluster currently has no events proceed
 
-			if(eventCluster.GetTimestampDifference(clusterIt->first.GetTimestamp())<=200){
+			if(eventCluster.GetTimestampDifference(clusterIt->first.GetTimestamp())<=2000){
 				//If the current event is within 2us of events within the cluster proceed
 
 				if(eventCluster.GetSide() == clusterIt->first.GetSide() && eventCluster.GetDSSD() == clusterIt->first.GetDSSD()){
@@ -315,8 +315,8 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 				if(abs(clusterSide0It->GetEnergy()-clusterSide1It->GetEnergy()) <= equalEnergyRange){
 					//Is the difference between the two clusters less than the equal energy cuts
 
-					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<250) ||
-						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<250) ){
+					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<2500) ||
+						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<2500) ){
 						//Clusters paired on both time and energy
 						#ifdef OLD_OUTPUT
 							MergerOutputOld pairedCluster(*clusterSide0It, *clusterSide1It);
