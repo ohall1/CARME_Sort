@@ -25,11 +25,17 @@ EventClustering::EventClustering(){
 			xyMultiplicity[i] = new TH2I(hname,"",128,0,128,128,0,128);
 		}
 	#endif
+
+	#ifdef OLD_OUTPUT
+    	outputTree = new TTree("AIDA_hits","AIDA_hits");
+	    outputTree->Branch("aida_hit",&oldOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
+	#endif
 };
 
 void EventClustering::InitialiseClustering(){
 	decayMap.clear();
 	implantMap.clear();
+	outputEvents.clear();
 
 	for (int i = 0; i < Common::noDSSD; i++){
 		for (int j = 0; j <2; j++){
@@ -93,6 +99,11 @@ void EventClustering::ProcessMaps(){
 			PairClusters(dssd, decayEnergyDifference,dssdDecayLists);
 		}
 	}
+
+	//Clusters have been formed and paired
+
+	WriteToFile();
+
 }
 void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & eventMap){
 
@@ -307,6 +318,10 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<250) ||
 						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<250) ){
 						//Clusters paired on both time and energy
+						#ifdef OLD_OUTPUT
+							MergerOutputOld pairedCluster(*clusterSide0It, *clusterSide1It);
+							outputEvents.emplace(pairedCluster.GetTimestamp(),pairedCluster);
+						#endif
 
 						#ifdef HISTOGRAMMING
 							if(equalEnergyRange == decayEnergyDifference){
@@ -368,6 +383,20 @@ void EventClustering::CloseClustering(){
 		}
 		for(int i =0; i<Common::noDSSD;i++){
 			xyMultiplicity[i]->Write();
+		}
+	#endif
+
+	#ifdef OLD_OUTPUT
+		outputTree->Write();
+	#endif
+}
+void EventClustering::WriteToFile(){
+	//Function to deal with writing to root output file
+
+	#ifdef OLD_OUTPUT
+		for(eventsIt = outputEvents.begin(); eventsIt != outputEvents.end(); eventsIt++){
+			oldOutput = eventsIt->second;
+			outputTree->Fill();
 		}
 	#endif
 }

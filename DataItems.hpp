@@ -131,12 +131,38 @@ class Cluster{
 		short GetDSSD() const;
 		short GetSide() const;
 		short GetStrip() const;
+		short GetStripMin() const;
 		short GetADCRange() const;
 		double GetEnergy() const;
 		short GetSize() const;
+		short GetMultiplicity() const;
 		unsigned long GetTimestampMin() const;
 		unsigned long GetTimestampMax() const;
 		unsigned long GetTimestampDifference(unsigned long timestampIn) const;
+
+};
+class MergerOutputOld{
+	//Pretty much a struct but calling it a class as it has functions associated with it.
+	//All variables are unfortunately public
+	public:
+
+		ULong_t T;
+		ULong_t Tfast;
+  		Double_t E;
+  		Double_t Ex;
+ 		Double_t Ey;
+ 		Double_t x;
+ 		Double_t y;
+		Double_t z;
+ 		Int_t nx;
+ 		Int_t ny;
+  		Int_t nz;   //Pointless variable required by BRIKEN merger
+		UChar_t ID;
+
+		MergerOutputOld(){};
+		MergerOutputOld(Cluster & clusterX, Cluster & clusterY);
+
+		ULong_t GetTimestamp() const;
 
 };
 #endif

@@ -126,7 +126,7 @@ CalibratedADCDataItem::CalibratedADCDataItem(ADCDataItem &adcDataItem){
 };
 void CalibratedADCDataItem::BuildItem(ADCDataItem &adcDataItem){
 	energy = adcDataItem.GetADCData();
-	timestamp = adcDataItem.GetTimestamp();
+	timestamp = (adcDataItem.GetTimestamp())*10;	//Convwerts the timestamp to nanoseconds
 	#ifdef DEB_CALIBRATOR
 		//std::cout << "\nadcDataItem " << adcDataItem.GetADCData() << " - Non-calibratedItem " << energy << std::endl;
 		//std::cout << "\nadcDataItem " << adcDataItem.GetTimestamp() << " - Non-calibratedItem " << timestamp << std::endl;
@@ -261,6 +261,9 @@ short Cluster::GetSide() const{
 short Cluster::GetStrip() const{
 	return stripMax;
 }
+short Cluster::GetStripMin() const{
+	return stripMin;
+}
 short Cluster::GetADCRange() const{
 	return adcRange;
 }
@@ -275,6 +278,9 @@ unsigned long Cluster::GetTimestampMax() const{
 }
 short Cluster::GetSize() const{
 	return clusterMultiplicity;
+}
+short Cluster::GetMultiplicity() const{
+	return eventMultiplicity;
 }
 unsigned long Cluster::GetTimestampDifference(unsigned long timestampIn) const{
 	unsigned long timestampDifMin;
@@ -294,8 +300,46 @@ unsigned long Cluster::GetTimestampDifference(unsigned long timestampIn) const{
 	}
 	else if( timestampMin == 0){
 		return 0;
-	}
+	} 
 	else{
 		return 0;
 	}
+}
+MergerOutputOld::MergerOutputOld(Cluster & clusterX, Cluster & clusterY){
+
+	if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
+		T = clusterX.GetTimestampMin();
+	}
+	else{
+		T = clusterY.GetTimestampMin();
+	}
+
+	Tfast = 0;
+
+	Ex = clusterX.GetEnergy();
+	Ey = clusterY.GetEnergy();
+
+	E = (Ex + Ey)/2.0;
+
+	x = clusterX.GetStripMin();
+	y = clusterY.GetStripMin();
+	z = clusterX.GetDSSD();
+
+	nx = clusterX.GetMultiplicity();
+	ny = clusterY.GetMultiplicity();
+	nz = 0;
+
+	if(clusterX.GetADCRange() == 0){
+		ID = 5;
+	}
+	else if(clusterY.GetADCRange() == 1){
+		ID = 4;
+	}
+	else{
+		ID==4;
+	}
+
+}
+ULong_t MergerOutputOld::GetTimestamp()const{
+	return T;
 }

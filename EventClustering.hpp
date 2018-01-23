@@ -30,6 +30,15 @@ class EventClustering{
 
 		short implantStoppingLayer;										//DSSD that an implant stops in
 
+		#ifdef OLD_OUTPUT
+		//OLD_OUPUT will use the original version of the merger where a search square is drawn around the implant
+			TTree * outputTree;										//Tree to store output
+
+			MergerOutputOld oldOutput;									//Variable to be used as the old output
+			std::multimap<ULong_t, MergerOutputOld> outputEvents;		//Map to time order paired clusters in each event before being written to map
+			std::multimap<ULong_t, MergerOutputOld>::iterator eventsIt;	//Iterator for output event map
+		#endif
+
 		#ifdef DEB_IMPLANT_STOPPING
 			int positiveStopping = 0;
 			int negativeStopping = 0;
@@ -53,6 +62,7 @@ class EventClustering{
 		void CloseCluster(Cluster & decayCluster);								//Close, store and reset cluster when no more events to add
 		short ImplantStoppingLayer();											//Find the stopping layer for an implant event
 		void PairClusters(int dssd, double equalEnergyRange,std::list<Cluster>  clusterLists[][2]);
+		void WriteToFile();
 
 	public:
 		EventClustering();
