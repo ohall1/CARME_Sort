@@ -15,7 +15,7 @@
 #include "TFile.h"
 
 #define HISTOGRAMMING
-#define OLD_OUTPUT
+#define NEW_OUTPUT
 
 #include "Common.hpp"
 #include "DataReader.cpp"

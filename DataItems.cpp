@@ -343,3 +343,44 @@ MergerOutputOld::MergerOutputOld(Cluster & clusterX, Cluster & clusterY){
 ULong_t MergerOutputOld::GetTimestamp()const{
 	return T;
 }
+MergerOutputNewTrial::MergerOutputNewTrial(Cluster & clusterX, Cluster & clusterY){
+
+	if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
+		T = clusterX.GetTimestampMin();
+	}
+	else{
+		T = clusterY.GetTimestampMin();
+	}
+
+	Tfast = 0;
+
+	Ex = clusterX.GetEnergy();
+	Ey = clusterY.GetEnergy();
+
+	E = (Ex + Ey)/2.0;
+
+	xMin = clusterX.GetStripMin();
+	yMin = clusterY.GetStripMin();
+
+	xMax = clusterX.GetStrip();
+	yMax = clusterY.GetStrip();
+	z = clusterX.GetDSSD();
+
+	nx = clusterX.GetMultiplicity();
+	ny = clusterY.GetMultiplicity();
+	nz = 0;
+
+	if(clusterX.GetADCRange() == 0){
+		ID = 5;
+	}
+	else if(clusterY.GetADCRange() == 1){
+		ID = 4;
+	}
+	else{
+		ID==4;
+	}
+
+}
+ULong_t MergerOutputNewTrial::GetTimestamp()const{
+	return T;
+}

@@ -322,6 +322,10 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 							MergerOutputOld pairedCluster(*clusterSide0It, *clusterSide1It);
 							outputEvents.emplace(pairedCluster.GetTimestamp(),pairedCluster);
 						#endif
+						#ifdef NEW_OUTPUT
+							MergerOutputNewTrial pairedCluster(*clusterSide0It, *clusterSide1It);
+							outputEvents.emplace(pairedCluster.GetTimestamp(),pairedCluster);
+						#endif
 
 						#ifdef HISTOGRAMMING
 							if(equalEnergyRange == decayEnergyDifference){
@@ -396,6 +400,12 @@ void EventClustering::WriteToFile(){
 	#ifdef OLD_OUTPUT
 		for(eventsIt = outputEvents.begin(); eventsIt != outputEvents.end(); eventsIt++){
 			oldOutput = eventsIt->second;
+			outputTree->Fill();
+		}
+	#endif
+	#ifdef NEW_OUTPUT
+		for(eventsIt = outputEvents.begin(); eventsIt != outputEvents.end(); eventsIt++){
+			newOutput = eventsIt->second;
 			outputTree->Fill();
 		}
 	#endif

@@ -165,4 +165,31 @@ class MergerOutputOld{
 		ULong_t GetTimestamp() const;
 
 };
+class MergerOutputNewTrial{
+	//Pretty much a struct but calling it a class as it has functions associated with it.
+	//All variables are unfortunately public
+	public:
+
+		ULong_t T;
+		ULong_t Tfast;
+  		Double_t E;
+  		Double_t Ex;
+ 		Double_t Ey;
+ 		Int_t xMin;
+ 		Int_t yMin;
+ 		Int_t xMax;
+ 		Int_t yMax;
+
+		Double_t z;
+ 		Int_t nx;
+ 		Int_t ny;
+  		Int_t nz;   //Pointless variable required by BRIKEN merger
+		UChar_t ID;
+
+		MergerOutputNewTrial(){};
+		MergerOutputNewTrial(Cluster & clusterX, Cluster & clusterY);
+
+		ULong_t GetTimestamp() const;
+
+};
 #endif
