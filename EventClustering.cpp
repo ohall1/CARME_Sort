@@ -30,6 +30,10 @@ EventClustering::EventClustering(){
     	outputTree = new TTree("AIDA_hits","AIDA_hits");
 	    outputTree->Branch("aida_hit",&oldOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
 	#endif
+	#ifdef NEW_OUTPUT
+    	outputTree = new TTree("AIDA_hits","AIDA_hits");
+	    outputTree->Branch("aida_hit",&newOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:xMin/I:yMin/I:xMax/I:yMax/I:z/D:nx/I:ny/I:nz/I:ID/b");
+	#endif
 };
 
 void EventClustering::InitialiseClustering(){
