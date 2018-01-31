@@ -17,7 +17,8 @@ void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *e
 void Calibrator::ReadInVariables(std::string variablesFile){
 
 	int fee64, dssd, channelID;
-	int value, side;
+	int side;
+	double value;
 	std::string line;
 
 	std::ifstream variables(variablesFile.data());
@@ -148,7 +149,7 @@ bool Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataI
 
 		/*std::cout << "ADCData: " << adcDataItemIn.GetADCData() << std::endl;
 		std::cout << "FEE: " << adcDataItemIn.GetFEE64ID() << " Channel: " << adcDataItemIn.GetChannelID() << " Offset: " << channelADCOffsets[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()] << std::endl;
-		std::cout << "Calibrated Energy: " << calibratedItemOut.GetEnergy() <<std::endl;	*/	
+		std::cout << "Calibrated Energy: " << calibratedItemOut.GetEnergy() <<std::endl;	*/
 
 		return true;
 	}
