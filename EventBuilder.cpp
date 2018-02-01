@@ -105,7 +105,7 @@ void EventBuilder::CloseEvent(){
 		#ifdef OFFSETS
 			for(decayEventsIt = decayEvents.begin(); decayEventsIt != decayEvents.end(); decayEventsIt++){
 				//Allows all channels to be plotted on one histogram
-				absPulserVsChannel->Fill(((decayEventsIt->GetFEE64ID()-1)*64)+decayEventsIt->GetChannelID(),abs(decayEventsIt->GetADCData()-32768));
+				absPulserVsChannel->Fill((((decayEventsIt->GetFEE64ID()-1)*64)+decayEventsIt->GetChannelID()),abs(decayEventsIt->GetADCData()-32768.0));
 			}
 		#endif
 	}
