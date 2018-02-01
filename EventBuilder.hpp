@@ -48,6 +48,9 @@ private:
 
 		std::list <ADCDataItem>::iterator decayEventsIt;	//Iterator for the decay events list
 	#endif
+	#ifdef OFFSETS
+		TH2D * absPulserVsChannel;							//Pulsers all put on a positive scale
+	#endif
 
 	//Mutex locks and variables used for protecting the buffer
 	std::mutex bufProtect;

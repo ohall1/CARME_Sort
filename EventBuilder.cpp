@@ -17,6 +17,9 @@ EventBuilder::EventBuilder(){
 		lowEnergyMultiplicity = new TH1I("lowEnergyMultiplicity","",1536,0,1536);
 		highEnergyMultiplicity = new TH1I("highEnergyMultiplicity","",1536,0,1536);
 	#endif
+	#ifdef OFFSETS
+		absPulserVsChannel = new TH2D("absPulserVsChannel","",Common::noFEE64*64,0,Common::noFEE64,1e3,0,32768);
+	#endif
 	return;
 };
 
@@ -98,6 +101,12 @@ void EventBuilder::CloseEvent(){
 				pulserVsChannel->Fill(((decayEventsIt->GetFEE64ID()-1)*64)+decayEventsIt->GetChannelID(),decayEventsIt->GetADCData());
 			}
 			lowEnergyMultiplicity->Fill(decayEvents.size());
+		#endif
+		#ifdef OFFSETS
+			for(decayEventsIt = decayEvents.begin(); decayEventsIt != decayEvents.end(); decayEventsIt++){
+				//Allows all channels to be plotted on one histogram
+				absPulserVsChannel->Fill(((decayEventsIt->GetFEE64ID()-1)*64)+decayEventsIt->GetChannelID(),abs(decayEventsIt->GetADCData()-32768));
+			}
 		#endif
 	}
 	else if(decayEvents.size() > 1){//Need at least two items to make a front back pair
