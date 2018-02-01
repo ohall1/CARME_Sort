@@ -65,7 +65,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 
 		#ifdef OFFSETS
 		}
-		else if(timestampMSBStatus){
+		else{
 		#endif
 			adcDataItem.BuildTimestamp(timestampMSB);
 
