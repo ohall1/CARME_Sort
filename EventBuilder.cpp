@@ -284,5 +284,8 @@ void EventBuilder::UnpackerFinished(){
 		lowEnergyMultiplicity->Write();
 		highEnergyMultiplicity->Write();
 	#endif
+	#ifdef OFFSETS
+		absPulserVsChannel->Write();
+	#endif
 	return;
 }
