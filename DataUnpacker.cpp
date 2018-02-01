@@ -62,6 +62,11 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		adcDataItem.BuildItem(wordsIn);
 
 		if (timestampMSBStatus && correlationScalerStatus){//If timestampMSB has been obtained from inforation data set the timestamp of the adc data
+
+		#ifdef OFFSETS
+		}
+		else if(timestampMSBStatus){
+		#endif
 			adcDataItem.BuildTimestamp(timestampMSB);
 
 			//If histogramming turned on add event information to histograms

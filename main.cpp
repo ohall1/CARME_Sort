@@ -16,6 +16,7 @@
 
 #define HISTOGRAMMING
 #define NEW_OUTPUT
+#define OFFSETS
 
 #include "Common.hpp"
 #include "DataReader.cpp"
