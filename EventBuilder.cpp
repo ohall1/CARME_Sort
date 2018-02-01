@@ -18,7 +18,7 @@ EventBuilder::EventBuilder(){
 		highEnergyMultiplicity = new TH1I("highEnergyMultiplicity","",1536,0,1536);
 	#endif
 	#ifdef OFFSETS
-		absPulserVsChannel = new TH2D("absPulserVsChannel","",Common::noFEE64*64,0,Common::noFEE64*64,1e3,0,32768);
+		absPulserVsChannel = new TH2D("absPulserVsChannel","",Common::noFEE64*64,0,Common::noFEE64*64,2e3,0,32768);
 	#endif
 	return;
 };
