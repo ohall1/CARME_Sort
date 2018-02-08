@@ -45,6 +45,15 @@ class EventClustering{
 			std::multimap<ULong_t, MergerOutputNewTrial> outputEvents;		//Map to time order paired clusters in each event before being written to map
 			std::multimap<ULong_t, MergerOutputNewTrial>::iterator eventsIt;	//Iterator for output event map
 		#endif
+		#ifdef MERGER_OUTPUT
+			TTree * outputTree;										//Tree to store output
+
+			MergerOutput mergerOutput;									//Variable to be used as the old output
+			std::multimap<ULong_t, MergerOutput> outputEvents;		//Map to time order paired clusters in each event before being written to map
+			std::multimap<ULong_t, MergerOutput>::iterator eventsIt;	//Iterator for output event map
+
+
+		#endif
 
 		#ifdef DEB_IMPLANT_STOPPING
 			int positiveStopping = 0;

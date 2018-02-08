@@ -34,6 +34,11 @@ EventClustering::EventClustering(){
     	outputTree = new TTree("AIDA_hits","AIDA_hits");
 	    outputTree->Branch("aida_hit",&newOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:xMin/I:yMin/I:xMax/I:yMax/I:z/D:nx/I:ny/I:nz/I:ID/b");
 	#endif
+	#ifdef MERGER_OUTPUT
+    	outputTree = new TTree("AIDA_hits","AIDA_hits");
+	    outputTree->Branch("aida_hit",&mergerOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
+	#endif
+
 };
 
 void EventClustering::InitialiseClustering(){
@@ -330,6 +335,10 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 							MergerOutputNewTrial pairedCluster(*clusterSide0It, *clusterSide1It);
 							outputEvents.emplace(pairedCluster.GetTimestamp(),pairedCluster);
 						#endif
+						#ifdef MERGER_OUTPUT
+							MergerOutput pairedCluster(*clusterSide0It, *clusterSide1It);
+							outputEvents.emplace(pairedCluster.GetTimestamp(),pairedCluster);
+						#endif
 
 						#ifdef HISTOGRAMMING
 							if(equalEnergyRange == decayEnergyDifference){
@@ -397,6 +406,12 @@ void EventClustering::CloseClustering(){
 	#ifdef OLD_OUTPUT
 		outputTree->Write();
 	#endif
+	#ifdef NEW_OUTPUT
+		outputTree->Write();
+	#endif
+	#ifdef MERGER_OUTPUT
+		outputTree->Write();
+	#endif
 }
 void EventClustering::WriteToFile(){
 	//Function to deal with writing to root output file
@@ -410,6 +425,12 @@ void EventClustering::WriteToFile(){
 	#ifdef NEW_OUTPUT
 		for(eventsIt = outputEvents.begin(); eventsIt != outputEvents.end(); eventsIt++){
 			newOutput = eventsIt->second;
+			outputTree->Fill();
+		}
+	#endif
+	#ifdef MERGER_OUTPUT
+		for(eventsIt = outputEvents.begin(); eventsIt != outputEvents.end(); eventsIt++){
+			mergerOutput = eventsIt->second;
 			outputTree->Fill();
 		}
 	#endif

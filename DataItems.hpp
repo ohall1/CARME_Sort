@@ -192,4 +192,32 @@ class MergerOutputNewTrial{
 		ULong_t GetTimestamp() const;
 
 };
+
+class MergerOutput{
+	//Based on the old version of the AIDA tree
+	//Key change is Tfast is used to hold dx and dy
+	//x and y are set to be the geometric centre of the decay or implant
+
+		//Pretty much a struct but calling it a class as it has functions associated with it.
+	//All variables are unfortunately public
+	public:
+
+		ULong_t T;
+		ULong_t Tfast;
+  		Double_t E;
+  		Double_t Ex;
+ 		Double_t Ey;
+ 		Double_t x;
+ 		Double_t y;
+		Double_t z;
+ 		Int_t nx;
+ 		Int_t ny;
+  		Int_t nz;   //Pointless variable required by BRIKEN merger
+		UChar_t ID;
+
+		MergerOutput(){};
+		MergerOutput(Cluster & clusterX, Cluster & clusterY);
+
+		ULong_t GetTimestamp() const;
+};
 #endif

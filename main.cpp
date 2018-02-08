@@ -15,7 +15,7 @@
 #include "TFile.h"
 
 #define HISTOGRAMMING
-#define NEW_OUTPUT
+#define MERGER_OUTPUT
 
 
 #include "Common.hpp"
