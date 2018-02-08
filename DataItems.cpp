@@ -405,8 +405,8 @@ MergerOutput::MergerOutput(Cluster & clusterX, Cluster & clusterY){
 
 	E = (Ex + Ey)/2.0;
 
-	x = (clusterX.GetStripMin() + clusterX.GetStrip())/2.0;
-	y = (clusterY.GetStripMin() + clusterY.GetStrip())/2.0;
+	x = ((clusterX.GetStripMin() + clusterX.GetStrip())/2.0)+0.5;
+	y = ((clusterY.GetStripMin() + clusterY.GetStrip())/2.0)+0.5;
 	z = clusterX.GetDSSD();
 
 	nx = clusterX.GetMultiplicity();
