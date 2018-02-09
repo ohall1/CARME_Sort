@@ -393,8 +393,8 @@ MergerOutput::MergerOutput(Cluster & clusterX, Cluster & clusterY){
 		T = clusterY.GetTimestampMin();
 	}
 
-	uint8_t dx = (clusterX.GetStrip()-clusterX.GetStripMin())+1;
-	uint8_t dy = (clusterY.GetStrip()-clusterY.GetStripMin())+1;
+	uint8_t dx = (clusterX.GetStrip()-clusterX.GetStripMin());
+	uint8_t dy = (clusterY.GetStrip()-clusterY.GetStripMin());
 	uint8_t dxCal;
 	uint8_t dyCal;
 
@@ -405,8 +405,8 @@ MergerOutput::MergerOutput(Cluster & clusterX, Cluster & clusterY){
 
 	E = (Ex + Ey)/2.0;
 
-	x = ((clusterX.GetStripMin() + clusterX.GetStrip())/2.0)+0.5;
-	y = ((clusterY.GetStripMin() + clusterY.GetStrip())/2.0)+0.5;
+	x = ((clusterX.GetStripMin() + clusterX.GetStrip())/2.0);
+	y = ((clusterY.GetStripMin() + clusterY.GetStrip())/2.0);
 	z = clusterX.GetDSSD();
 
 	nx = clusterX.GetMultiplicity();
