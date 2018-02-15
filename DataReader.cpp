@@ -29,7 +29,7 @@ void DataReader::BeginReader(){
 		CalculateFileSize();
 
 		if (numBlocks > 0){//If file contains data blocks
-			for (int currentBlock = 0; currentBlock <= numBlocks; currentBlock++){//Loop over data blocks
+			for (int currentBlock = 0; currentBlock < numBlocks; currentBlock++){//Loop over data blocks
 
 				dataWordList.clear();
 
