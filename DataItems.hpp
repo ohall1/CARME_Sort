@@ -140,6 +140,8 @@ class Cluster{
 		unsigned long GetTimestampMax() const;
 		unsigned long GetTimestampDifference(unsigned long timestampIn) const;
 
+		void SetMultiplicity(short multiplicity);
+
 };
 class MergerOutputOld{
 	//Pretty much a struct but calling it a class as it has functions associated with it.

@@ -310,6 +310,9 @@ unsigned long Cluster::GetTimestampDifference(unsigned long timestampIn) const{
 		return 0;
 	}
 }
+void Cluster::SetMultiplicity(short multiplicity){
+	eventMultiplicity = multiplicity;
+}
 MergerOutputOld::MergerOutputOld(Cluster & clusterX, Cluster & clusterY){
 
 	if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){

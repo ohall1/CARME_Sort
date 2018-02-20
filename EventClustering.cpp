@@ -126,7 +126,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 	for(clusterIt = eventMap.begin(); clusterIt != eventMap.end(); clusterIt++){
 		//Iterator that loops through the map of decays from the beginning to the end
 
-		if(((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1) && clusterIt->first.GetEnergy()>100){
+		if(((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1) && clusterIt->first.GetEnergy()>energyThreshold){
 			//If current event is adjacent to last strip added to the cluster or cluster currently has no events proceed
 
 			if(eventCluster.GetTimestampDifference(clusterIt->first.GetTimestamp())<=2000){
@@ -179,7 +179,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 				#endif
 			}
 		}
-		else if ( eventCluster.GetStrip() == -5 && clusterIt->first.GetEnergy()>100){
+		else if ( eventCluster.GetStrip() == -5 && clusterIt->first.GetEnergy()>energyThreshold){
 			//If cluster currently doesn't have items associated with it add to cluster
 
 			eventCluster.AddEventToCluster(clusterIt->first);
@@ -191,7 +191,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 				#endif
 
 		}
-		else if (((clusterIt->first.GetStrip()-eventCluster.GetStrip()) > 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) < -1)&& clusterIt->first.GetEnergy()>100){
+		else if (((clusterIt->first.GetStrip()-eventCluster.GetStrip()) > 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) < -1)&& clusterIt->first.GetEnergy()>energyThreshold){
 			//Cluster is finished
 
 			#ifdef CLUSTER_DECAY_DEB
@@ -326,6 +326,10 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 
 					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<2500) ||
 						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<2500) ){
+
+						//Set the x and y multiplicity of the clusters
+						clusterSide0It->SetMultiplicity(dssdSideMultiplicity[0][dssd]);
+						clusterSide0It->SetMultiplicity(dssdSideMultiplicity[1][dssd]);
 						//Clusters paired on both time and energy
 						#ifdef OLD_OUTPUT
 							MergerOutputOld pairedCluster(*clusterSide0It, *clusterSide1It);

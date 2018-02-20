@@ -25,8 +25,9 @@ class EventClustering{
 
 		short dssdSideMultiplicity[Common::noDSSD][2];					//Stores the multiplicity of each side of the detector
 
-		const double decayEnergyDifference = 300;						//Cluster energy difference in keV for decay clusters
-		const double implantEnergyDifference = 1000;						//Cluster energy difference in MeV for implant clusters
+		const double decayEnergyDifference = 300.0;						//Cluster energy difference in keV for decay clusters
+		const double implantEnergyDifference = 1000.0;						//Cluster energy difference in MeV for implant clusters
+		const double energyThreshold = 0.0;
 
 		short implantStoppingLayer;										//DSSD that an implant stops in
 
