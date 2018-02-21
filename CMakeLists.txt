@@ -19,6 +19,17 @@ cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
    SET(CMAKE_BUILD_TYPE Debug)
    include(CheckCCompilerFlag)
    include(CheckCXXCompilerFlag)
+
+# CMAKE compiler check_c_compiler_flag
+if(CMAKE_COMPILER_IS_GNUCXX)
+message ("--Optimization flag -02 and -s (for stripping the binary) " )
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")        ## Optimize
+    if ( "${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE" )
+	message("release mode")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}-s")  ## Strip binary
+    endif()
+
+endif(CMAKE_COMPILER_IS_GNUCXX)
    
 
 project(aidasort)
