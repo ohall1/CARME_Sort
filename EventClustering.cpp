@@ -207,7 +207,24 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 							 " Strip " << clusterIt->first.GetStrip() << " Timestamp: " << clusterIt->first.GetTimestamp() <<std::endl;
 			#endif
 		}
-	}
+		else if((clusterIt->first.GetSide() != eventCluster.GetSide() && clusterIt->first.GetEnergy() > energyThreshold)){
+			//Cluster is finished
+
+			#ifdef CLUSTER_DECAY_DEB
+				std::cout << "\nSides are different. Item not added to cluster creating new cluster." <<std::endl;
+			#endif
+			
+			//Closes the current clustedr. Storing and then resets it
+			CloseCluster(eventCluster);
+			eventCluster.AddEventToCluster(clusterIt->first);
+			#ifdef CLUSTER_DECAY_DEB
+				clusterItem = clusterItem + 1;
+				std::cout << "Cluster item: " << clusterItem << " DSSD: " << clusterIt->first.GetDSSD() << " Side: " << clusterIt->first.GetSide() <<
+							 " Strip " << clusterIt->first.GetStrip() << " Timestamp: " << clusterIt->first.GetTimestamp() <<std::endl;
+			#endif
+
+		}
+	}//Close for loop iterating round cluster map
 	if(eventCluster.GetDSSD() != -5){
 		//Cluster isnt empty
 		CloseCluster(eventCluster);
