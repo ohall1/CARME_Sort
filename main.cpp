@@ -69,14 +69,21 @@ int main(int argc, char **argv){
 
 					default:
 						Usage(argv[0]);
+						return -1;
 						break;
 
 				}
 			}
-			else Usage(argv[0]);
+			else{
+				Usage(argv[0]);
+				return -1;
+			}
 		}
 	}// End of reading in command line arguments
-	else Usage(argv[0]);
+	else{
+		Usage(argv[0]);
+		return -1;
+	}
 
 	std::ifstream confFile(configFile.data());
 	while ( confFile.good() ){
