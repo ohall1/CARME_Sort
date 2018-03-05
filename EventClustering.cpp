@@ -45,6 +45,7 @@ void EventClustering::InitialiseClustering(){
 	decayMap.clear();
 	implantMap.clear();
 	outputEvents.clear();
+	decayMapCurrent = false;
 
 	for (int i = 0; i < Common::noDSSD; i++){
 		for (int j = 0; j <2; j++){
@@ -121,12 +122,16 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 		int clusterItem = 0;
 	#endif
 
+	if(eventMap.begin()->first.GetADCRange() == 0){
+		decayMapCurrent = true;
+	}
+
 	Cluster eventCluster; //Defines the cluster class used
 
 	for(clusterIt = eventMap.begin(); clusterIt != eventMap.end(); clusterIt++){
 		//Iterator that loops through the map of decays from the beginning to the end
 
-		if(((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1) && clusterIt->first.GetEnergy()>energyThreshold){
+		if(((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1) && (clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent)){
 			//If current event is adjacent to last strip added to the cluster or cluster currently has no events proceed
 
 			if(eventCluster.GetTimestampDifference(clusterIt->first.GetTimestamp())<=2000){
@@ -179,7 +184,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 				#endif
 			}
 		}
-		else if ( eventCluster.GetStrip() == -5 && clusterIt->first.GetEnergy()>energyThreshold){
+		else if ( eventCluster.GetStrip() == -5 && (clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent)){
 			//If cluster currently doesn't have items associated with it add to cluster
 
 			eventCluster.AddEventToCluster(clusterIt->first);
@@ -191,7 +196,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 				#endif
 
 		}
-		else if (((clusterIt->first.GetStrip()-eventCluster.GetStrip()) > 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) < -1)&& clusterIt->first.GetEnergy()>energyThreshold){
+		else if (((clusterIt->first.GetStrip()-eventCluster.GetStrip()) > 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) < -1)&& (clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent)){
 			//Cluster is finished
 
 			#ifdef CLUSTER_DECAY_DEB
@@ -207,7 +212,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 							 " Strip " << clusterIt->first.GetStrip() << " Timestamp: " << clusterIt->first.GetTimestamp() <<std::endl;
 			#endif
 		}
-		else if((clusterIt->first.GetSide() != eventCluster.GetSide() && clusterIt->first.GetEnergy() > energyThreshold)){
+		else if((clusterIt->first.GetSide() != eventCluster.GetSide()) && (clusterIt->first.GetEnergy() > energyThreshold && decayMapCurrent)){
 			//Cluster is finished
 
 			#ifdef CLUSTER_DECAY_DEB
