@@ -110,7 +110,7 @@ void Calibrator::ProcessEvents(){
 			calibratedItem.BuildItem(eventList.front());
 			CalibrateData(eventList.front(),calibratedItem);
 			eventList.pop_front();
-			if(calibratedItem.GetDSSD()>0){
+			if(calibratedItem.GetDSSD()>=0){
 				myClustering.AddEventToMap(calibratedItem);
 			}
 		}
