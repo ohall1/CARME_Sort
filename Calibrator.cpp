@@ -12,14 +12,26 @@ void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *e
 			adcHighEnergyGain[i][j] = 0.7; 	//MeV/ch
 		}
 	}
-
 }
+
 void Calibrator::ReadInVariables(std::string variablesFile){
 
 	int fee64, dssd, channelID;
 	int side;
 	double value;
 	std::string line;
+
+	for(int i =0; i < Common::noFEE64 ; i++){
+		for(int j =0; j<Common::noChannel; j++){
+			channelADCOffsets[i][j] = 0.0;
+		}
+
+		feeDSSDMap[i] = -1;
+		feeSideMap[i] = -1;
+		feeStripMap[i] =-1; 			
+		feePolarityMap[i] = 0;
+	}
+
 
 	std::ifstream variables(variablesFile.data());
 	while (variables.good()){
@@ -132,6 +144,7 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 	else if(feeStripMap[adcDataItemIn.GetFEE64ID()-1] == 2){
 		calibratedItemOut.SetStrip(127-GetOrder(adcDataItemIn.GetChannelID()));		
 	}
+	else if(feeStripMap[adcDataItemIn.GetFEE64ID()-1] == -1){}
 	else{
 		std::cout << "Warning! FEE mapped to strip map improperly check variables file." << std::endl;
 		std::cout << "FEE " << adcDataItemIn.GetFEE64ID() << std::endl;
