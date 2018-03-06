@@ -110,7 +110,9 @@ void Calibrator::ProcessEvents(){
 			calibratedItem.BuildItem(eventList.front());
 			CalibrateData(eventList.front(),calibratedItem);
 			eventList.pop_front();
-			myClustering.AddEventToMap(calibratedItem);
+			if(calibratedItem.GetDSSD()>0){
+				myClustering.AddEventToMap(calibratedItem);
+			}
 		}
 		//Once all items from an event has been read in and stored in maps. Begin clustering
 		if(eventBuilderStatus){
