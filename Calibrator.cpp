@@ -40,26 +40,32 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 			if(dummyVar == "dssdMap"){
 				iss >> fee64;
 				iss >> dssd;
-				feeDSSDMap[fee64-1] = dssd;
+				if(dssd != -1 && fee64 <= Common::noFEE64){
+					feeDSSDMap[fee64-1] = dssd;
+				}
 
 			}
 			else if(dummyVar == "sideMap"){
 				iss >> fee64;
 				iss >> side;
-				feeSideMap[fee64-1] = side;
+				if (side != -1 && fee64 <= Common::noFEE64){
+					feeSideMap[fee64-1] = side;
+				}
 
 			}
 			else if(dummyVar == "stripMap"){
 				iss >> fee64;
 				iss >> value;
-				feeStripMap[fee64-1] = value;
+				if(fee64 <= Common::noFEE64){
+					feeStripMap[fee64-1] = value;
+				}
 
 			}
 			else if(dummyVar == "adcOffset"){
 				iss >> fee64;
 				iss >> channelID;
 				iss >> value;
-				if(value != -9999.99){
+				if(value != -9999.99 && fee64 <= Common::noFEE64){
 					channelADCOffsets[fee64-1][channelID] = value;
 				}
 
@@ -67,7 +73,9 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 			else if (dummyVar == "adcPolarity"){
 				iss >> fee64;
 				iss >> value;
-				feePolarityMap[fee64-1] = value;
+				if(fee64 <= Common::noFEE64){
+					feePolarityMap[fee64-1] = value;
+				}
 			}
 			/*else{
 				std::cout << "Problem in reading in variables file. Unrecognised parameter type - " << dummyVar.data() << "."<<std::endl;

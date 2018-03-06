@@ -51,7 +51,7 @@ sideMap	22	1
 sideMap	23	0											
 sideMap	24	0
 
-#map strip: 01:00 left/bottom side, 02:00 right/top side (from beam view)			
+#map strip: 01:00 left/top side, 02:00 right/bottom side (from beam view)			
 stripMap	1	1											
 stripMap	2	1											
 stripMap	3	1											
