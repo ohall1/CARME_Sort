@@ -28,15 +28,15 @@ EventClustering::EventClustering(){
 
 	#ifdef OLD_OUTPUT
     	outputTree = new TTree("aida","aida");
-	    outputTree->Branch("aida_hits",&oldOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
+	    outputTree->Branch("aida",&oldOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
 	#endif
 	#ifdef NEW_OUTPUT
     	outputTree = new TTree("aida","aida");
-	    outputTree->Branch("aida_hits",&newOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:xMin/I:yMin/I:xMax/I:yMax/I:z/D:nx/I:ny/I:nz/I:ID/b");
+	    outputTree->Branch("aida",&newOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:xMin/I:yMin/I:xMax/I:yMax/I:z/D:nx/I:ny/I:nz/I:ID/b");
 	#endif
 	#ifdef MERGER_OUTPUT
     	outputTree = new TTree("aida","aida");
-	    outputTree->Branch("aida_hits",&mergerOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
+	    outputTree->Branch("aida",&mergerOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
 	#endif
 
 };
