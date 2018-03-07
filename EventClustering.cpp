@@ -212,7 +212,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 							 " Strip " << clusterIt->first.GetStrip() << " Timestamp: " << clusterIt->first.GetTimestamp() <<std::endl;
 			#endif
 		}
-		else if((clusterIt->first.GetSide() != eventCluster.GetSide()) && (clusterIt->first.GetEnergy() > energyThreshold && decayMapCurrent)){
+		else if((clusterIt->first.GetSide() != eventCluster.GetSide()) && ((clusterIt->first.GetEnergy() > energyThreshold && decayMapCurrent) || !decayMapCurrent)){
 			//Cluster is finished
 
 			#ifdef CLUSTER_DECAY_DEB
