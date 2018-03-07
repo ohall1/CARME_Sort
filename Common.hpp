@@ -4,9 +4,9 @@
 namespace Common{
 	//Variables that will be used throughout the program by all threads
 
-	const int noFEE64 = 24;
-	const int noDSSD = 6;
-	const int noChannel = 64;
+	const int noFEE64 = 24;			//Not just the number in use but the highest number ID that is used
+	const int noDSSD = 6;			//Total number of DSSD you are implanting in
+	const int noChannel = 64;		//Will remain fixed. Number of channels per FEE
 
 	//Pointer used by ROOT to access output file
 	TFile * fOutRoot;
