@@ -87,7 +87,7 @@ void EventBuilder::CloseEvent(){
 		AddEventToBuffer(implantEvents);
 		totalImplantEvents++;
 	}
-	else if(decayEvents.size() > 800){
+	else if(decayEvents.size() > 128*Common::noDSSD){//Half the number of channels per dssd
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Size of decay list > 800. Event being defined as a pulser event. Multiplicity = " << decayEvents.size() << "\n" << std::endl;
