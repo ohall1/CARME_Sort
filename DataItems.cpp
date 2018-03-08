@@ -95,7 +95,12 @@ void InformationDataItem::BuildItem(std::pair < unsigned int, unsigned int> inDa
 	}
 }
 void InformationDataItem::SetTimestamp(unsigned long MSB){
-	timestamp = ((MSB <<28 ) | timestampLSB);
+	if(timestampLSB <= 0x00000A0){
+		timestamp = ((MSB+1) << 28) | timestampLSB;
+	}
+	else{
+		timestamp = (MSB << 28) | timestampLSB;
+	}
 }
 unsigned long InformationDataItem::GetTimestampMSB(){
 	return timestampMSB;

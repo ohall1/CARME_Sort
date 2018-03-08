@@ -103,7 +103,7 @@ adcPolarity	22	-1
 adcPolarity	23	1											
 adcPolarity	24	1
 
-#ADC offsets were calculated using the pulser walkthrough data of files Oct17/R29												
+#ADC offsets were calculated using the pulser walkthrough data of files May17/R29												
 adcOffset	1	0	168.755	0.999946
 adcOffset	1	1	-139.264	0.99912
 adcOffset	1	2	18.0224	0.999871
