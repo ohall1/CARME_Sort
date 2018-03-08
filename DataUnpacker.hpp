@@ -42,6 +42,7 @@ class DataUnpacker{
 		unsigned int pauseItemCounter[Common::noFEE64];
 		unsigned int resumeItemCounter[Common::noFEE64];
 		unsigned int sync100Counter[Common::noFEE64];
+		unsigned int correlationScalerChangeCounter;
 
 		unsigned int totalPauseItem;
 		unsigned int totalResumeItem;
@@ -57,6 +58,7 @@ class DataUnpacker{
 		//Histrogramming declarations
 		#ifdef HISTOGRAMMING
 
+		TH1D * deltaCorrelationScaler;
 		TH1D * timestampADCData;
 		TH1D * timestampLowEnergy;
 		TH1D * timestampHighEnergy;

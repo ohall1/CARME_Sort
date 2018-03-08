@@ -24,12 +24,14 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 	totalDataWords = 0;
 	totalDecayWords = 0;
 	totalImplantWords = 0;
+	correlationScalerChangeCounter = 0;
 
 	correlationScalerStatus = false;
 
 	#ifdef HISTOGRAMMING
 		lowEnergyChannelADC = new TH2D("lowEnergyChannelADC","",1536,0,1536,5e2,0,65536);
 		highEnergyChannelADC = new TH2D("highEnergyChannelADC","",1536,0,1536,5e2,0,65536);
+		deltaCorrelationScaler = new TH1D("deltaCorrelationScaler","",10000,-5000,5000);
 	#endif
 
 	return myEventBuilderPoint;
@@ -141,10 +143,13 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 
 						std::cout << "Setting the correlation scaler offset to: " << correlationScalerOffset << std::endl;
 						correlationScalerStatus = true;
+						deltaCorrelationScaler->Fill(correlationScalerOffset-myEventBuilder.GetCorrelationScalerOffset());
 					}
 					else if (myEventBuilder.GetCorrelationScalerOffset() != correlationScalerOffset){
 						std::cout << "Warning correlation scaler offset changed mid run. Old Offset = " << myEventBuilder.GetCorrelationScalerOffset()
 								  << " - New offset = " << correlationScalerOffset << ". Was a sync pulse sent in the middle of a run?" <<std::endl;
+						deltaCorrelationScaler->Fill(correlationScalerOffset-myEventBuilder.GetCorrelationScalerOffset());
+						correlationScalerChangeCounter++;
 					}
 
 					#ifdef DEB_CORRELATION
@@ -186,10 +191,12 @@ void DataUnpacker::CloseUnpacker(){
 	std::cout << "Total number of PUASE statements - " << totalPauseItem << std::endl;
 	std::cout << "Total number of RESUME statements - " << totalResumeItem << std::endl;
 	std::cout << "Total number of SYNC100 pulses - " << totalSYNC100 << std::endl;
+	std::cout << "Changes in the correlation scaler - " << correlationScalerChangeCounter << std::endl; 
 
 	#ifdef HISTOGRAMMING
 		lowEnergyChannelADC->Write();
 		highEnergyChannelADC->Write();
+		deltaCorrelationScaler->Write();
 	#endif
 
 	return;
