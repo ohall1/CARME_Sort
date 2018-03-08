@@ -35,8 +35,8 @@ EventClustering::EventClustering(){
 	    outputTree->Branch("aida",&newOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:xMin/I:yMin/I:xMax/I:yMax/I:z/D:nx/I:ny/I:nz/I:ID/b");
 	#endif
 	#ifdef MERGER_OUTPUT
-    	outputTree = new TTree("aida","aida");
-	    outputTree->Branch("aida",&mergerOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
+    	outputTree = new TTree("AIDA_hits","AIDA_hits");
+	    outputTree->Branch("aida_hit",&mergerOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
 	#endif
 
 };
@@ -131,7 +131,8 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 	for(clusterIt = eventMap.begin(); clusterIt != eventMap.end(); clusterIt++){
 		//Iterator that loops through the map of decays from the beginning to the end
 
-		if(((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1) && ((clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent) || !decayMapCurrent)){
+		if(((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1)
+			&& ((clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent) || !decayMapCurrent)){
 			//If current event is adjacent to last strip added to the cluster or cluster currently has no events proceed
 
 			if(eventCluster.GetTimestampDifference(clusterIt->first.GetTimestamp())<=2000){
@@ -196,7 +197,8 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 				#endif
 
 		}
-		else if (((clusterIt->first.GetStrip()-eventCluster.GetStrip()) > 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) < -1)&& ((clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent)||!decayMapCurrent)){
+		else if (((clusterIt->first.GetStrip()-eventCluster.GetStrip()) > 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) < -1)
+				&& ((clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent)||!decayMapCurrent)){
 			//Cluster is finished
 
 			#ifdef CLUSTER_DECAY_DEB
@@ -212,7 +214,8 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 							 " Strip " << clusterIt->first.GetStrip() << " Timestamp: " << clusterIt->first.GetTimestamp() <<std::endl;
 			#endif
 		}
-		else if((clusterIt->first.GetSide() != eventCluster.GetSide()) && ((clusterIt->first.GetEnergy() > energyThreshold && decayMapCurrent) || !decayMapCurrent)){
+		else if((clusterIt->first.GetSide() != eventCluster.GetSide()) &&
+				((clusterIt->first.GetEnergy() > energyThreshold && decayMapCurrent) || !decayMapCurrent)){
 			//Cluster is finished
 
 			#ifdef CLUSTER_DECAY_DEB
@@ -384,7 +387,6 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 							clusterPairE=true;
 							std::cout << "Pecentage of clusters being paired " << (double)pairedTime/(double)clusterTotal << std::endl;
 						}
-						//std::cout << "Cluster paired" << " time difference " << abs(clusterSide0It->GetTimestampMin()-clusterSide1It->GetTimestampMin()) <<  std::endl;
 					#endif
 					}
 					#ifdef DEB_CLUSTER_PAIR
@@ -393,7 +395,6 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 							pairedEnergy++;
 							clusterPairE = true;
 						}
-						//std::cout << "Cluster not paired" << " time difference " << abs(clusterSide0It->GetTimestampMin()-clusterSide1It->GetTimestampMin()) << std::endl;
 						std::cout << "Percentage of paired event making E " << (double)pairedEnergy/clusterTotal<< std::endl;
 					}
 					#endif
