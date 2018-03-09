@@ -44,7 +44,15 @@ EventClustering::EventClustering(){
 void EventClustering::InitialiseClustering(){
 	decayMap.clear();
 	implantMap.clear();
-	outputEvents.clear();
+	#ifdef OLD_OUTPUT
+		outputEvents.clear();
+	#endif
+	#ifdef NEW_OUTPUT
+		outputEvents.clear();
+	#endif
+	#ifdef MERGER_OUTPUT
+		outputEvents.clear();
+	#endif
 	decayMapCurrent = false;
 
 	for (int i = 0; i < Common::noDSSD; i++){

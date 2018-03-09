@@ -32,8 +32,8 @@ class DataUnpacker{
 		std::pair < unsigned int, unsigned int> dataWords;
 		unsigned int word0, word1;
 
-		unsigned long correlationScalerData0[Common::noFEE64];		//Used in calculating the correlation scaler
-		unsigned long correlationScalerData1[Common::noFEE64];		//
+		unsigned long correlationScalerData0;		//Used in calculating the correlation scaler
+		unsigned long correlationScalerData1;		//
 		unsigned long correlationScaler;				//Correlation scaler between AIDA and other DAQs
 		long int correlationScalerOffset;				//Offset between correlation scaler and AIDA timstamp
 		bool correlationScalerStatus;					//Status off correlation scaler

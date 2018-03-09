@@ -7,6 +7,7 @@ namespace Common{
 	const int noFEE64 = 24;			//Not just the number in use but the highest number ID that is used
 	const int noDSSD = 6;			//Total number of DSSD you are implanting in
 	const int noChannel = 64;		//Will remain fixed. Number of channels per FEE
+	const int masterFEE64 = 6;
 
 	//Pointer used by ROOT to access output file
 	TFile * fOutRoot;

@@ -15,9 +15,9 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 		pauseItemCounter[i] = 0;
 		resumeItemCounter[i] = 0;
 		sync100Counter[i] = 0;
-		correlationScalerData0[i] = 0;
-		correlationScalerData1[i] = 0;
 	}
+	correlationScalerData0 = 0;
+	correlationScalerData1 = 0;
 	totalSYNC100 = 0;
 	totalPauseItem = 0;
 	totalResumeItem = 0;
@@ -120,20 +120,20 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 				std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " SYNC100 information item\n" << std::endl;
 			#endif
 		}
-		else if(informationDataItem.GetInfoCode() == 8){		//Correlation scaler data item
+		else if(informationDataItem.GetInfoCode() == 8 && informationDataItem.GetFEE64ID() == Common::masterFEE64){		//Correlation scaler data item
 
 			if(timestampMSBStatus){//No MSB information in scaler so can't set timestamp in constructor
 				informationDataItem.SetTimestamp(timestampMSB);
 
 				if(informationDataItem.GetCorrScalerIndex() == 0){ //Scaler is split across three data word pairs need to combine the three to get the scaler
-					correlationScalerData0[informationDataItem.GetFEE64ID()] = informationDataItem.GetCorrScalerTimestamp();
+					correlationScalerData0 = informationDataItem.GetCorrScalerTimestamp();
 				}
 				else if(informationDataItem.GetCorrScalerIndex() == 1){
-					correlationScalerData1[informationDataItem.GetFEE64ID()] = informationDataItem.GetCorrScalerTimestamp();
+					correlationScalerData1 = informationDataItem.GetCorrScalerTimestamp();
 				}
 				else if(informationDataItem.GetCorrScalerIndex() == 2){
-					correlationScaler = (informationDataItem.GetCorrScalerTimestamp() << 32) | (correlationScalerData1[informationDataItem.GetFEE64ID()] << 16)
-										| (correlationScalerData0[informationDataItem.GetFEE64ID()]);	
+					correlationScaler = (informationDataItem.GetCorrScalerTimestamp() << 32) | (correlationScalerData1 << 16)
+										| (correlationScalerData0);	
 
 					correlationScalerOffset = (4 * correlationScaler) - informationDataItem.GetTimestamp();
 
@@ -143,12 +143,16 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 
 						std::cout << "Setting the correlation scaler offset to: " << correlationScalerOffset << std::endl;
 						correlationScalerStatus = true;
-						deltaCorrelationScaler->Fill(correlationScalerOffset-myEventBuilder.GetCorrelationScalerOffset());
+						#ifdef HISTOGRAMMING
+							deltaCorrelationScaler->Fill(correlationScalerOffset-myEventBuilder.GetCorrelationScalerOffset());
+						#endif
 					}
 					else if (myEventBuilder.GetCorrelationScalerOffset() != correlationScalerOffset){
 						std::cout << "Warning correlation scaler offset changed mid run. Old Offset = " << myEventBuilder.GetCorrelationScalerOffset()
 								  << " - New offset = " << correlationScalerOffset << ". Was a sync pulse sent in the middle of a run?" <<std::endl;
-						deltaCorrelationScaler->Fill(correlationScalerOffset-myEventBuilder.GetCorrelationScalerOffset());
+						#ifdef HISTOGRAMMING
+							deltaCorrelationScaler->Fill(correlationScalerOffset-myEventBuilder.GetCorrelationScalerOffset());
+						#endif
 						correlationScalerChangeCounter++;
 					}
 
