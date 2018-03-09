@@ -135,6 +135,7 @@ int main(int argc, char **argv){
 		}//End of if (newLine)
 
 	}// End of reading in configuration file
+	confFile.close();
 
 	Common::fOutRoot = new TFile(userOutFile.data(),"RECREATE");
 	if (!Common::fOutRoot){

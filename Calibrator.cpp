@@ -97,7 +97,8 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 			}*/
 
 		}
-	}
+	}// Variables all read in
+	variables.close();
 }
 void Calibrator::ProcessEvents(){
 	
