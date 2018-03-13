@@ -66,6 +66,21 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		if (timestampMSBStatus && correlationScalerStatus){//If timestampMSB has been obtained from inforation data set the timestamp of the adc data
 
 		#ifdef OFFSETS
+			adcDataItem.BuildTimestamp(timestampMSB);
+
+			//If histogramming turned on add event information to histograms
+			#ifdef HISTOGRAMMING
+				if(adcDataItem.GetADCRange() == 0){
+					lowEnergyChannelADC->Fill((((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID()),adcDataItem.GetADCData());
+				}
+				else if(adcDataItem.GetADCRange() == 1){
+					highEnergyChannelADC->Fill((((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID()),adcDataItem.GetADCData());
+				}
+			#endif
+
+			//Send ADC item to the event builder to be built
+			myEventBuilder.AddADCEvent(adcDataItem);
+			totalDataWords++;
 		}
 		else if(timestampMSBStatus){
 		#endif
