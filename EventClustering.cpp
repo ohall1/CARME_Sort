@@ -363,8 +363,8 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 				if(abs(clusterSide0It->GetEnergy()-clusterSide1It->GetEnergy()) <= equalEnergyRange){
 					//Is the difference between the two clusters less than the equal energy cuts
 
-					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<3500) ||
-						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<3500) ){
+					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<4000) ||
+						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<4000) ){
 
 						//Set the x and y multiplicity of the clusters
 						clusterSide0It->SetMultiplicity(dssdSideMultiplicity[0][dssd]);
