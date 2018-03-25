@@ -39,6 +39,9 @@ EventClustering::EventClustering(){
 	    outputTree->Branch("aida_hit",&mergerOutput,"T/l:Tfast/l:E/D:Ex/D:Ey/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
 	#endif
 
+	implantStoppingCounter = 0;
+	implantPairCounter = 0;
+
 };
 
 void EventClustering::InitialiseClustering(){
@@ -83,7 +86,10 @@ void EventClustering::ProcessMaps(){
 		//Do not expect many clusters here but just in case
 		ClusterMap(implantMap);
 		implantStoppingLayer = ImplantStoppingLayer();
-		PairClusters(implantStoppingLayer, implantEnergyDifference, dssdImplantLists);
+		if(implantStoppingLayer >= 0){
+			implantStoppingCounter++;
+			PairClusters(implantStoppingLayer, implantEnergyDifference, dssdImplantLists);
+		}
 
 		#ifdef DEB_IMPLANT_STOPPING
 			if(implantStoppingLayer > -1){
@@ -93,7 +99,7 @@ void EventClustering::ProcessMaps(){
 				negativeStopping++;
 			}	
 
-			std::cout << "Ne event" << std::endl;
+			std::cout << "New event" << std::endl;
 			int Etest = 0;
 			int Etest2 = 0;	
 
@@ -357,8 +363,8 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 				if(abs(clusterSide0It->GetEnergy()-clusterSide1It->GetEnergy()) <= equalEnergyRange){
 					//Is the difference between the two clusters less than the equal energy cuts
 
-					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<2500) ||
-						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<2500) ){
+					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<3500) ||
+						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<3500) ){
 
 						//Set the x and y multiplicity of the clusters
 						clusterSide0It->SetMultiplicity(dssdSideMultiplicity[0][dssd]);
@@ -403,7 +409,9 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 							pairedEnergy++;
 							clusterPairE = true;
 						}
-						std::cout << "Percentage of paired event making E " << (double)pairedEnergy/clusterTotal<< std::endl;
+						std::cout << "Percentage of paired event making E but not T" << (double)pairedEnergy/clusterTotal<< std::endl;
+						std::cout << "Cluster 0 Timsestamps: " << clusterSide0It->GetTimestampMin() << " " << clusterSide0It->GetTimestampMax() <<std::endl;
+						std::cout << "Cluster 0 Timsestamps: " << clusterSide1It->GetTimestampMin() << " " << clusterSide1It->GetTimestampMax() <<std::endl;
 					}
 					#endif
 				}
@@ -419,6 +427,7 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 }
 void EventClustering::CloseClustering(){
 	std::cout << "Clustering finished" <<std::endl;
+	std::cout << "Number of stopping layers calculated: " << implantStoppingCounter << std::endl;
 
 	#ifdef HISTOGRAMMING
 		for(int i =0; i<Common::noDSSD;i++){

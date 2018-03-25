@@ -29,6 +29,9 @@ class EventClustering{
 		const double implantEnergyDifference = 1000.0;					//Cluster energy difference in MeV for implant clusters
 		const double energyThreshold = 0.0;								//Thresholds used for checking decays
 
+		int implantStoppingCounter;
+		int implantPairCounter;
+
 		bool decayMapCurrent;													//Bool to keep track of whether current map is a decay
 
 		short implantStoppingLayer;										//DSSD that an implant stops in
