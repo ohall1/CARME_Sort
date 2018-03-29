@@ -156,11 +156,11 @@ void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
  	return;
 
 }
-void EventBuilder::SetCorrelationScaler(unsigned long corrOffset){
+void EventBuilder::SetCorrelationScaler(long int corrOffset){
 	correlationScalerOffset = corrOffset;
 	return;
 }
-unsigned long EventBuilder::GetCorrelationScalerOffset(){
+long int EventBuilder::GetCorrelationScalerOffset(){
 	return correlationScalerOffset;
 }
 void EventBuilder::AddEventToBuffer(std::list<ADCDataItem> closedEvent){
