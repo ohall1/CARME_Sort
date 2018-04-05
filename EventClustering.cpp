@@ -41,6 +41,9 @@ EventClustering::EventClustering(){
 
 	implantStoppingCounter = 0;
 	implantPairCounter = 0;
+	implantWindowCounter = 0;
+	implantEnergyMatchCount = 0;
+	implantTimeMatchCounter = 0;
 
 };
 
@@ -85,6 +88,7 @@ void EventClustering::ProcessMaps(){
 		//If there are events in the implant map, cluster them.
 		//Do not expect many clusters here but just in case
 		ClusterMap(implantMap);
+		implantWindowCounter++;
 		implantStoppingLayer = ImplantStoppingLayer();
 		if(implantStoppingLayer >= 0){
 			implantStoppingCounter++;
@@ -362,9 +366,15 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 				#endif
 				if(abs(clusterSide0It->GetEnergy()-clusterSide1It->GetEnergy()) <= equalEnergyRange){
 					//Is the difference between the two clusters less than the equal energy cuts
+					if(equalEnergyRange == implantEnergyDifference){
+						implantEnergyMatchCount++;
+					}
 
 					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<4000) ||
 						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<4000) ){
+						if(equalEnergyRange == implantEnergyDifference){
+							implantTimeMatchCounter++;
+						}
 
 						//Set the x and y multiplicity of the clusters
 						clusterSide0It->SetMultiplicity(dssdSideMultiplicity[0][dssd]);
@@ -427,7 +437,12 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 }
 void EventClustering::CloseClustering(){
 	std::cout << "Clustering finished" <<std::endl;
+	std::cout << "Number of implant event windows processed: " << implantWindowCounter << std::endl;
 	std::cout << "Number of stopping layers calculated: " << implantStoppingCounter << std::endl;
+	std::cout << "Number of implant events with stopping layer making energy cut: " << implantEnergyMatchCount << std::endl;
+	std::cout << "Number of implant events making energy cut also making time cut: " << implantTimeMatchCounter << std::endl;
+	std::cout << "Percentage of implant event windows being written to file: " << (double)implantTimeMatchCounter/((double)implantWindowCounter) << std::endl;
+
 
 	#ifdef HISTOGRAMMING
 		for(int i =0; i<Common::noDSSD;i++){

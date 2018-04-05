@@ -31,6 +31,9 @@ class EventClustering{
 
 		int implantStoppingCounter;
 		int implantPairCounter;
+		int implantWindowCounter;
+		int implantEnergyMatchCount;
+		int implantTimeMatchCounter;
 
 		bool decayMapCurrent;													//Bool to keep track of whether current map is a decay
 
