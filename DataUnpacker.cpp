@@ -109,7 +109,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		informationDataItem.BuildItem(wordsIn);
 
 		if(informationDataItem.GetInfoCode() == 2){				//Pause information item
-			timestampMSB = informationDataItem.GetTimestampMSB();
+			//timestampMSB = informationDataItem.GetTimestampMSB();
 			timestampMSBStatus = true;
 			pauseItemCounter[informationDataItem.GetFEE64ID()-1] += 1;
 
@@ -118,7 +118,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			#endif
 		}
 		else if(informationDataItem.GetInfoCode() == 3){		//Resume information item
-			timestampMSB = informationDataItem.GetTimestampMSB();
+			//timestampMSB = informationDataItem.GetTimestampMSB();
 			timestampMSBStatus = true;
 			resumeItemCounter[informationDataItem.GetFEE64ID()-1] += 1;
 
