@@ -27,6 +27,7 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 	correlationScalerChangeCounter = 0;
 
 	correlationScalerStatus = false;
+	timestampMSBStatus = false;
 
 	#ifdef HISTOGRAMMING
 		lowEnergyChannelADC = new TH2D("lowEnergyChannelADC","",1536,0,1536,5e2,0,65536);
@@ -110,7 +111,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 
 		if(informationDataItem.GetInfoCode() == 2){				//Pause information item
 			//timestampMSB = informationDataItem.GetTimestampMSB();
-			timestampMSBStatus = true;
+			//timestampMSBStatus = true;
 			pauseItemCounter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
@@ -119,7 +120,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		}
 		else if(informationDataItem.GetInfoCode() == 3){		//Resume information item
 			//timestampMSB = informationDataItem.GetTimestampMSB();
-			timestampMSBStatus = true;
+			//timestampMSBStatus = true;
 			resumeItemCounter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
