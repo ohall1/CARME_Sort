@@ -15,6 +15,7 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 		pauseItemCounter[i] = 0;
 		resumeItemCounter[i] = 0;
 		sync100Counter[i] = 0;
+		timestampMSBStatus[i] = false;
 	}
 	correlationScalerData0 = 0;
 	correlationScalerData1 = 0;
@@ -63,10 +64,10 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		//ADC data item - Unpack into ADCDataItem format
 		adcDataItem.BuildItem(wordsIn);
 
-		if (timestampMSBStatus && correlationScalerStatus){//If timestampMSB has been obtained from inforation data set the timestamp of the adc data
+		if (timestampMSBStatus[adcDataItem.GetFEE64ID()-1] && correlationScalerStatus){//If timestampMSB has been obtained from inforation data set the timestamp of the adc data
 
 		#ifdef OFFSETS
-			adcDataItem.BuildTimestamp(timestampMSB);
+			adcDataItem.BuildTimestamp(timestampMSB[adcDataItem.GetFEE64ID()-1]);
 
 			//If histogramming turned on add event information to histograms
 			#ifdef HISTOGRAMMING
@@ -82,9 +83,9 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			myEventBuilder.AddADCEvent(adcDataItem);
 			totalDataWords++;
 		}
-		else if(timestampMSBStatus){
+		else if(timestampMSBStatus[adcDataItem.GetFEE64ID()-1]){
 		#endif
-			adcDataItem.BuildTimestamp(timestampMSB);
+			adcDataItem.BuildTimestamp(timestampMSB[adcDataItem.GetFEE64ID()-1]);
 
 			//If histogramming turned on add event information to histograms
 			#ifdef HISTOGRAMMING
@@ -110,7 +111,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 
 		if(informationDataItem.GetInfoCode() == 2){				//Pause information item
 			//timestampMSB = informationDataItem.GetTimestampMSB();
-			timestampMSBStatus = true;
+			//timestampMSBStatus = true;
 			pauseItemCounter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
@@ -119,7 +120,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		}
 		else if(informationDataItem.GetInfoCode() == 3){		//Resume information item
 			//timestampMSB = informationDataItem.GetTimestampMSB();
-			timestampMSBStatus = true;
+			//timestampMSBStatus = true;
 			resumeItemCounter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
@@ -127,8 +128,8 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			#endif
 		}
 		else if(informationDataItem.GetInfoCode() == 4){		//SYNC100 information item
-			timestampMSB = informationDataItem.GetTimestampMSB();
-			timestampMSBStatus = true;
+			timestampMSB[informationDataItem.GetFEE64ID()-1] = informationDataItem.GetTimestampMSB();
+			timestampMSBStatus[informationDataItem.GetFEE64ID()-1] = true;
 			sync100Counter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
@@ -137,8 +138,8 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		}
 		else if(informationDataItem.GetInfoCode() == 8 && informationDataItem.GetFEE64ID() == Common::masterFEE64){		//Correlation scaler data item
 
-			if(timestampMSBStatus){//No MSB information in scaler so can't set timestamp in constructor
-				informationDataItem.SetTimestamp(timestampMSB);
+			if(timestampMSBStatus[informationDataItem.GetFEE64ID()-1]){//No MSB information in scaler so can't set timestamp in constructor
+				informationDataItem.SetTimestamp(timestampMSB[informationDataItem.GetFEE64ID()-1]);
 
 				if(informationDataItem.GetCorrScalerIndex() == 0){ //Scaler is split across three data word pairs need to combine the three to get the scaler
 					correlationScalerData0 = informationDataItem.GetCorrScalerTimestamp();

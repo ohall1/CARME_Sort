@@ -131,27 +131,43 @@ void EventBuilder::CloseEvent(){
 
 void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
 
-	//Check if event is still within event window
-	if((adcItem.GetTimestamp()-previousTimestamp)>=220 && previousTimestamp != 0){
-		//Gap between items greater than multiplexed time period. New item is the start of a new event close the old event
-		CloseEvent();
-		InitialiseEvent();
+	mergerMap.emplace(adcItem.GetTimestamp(),adcItem);
+	ADCDataItem mergedItem;
+
+	mergerItEnd = mergerMap.end();
+	mergerItEnd--;
+	mergerItStart = mergerMap.begin();
+	if( mergerItEnd->second.GetTimestamp() - mergerItStart->first > 1e8 && mergerMap.size()>1){
+		while(mergerItEnd->first - mergerItStart->first > 1e8){
+			mergedItem = mergerItStart->second;
+
+			//Check if event is still within event window
+			if((mergerItStart->first-previousTimestamp)>=220 && previousTimestamp != 0){
+				//Gap between items greater than multiplexed time period. New item is the start of a new event close the old event
+				CloseEvent();
+				InitialiseEvent();
+			}
+			previousTimestamp = mergerItStart->first;		
+
+			CorrectMultiplexer(mergedItem);		
+
+			ApplyCorrelationScalerOffset(mergedItem);	
+			
+
+		 	if(mergerItStart->second.GetADCRange() == 0){
+		 		//Low energy event. Add to decay list
+		 		decayEvents.push_back(mergedItem);
+		 	}
+		 	else if( mergerItStart->second.GetADCRange() == 1){
+		 		//High energy event. Add to implant list
+		 		implantEvents.push_back(mergedItem);
+		 	}
+		 	mergerMap.erase(mergerItStart);
+		 	mergerItStart = mergerMap.begin();
+
+		}
 	}
-	previousTimestamp = adcItem.GetTimestamp();
 
-	CorrectMultiplexer(adcItem);
-
-	ApplyCorrelationScalerOffset(adcItem);
-
-
- 	if( adcItem.GetADCRange() == 0){
- 		//Low energy event. Add to decay list
- 		decayEvents.push_back(adcItem);
- 	}
- 	else if( adcItem.GetADCRange() == 1){
- 		//High energy event. Add to implant list
- 		implantEvents.push_back(adcItem);
- 	}
 
  	return;
 

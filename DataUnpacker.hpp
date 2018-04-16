@@ -37,7 +37,7 @@ class DataUnpacker{
 		unsigned long correlationScaler;				//Correlation scaler between AIDA and other DAQs
 		long int correlationScalerOffset;				//Offset between correlation scaler and AIDA timstamp
 		bool correlationScalerStatus;					//Status off correlation scaler
-		unsigned long timestampMSB;						//Most significant bit of the timestamp
+		unsigned long timestampMSB[Common::noFEE64];						//Most significant bit of the timestamp
 
 		unsigned int pauseItemCounter[Common::noFEE64];
 		unsigned int resumeItemCounter[Common::noFEE64];
@@ -53,7 +53,7 @@ class DataUnpacker{
 		unsigned int dataType;		//Data type of data words
 
 		bool correlationStatus;		//Bool to keep track of whether correlation scaler has been measured
-		bool timestampMSBStatus;	//Bool to keep track of whether timeStampMSB has been set
+		bool timestampMSBStatus[Common::noFEE64];	//Bool to keep track of whether timeStampMSB has been set
 
 		//Histrogramming declarations
 		#ifdef HISTOGRAMMING

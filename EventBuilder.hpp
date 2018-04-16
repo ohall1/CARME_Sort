@@ -20,6 +20,9 @@ private:
 	//Lists to store data events
 	std::list <ADCDataItem> decayEvents;		//list to store decay events
 	std::list <ADCDataItem> implantEvents;		//list to store implant events
+	std::multimap <unsigned long, ADCDataItem> mergerMap;
+	std::multimap <unsigned long, ADCDataItem>::iterator mergerItEnd;
+	std::multimap <unsigned long, ADCDataItem>::iterator mergerItStart;
 
 	std::list <std::list<ADCDataItem>> eventsList;			//List to store events to be calibrated
 
