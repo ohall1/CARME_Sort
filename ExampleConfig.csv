@@ -1,5 +1,5 @@
 #Include Single AIDA File
-AIDAFile	/mnt/c/Users/oscar/Documents/Code/data/R6_237
+AIDAFile	/mnt/c/Users/oscar/Documents/Code/data/R1300_0
 
 #Include multiple AIDA files format "String before run number" <run number> <sub-run start> <sub-run end>
 #AIDAList R 6 17 20

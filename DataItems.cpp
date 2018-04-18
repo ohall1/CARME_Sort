@@ -22,11 +22,12 @@ void ADCDataItem::BuildItem(std::pair < unsigned int, unsigned int> inData){
 }
 void ADCDataItem::BuildTimestamp(unsigned long MSB){
 	if(timestampLSB <= 0x00000A0){
-		timestamp = ((MSB+1+Common::offsetMSBFEE64[fee64ID-1]) << 28) | timestampLSB;
+		timestamp = ((MSB+1) << 28) | timestampLSB;
 	}
 	else{
-		timestamp = ((MSB+Common::offsetMSBFEE64[fee64ID-1]) << 28) | timestampLSB;
+		timestamp = ((MSB) << 28) | timestampLSB;
 	}
+	timestamp = timestamp - (Common::offsetMSBFEE64[fee64ID-1]*0x40000);
 }
 void ADCDataItem::SetTimestamp(unsigned long newTimestamp){
 	timestamp = newTimestamp;
@@ -96,11 +97,13 @@ void InformationDataItem::BuildItem(std::pair < unsigned int, unsigned int> inDa
 }
 void InformationDataItem::SetTimestamp(unsigned long MSB){
 	if(timestampLSB <= 0x00000A0){
-		timestamp = ((MSB+1+Common::offsetMSBFEE64[fee64ID-1]) << 28) | timestampLSB;
+		timestamp = ((MSB+1) << 28) | timestampLSB;
 	}
 	else{
-		timestamp = ((MSB+Common::offsetMSBFEE64[fee64ID-1]) << 28) | timestampLSB;
+		timestamp = ((MSB) << 28) | timestampLSB;
 	}
+
+	timestamp = timestamp - (Common::offsetMSBFEE64[fee64ID-1]* 0x40000);
 }
 unsigned long InformationDataItem::GetTimestampMSB(){
 	return timestampMSB;

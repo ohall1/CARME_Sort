@@ -75,19 +75,7 @@ void EventBuilder::CloseEvent(){
 	//Second check: If size of implant map > 0 - Define as implant event. Will currently veto all decays
 	//Thir check: If implant map == 0 and decay map > 0 define as decay event
 
-	if(implantEvents.size() > 1){//Need at least two events to make a front back pair
-		#ifdef DEB_EVENTBUILDER
-			std::cout << "End of event window." <<std::endl;
-			std::cout << "Size of implant events > 0. Event defined as implant event. Implant size = " << implantEvents.size() <<std::endl;
-			std::cout << "Implant events being passed onto calibrator.\n" <<std::endl;
-		#endif
-		#ifdef HISTOGRAMMING
-			highEnergyMultiplicity->Fill(implantEvents.size());
-		#endif
-		AddEventToBuffer(implantEvents);
-		totalImplantEvents++;
-	}
-	else if(decayEvents.size() > 128*Common::noDSSD){//Half the number of channels per dssd
+	if(decayEvents.size() > 128*Common::noDSSD){//Half the number of channels per dssd
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Size of decay list > 800. Event being defined as a pulser event. Multiplicity = " << decayEvents.size() << "\n" << std::endl;
@@ -108,6 +96,18 @@ void EventBuilder::CloseEvent(){
 				absPulserVsChannel->Fill((((decayEventsIt->GetFEE64ID()-1)*64)+decayEventsIt->GetChannelID()),abs(decayEventsIt->GetADCData()-32768.0));
 			}
 		#endif
+	}
+	else if(implantEvents.size() > 1){//Need at least two events to make a front back pair
+		#ifdef DEB_EVENTBUILDER
+			std::cout << "End of event window." <<std::endl;
+			std::cout << "Size of implant events > 0. Event defined as implant event. Implant size = " << implantEvents.size() <<std::endl;
+			std::cout << "Implant events being passed onto calibrator.\n" <<std::endl;
+		#endif
+		#ifdef HISTOGRAMMING
+			highEnergyMultiplicity->Fill(implantEvents.size());
+		#endif
+		AddEventToBuffer(implantEvents);
+		totalImplantEvents++;
 	}
 	else if(decayEvents.size() > 1){//Need at least two items to make a front back pair
 		#ifdef DEB_EVENTBUILDER
