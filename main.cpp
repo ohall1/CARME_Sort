@@ -17,7 +17,6 @@
 #define HISTOGRAMMING
 #define MERGER_OUTPUT
 
-
 #include "Common.hpp"
 #include "DataReader.cpp"
 #include "DataUnpacker.cpp"
@@ -27,14 +26,14 @@
 #include "EventClustering.cpp"
 
 void Usage(char *progname){
-	std::cout << "Usage: AIDASort -c configFile -o OutputFile" << std::endl;
+	std::cout << "Usage: AIDASort -c configFile -s syncOffsetsFile -o OutputFile" << std::endl;
 	exit;
 }
 
 int main(int argc, char **argv){
 
 	std::string runName, line;
-	std::string configFile, aidaParameters;
+	std::string configFile, aidaParameters, syncOffsetsFile;
 	std::string inFile, outFile, userOutFile;
 	std::string dataDir, outputDir;
 	int runNum, subRunStart, subRunEnd;
@@ -60,6 +59,11 @@ int main(int argc, char **argv){
 					case 'c':
 						configFile = argv[++i];
 						std::cout << "Configuration file: "<< configFile << std::endl;
+						break;
+
+				        case 's':
+         					syncOffsetsFile = argv[++i];
+	        				std::cout << "Sync offsets file " << syncOffsetsFile << std::endl;
 						break;
 
 					case 'o':
@@ -158,7 +162,7 @@ int main(int argc, char **argv){
 	calibratorPoint = &myCalibrator;
 
 	myDataReader.InitialiseReader(AIDAFileList);
-	eventBuilderPoint = myDataUnpacker.InitialiseDataUnpacker();
+	eventBuilderPoint = myDataUnpacker.InitialiseDataUnpacker(syncOffsetsFile);
 	myCalibrator.InitialiseCalibrator(aidaParameters, eventBuilderPoint);
 
 	std::thread th1 (&DataReader::BeginReader,dataReaderPoint);

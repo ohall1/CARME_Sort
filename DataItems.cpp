@@ -2,444 +2,481 @@
 ADCDataItem::ADCDataItem(){};
 ADCDataItem::ADCDataItem(std::pair < unsigned int, unsigned int> inData){
 
-	dataType = 3;
-	unsigned int chIdentity = (inData.first >> 16) & 0xFFF; //Word 0, bits 16:27
-	fee64ID = (chIdentity >> 6) & 0x003F;  					//Top 6 bit of chIdentity (22:27) are FEE64 number
-	channelID = chIdentity & 0x003f;						//Bottom 6 bits of chIdentity (16:21) are channel number
-	adcRange = (inData.first >> 28 ) & 0x0001;				//Bit 28 - Veto bit used as ADC range
-	adcData = (inData.first & 0xFFFF); 						//Bits 0:15 of Word 0 is ADC data
-	timestampLSB = (inData.second & 0x0FFFFFFF);				//Word 1, bits 0:27 - Timestamp LSB
+  dataType = 3;
+  unsigned int chIdentity = (inData.first >> 16) & 0xFFF; //Word 0, bits 16:27
+  fee64ID = (chIdentity >> 6) & 0x003F;  			//Top 6 bit of chIdentity (22:27) are FEE64 number
+  channelID = chIdentity & 0x003f;			//Bottom 6 bits of chIdentity (16:21) are channel number
+  adcRange = (inData.first >> 28 ) & 0x0001;	        //Bit 28 - Veto bit used as ADC range
+  adcData = (inData.first & 0xFFFF); 			//Bits 0:15 of Word 0 is ADC data
+  timestampLSB = (inData.second & 0x0FFFFFFF);		//Word 1, bits 0:27 - Timestamp LSB
 
 }
 void ADCDataItem::BuildItem(std::pair < unsigned int, unsigned int> inData){
-	dataType = 3;
-	unsigned int chIdentity = (inData.first >> 16) & 0xFFF; //Word 0, bits 16:27
-	fee64ID = (chIdentity >> 6) & 0x003F;  					//Top 6 bit of chIdentity (22:27) are FEE64 number
-	channelID = chIdentity & 0x003f;						//Bottom 6 bits of chIdentity (16:21) are channel number
-	adcRange = (inData.first >> 28 ) & 0x0001;				//Bit 28 - Veto bit used as ADC range
-	adcData = (inData.first & 0xFFFF); 						//Bits 0:15 of Word 0 is ADC data
-	timestampLSB = (inData.second & 0x0FFFFFFF);				//Word 1, bits 0:27 - Timestamp LSB
+  dataType = 3;
+  unsigned int chIdentity = (inData.first >> 16) & 0xFFF; //Word 0, bits 16:27
+  fee64ID = (chIdentity >> 6) & 0x003F;  			//Top 6 bit of chIdentity (22:27) are FEE64 number
+  channelID = chIdentity & 0x003f;			//Bottom 6 bits of chIdentity (16:21) are channel number
+  adcRange = (inData.first >> 28 ) & 0x0001;		//Bit 28 - Veto bit used as ADC range
+  adcData = (inData.first & 0xFFFF); 			//Bits 0:15 of Word 0 is ADC data
+  timestampLSB = (inData.second & 0x0FFFFFFF);		//Word 1, bits 0:27 - Timestamp LSB
+}
+void ADCDataItem::BuildScalerItem(std::pair < unsigned int, unsigned int> inData){
+  dataType     = 2;
+  fee64ID      = (inData.first >> 24) & 0x003F; 	//Top 6 bit of chIdentity (22:27) are FEE64 number
+  adcRange     = 2;		                        //ADC range bit cannot take value 2 -> set it to this to differentiate from real ADC data
+  //timestampLSB = (inData.second & 0x0FFFFFFF);		//Word 1, bits 0:27 - Timestamp LSB
 }
 void ADCDataItem::BuildTimestamp(unsigned long MSB){
-	if(timestampLSB < 0x00000A0){
-		timestamp = ((MSB+1) << 28) | timestampLSB;
-	}
-	else{
-		timestamp = ((MSB) << 28) | timestampLSB;
-	}
-	timestamp = timestamp - (Common::offsetMSBFEE64[fee64ID-1]*0x40000);
+  if(timestampLSB < 0x00000A0){
+    timestamp = ((MSB+1) << 28) | timestampLSB;
+  }
+  else{
+    timestamp = ((MSB) << 28) | timestampLSB;
+  }
+  timestamp = timestamp - (Common::offsetMSBFEE64[fee64ID-1]*0x40000);
 }
 void ADCDataItem::SetTimestamp(unsigned long newTimestamp){
-	timestamp = newTimestamp;
+  timestamp = newTimestamp;
 }
-unsigned long ADCDataItem::GetTimestamp(){
-	return timestamp;
-}
-int ADCDataItem::GetFEE64ID(){
-	return fee64ID;
-}
-unsigned int ADCDataItem::GetADCRange(){
-	return adcRange;
-}
-unsigned int ADCDataItem::GetChannelID(){
-	return channelID;
-}
-unsigned int ADCDataItem::GetADCData(){
-	return adcData;
+void ADCDataItem::SetTimestampLSB(unsigned long value){
+  timestampLSB = value;
 }
 void ADCDataItem::SetADCRange(short range){
-	adcRange = range;
+  adcRange = range;
+}
+unsigned long ADCDataItem::GetTimestamp(){
+  return timestamp;
+}
+unsigned long ADCDataItem::GetTimestampLSB(){
+  return timestampLSB;
+}
+int ADCDataItem::GetFEE64ID(){
+  return fee64ID;
+}
+unsigned int ADCDataItem::GetADCRange(){
+  return adcRange;
+}
+unsigned int ADCDataItem::GetChannelID(){
+  return channelID;
+}
+unsigned int ADCDataItem::GetADCData(){
+  return adcData;
 }
 
 InformationDataItem::InformationDataItem(){};
 InformationDataItem::InformationDataItem(std::pair < unsigned int, unsigned int> inData){
 
-	dataType = 2;
+  dataType = 2;
 
-	infoField = ( inData.first & 0x000FFFFF); 				//Word 0, bits 0:19 is the information field
-	infoCode = (inData.first >> 20) & 0x000F;				//Word 0, bits 20:23 - Information code
-	fee64ID = (inData.first >> 24) & 0x003F;				//Word 0, bits 24:29 - FEE64 module number
-	timestampLSB = (inData.second & 0x0FFFFFFF);			//Word 1, bits 0:27 - Timestamp LSB
+  infoField = ( inData.first & 0x000FFFFF); 			//Word 0, bits 0:19 is the information field
+  infoCode = (inData.first >> 20) & 0x000F;			//Word 0, bits 20:23 - Information code
+  fee64ID = (inData.first >> 24) & 0x003F;			//Word 0, bits 24:29 - FEE64 module number
+  timestampLSB = (inData.second & 0x0FFFFFFF);			//Word 1, bits 0:27 - Timestamp LSB
 
-	if ( infoCode == 2 || infoCode == 3 || infoCode == 4){
-		timestampMSB = infoField;
-		timestamp = (timestampMSB << 28) | timestampLSB;
-	}
+  if ( infoCode == 2 || infoCode == 3 || infoCode == 4){
+    timestampMSB = infoField;
+    timestamp = (timestampMSB << 28) | timestampLSB;
+    timestamp = timestamp - (Common::offsetMSBFEE64[fee64ID-1] * 0x40000);
+  }
 
-	if ( infoCode == 8){
-
-		corrScalerIndex = (infoField & 0x000F0000) >> 16;	//Index of correlation scaler
-		corrScalerTimestamp = (infoField & 0x0000FFFF);		//Bits with timestamp
-
-	}
-
-
+  if ( infoCode == 8){
+    corrScalerIndex = (infoField & 0x000F0000) >> 16;	//Index of correlation scaler
+    corrScalerTimestamp = (infoField & 0x0000FFFF);		//Bits with timestamp
+  }
 }
 void InformationDataItem::BuildItem(std::pair < unsigned int, unsigned int> inData){
-	dataType = 2;
+  dataType = 2;
 
-	infoField = ( inData.first & 0x000FFFFF); 				//Word 0, bits 0:19 is the information field
-	infoCode = (inData.first >> 20) & 0x000F;				//Word 0, bits 20:23 - Information code
-	fee64ID = (inData.first >> 24) & 0x003F;				//Word 0, bits 24:29 - FEE64 module number
-	timestampLSB = (inData.second & 0x0FFFFFFF);			//Word 1, bits 0:27 - Timestamp LSB
+  infoField = ( inData.first & 0x000FFFFF); 			//Word 0, bits 0:19 is the information field
+  infoCode = (inData.first >> 20) & 0x000F;			//Word 0, bits 20:23 - Information code
+  fee64ID = (inData.first >> 24) & 0x003F;			//Word 0, bits 24:29 - FEE64 module number
+  timestampLSB = (inData.second & 0x0FFFFFFF);			//Word 1, bits 0:27 - Timestamp LSB
 
-	if ( infoCode == 2 || infoCode == 3 || infoCode == 4){
-		timestampMSB = infoField;
-		timestamp = (timestampMSB << 28) | timestampLSB;
-	}
+  if (infoCode == 2 || infoCode == 3 || infoCode == 4){
+    timestampMSB = infoField;
+    timestamp = (timestampMSB << 28) | timestampLSB;
+    timestamp = timestamp - (Common::offsetMSBFEE64[fee64ID-1] * 0x40000);
+  }
 
-	if ( infoCode == 8){
+  if (infoCode == 8){
 
-		corrScalerIndex = (infoField & 0x000F0000) >> 16;	//Index of correlation scaler
-		corrScalerTimestamp = (infoField & 0x0000FFFF);		//Bits with timestamp
+    corrScalerIndex = (infoField & 0x000F0000) >> 16;	//Index of correlation scaler
+    corrScalerTimestamp = (infoField & 0x0000FFFF);		//Bits with timestamp
 
-	}
+  }
 }
 void InformationDataItem::SetTimestamp(unsigned long MSB){
-	if(timestampLSB < 0x00000A0){
-		timestamp = ((MSB+1) << 28) | timestampLSB;
-	}
-	else{
-		timestamp = ((MSB) << 28) | timestampLSB;
-	}
-
-	timestamp = timestamp - (Common::offsetMSBFEE64[fee64ID-1]* 0x40000);
+  if(timestampLSB < 0x00000A0){
+    timestamp = ((MSB+1) << 28) | timestampLSB;
+  }
+  else{
+    timestamp = ((MSB) << 28) | timestampLSB;
+  }
+  timestamp = timestamp - (Common::offsetMSBFEE64[fee64ID-1]* 0x40000);
+}
+void InformationDataItem::SetTimestampFull(unsigned long fullTimestamp){
+  timestamp = fullTimestamp;
+}
+void InformationDataItem::SetCorrScaler(unsigned long corrScaler){
+  corrScalerTimestamp = corrScaler;
 }
 unsigned long InformationDataItem::GetTimestampMSB(){
-	return timestampMSB;
+  return timestampMSB;
 }
 unsigned int InformationDataItem::GetInfoCode(){
-	return infoCode;
+  return infoCode;
 }
 
 unsigned int InformationDataItem::GetCorrScalerIndex(){
-	return corrScalerIndex;
+  return corrScalerIndex;
 }
 unsigned long InformationDataItem::GetCorrScalerTimestamp(){
-	return corrScalerTimestamp;
+  return corrScalerTimestamp;
 }
 unsigned int InformationDataItem::GetFEE64ID(){
-	return fee64ID;
+  return fee64ID;
 }
 unsigned long InformationDataItem::GetTimestamp(){
-	return timestamp;
+  return timestamp;
 }
 unsigned long InformationDataItem::GetTimestampLSB(){
-	return timestampLSB;
+  return timestampLSB;
 }
 
 CalibratedADCDataItem::CalibratedADCDataItem(){};
 CalibratedADCDataItem::CalibratedADCDataItem(ADCDataItem &adcDataItem){
-	energy = adcDataItem.GetADCData();
-	timestamp = adcDataItem.GetTimestamp();
-	#ifdef DEB_CALIBRATOR
-		//std::cout << "\nadcDataItem " << adcDataItem.GetADCData() << " - Non-calibratedItem " << energy << std::endl;
-		//std::cout << "\nadcDataItem " << adcDataItem.GetTimestamp() << " - Non-calibratedItem " << timestamp << std::endl;
-		#endif
+  energy = adcDataItem.GetADCData();
+  timestamp = adcDataItem.GetTimestamp();
+#ifdef DEB_CALIBRATOR
+  //std::cout << "\nadcDataItem " << adcDataItem.GetADCData() << " - Non-calibratedItem " << energy << std::endl;
+  //std::cout << "\nadcDataItem " << adcDataItem.GetTimestamp() << " - Non-calibratedItem " << timestamp << std::endl;
+#endif
 };
 void CalibratedADCDataItem::BuildItem(ADCDataItem &adcDataItem){
-	energy = adcDataItem.GetADCData();
-	timestamp = (adcDataItem.GetTimestamp())*10;	//Convwerts the timestamp to nanoseconds
-	#ifdef DEB_CALIBRATOR
-		//std::cout << "\nadcDataItem " << adcDataItem.GetADCData() << " - Non-calibratedItem " << energy << std::endl;
-		//std::cout << "\nadcDataItem " << adcDataItem.GetTimestamp() << " - Non-calibratedItem " << timestamp << std::endl;
-		#endif	
+  energy = adcDataItem.GetADCData();
+  timestamp = (adcDataItem.GetTimestamp())*10;	//Convwerts the timestamp to nanoseconds
+#ifdef DEB_CALIBRATOR
+  //std::cout << "\nadcDataItem " << adcDataItem.GetADCData() << " - Non-calibratedItem " << energy << std::endl;
+  //std::cout << "\nadcDataItem " << adcDataItem.GetTimestamp() << " - Non-calibratedItem " << timestamp << std::endl;
+#endif	
 }
 void CalibratedADCDataItem::SetDSSD(short dssdIn){
-	dssd = dssdIn;
-	return;
+  dssd = dssdIn;
+  return;
 }
 void CalibratedADCDataItem::SetSide(short sideIn){
-	side = sideIn;
-	return;
+  side = sideIn;
+  return;
 }
 void CalibratedADCDataItem::SetStrip(short stripIn){
-	strip = stripIn;
-	return;
+  strip = stripIn;
+  return;
 }
 void CalibratedADCDataItem::SetADCRange(short adcRangeIn){
-	adcRange = adcRangeIn;
-	return;
+  adcRange = adcRangeIn;
+  return;
 }
 void CalibratedADCDataItem::SetEnergy(double EnergyIn){
-	energy = EnergyIn;
-	return;
+  energy = EnergyIn;
+  return;
 }
 void CalibratedADCDataItem::SetTimestamp(unsigned long timestampIn){
-	timestamp = timestampIn;
-	return;
+  timestamp = timestampIn;
+  return;
 }
 short CalibratedADCDataItem::GetDSSD() const{
-	return dssd;
+  return dssd;
 }
 short CalibratedADCDataItem::GetSide() const{
-	return side;
+  return side;
 }
 short CalibratedADCDataItem::GetStrip() const{
-	return strip;
+  return strip;
 }
 short CalibratedADCDataItem::GetADCRange() const{
-	return adcRange;
+  return adcRange;
 }
 double CalibratedADCDataItem::GetEnergy() const{
-	return energy;
+  return energy;
 }
 unsigned long CalibratedADCDataItem::GetTimestamp() const{
-	return timestamp;
+  return timestamp;
 }
 
 bool CalibratedADCDataItem::operator<(const CalibratedADCDataItem &dataItem) const{
-	return dssd < dataItem.GetDSSD() || (dssd == dataItem.GetDSSD() && side < dataItem.GetSide())
-			|| (dssd == dataItem.GetDSSD() && side == dataItem.GetSide() && strip < dataItem.GetStrip());
+  return dssd < dataItem.GetDSSD() || (dssd == dataItem.GetDSSD() && side < dataItem.GetSide())
+    || (dssd == dataItem.GetDSSD() && side == dataItem.GetSide() && strip < dataItem.GetStrip());
 }
 Cluster::Cluster(){
-	dssd = -5;
-	side = -5;
-	stripMin = -5;
-	stripMax = -5;
-	Energy = -5;
-	timestampMin = 0;
-	timestampMax = 0;
-	clusterMultiplicity = -5;
-	eventMultiplicity = -5;
+  dssd = -5;
+  side = -5;
+  stripMin = -5;
+  stripMax = -5;
+  Energy = -5;
+  timestampMin = 0;
+  timestampMax = 0;
+  clusterMultiplicity = -5;
+  eventMultiplicity = -5;
 };
 Cluster::Cluster(CalibratedADCDataItem &dataItem){
-	dssd = dataItem.GetDSSD();
-	side = dataItem.GetSide();
-	stripMin = dataItem.GetStrip();
-	stripMax = stripMin;
-	Energy = dataItem.GetEnergy();
-	adcRange = dataItem.GetADCRange();
-	timestampMin = dataItem.GetTimestamp();
-	timestampMax = timestampMin;
-	clusterMultiplicity = 1;
-	eventMultiplicity = 0;
+  dssd = dataItem.GetDSSD();
+  side = dataItem.GetSide();
+  stripMin = dataItem.GetStrip();
+  stripMax = stripMin;
+  Energy = dataItem.GetEnergy();
+  adcRange = dataItem.GetADCRange();
+  timestampMin = dataItem.GetTimestamp();
+  timestampMax = timestampMin;
+  clusterMultiplicity = 1;
+  eventMultiplicity = 0;
 }
 void Cluster::AddEventToCluster(CalibratedADCDataItem dataItem){
 
-	unsigned long timestampIn = dataItem.GetTimestamp();
-	short stripIn = dataItem.GetStrip();
+  unsigned long timestampIn = dataItem.GetTimestamp();
+  short stripIn = dataItem.GetStrip();
 
 
-	if(timestampMin == 0 || timestampMax == 0){
-		timestampMin = timestampIn;
-		timestampMax = timestampIn;
-	}
-	else if(timestampIn < timestampMin){
-		timestampMin = timestampIn;
-	}
-	else if(timestampIn > timestampMax){
-		timestampMax = timestampIn;
-	}
-	else if(timestampIn == timestampMin || timestampIn == timestampMax){}
+  if(timestampMin == 0 || timestampMax == 0){
+    timestampMin = timestampIn;
+    timestampMax = timestampIn;
+  }
+  else if(timestampIn < timestampMin){
+    timestampMin = timestampIn;
+  }
+  else if(timestampIn > timestampMax){
+    timestampMax = timestampIn;
+  }
+  else if(timestampIn == timestampMin || timestampIn == timestampMax){}
 
-	if(stripIn < stripMin){
-		stripMin = stripIn;
-	}
-	else if (stripIn > stripMax && stripMax != -5){
-		stripMax = stripIn;
-	}
-	else if (stripMin == -5 || stripMax == -5){
-		stripMin = stripIn;
-		stripMax = stripIn;
-	}
-	if(clusterMultiplicity == -5){
+  if(stripIn < stripMin){
+    stripMin = stripIn;
+  }
+  else if (stripIn > stripMax && stripMax != -5){
+    stripMax = stripIn;
+  }
+  else if (stripMin == -5 || stripMax == -5){
+    stripMin = stripIn;
+    stripMax = stripIn;
+  }
+  if(clusterMultiplicity == -5){
 
-		dssd = dataItem.GetDSSD();
-		side = dataItem.GetSide();
-		Energy = 0;
-		adcRange = dataItem.GetADCRange();
-		clusterMultiplicity = 0;
-	}
-	Energy += dataItem.GetEnergy();
-	clusterMultiplicity++;
+    dssd = dataItem.GetDSSD();
+    side = dataItem.GetSide();
+    Energy = 0;
+    adcRange = dataItem.GetADCRange();
+    clusterMultiplicity = 0;
+  }
+  Energy += dataItem.GetEnergy();
+  clusterMultiplicity++;
 }
 void Cluster::ResetCluster(){
-	dssd = -5;
-	side = -5;
-	stripMin = -5;
-	stripMax = -5;
-	Energy = -5;
-	timestampMin = 0;
-	timestampMax = 0;
-	clusterMultiplicity = -5;
-	eventMultiplicity = -5;
+  dssd = -5;
+  side = -5;
+  stripMin = -5;
+  stripMax = -5;
+  Energy = -5;
+  timestampMin = 0;
+  timestampMax = 0;
+  clusterMultiplicity = -5;
+  eventMultiplicity = -5;
 }
 short Cluster::GetDSSD() const{
-	return dssd;
+  return dssd;
 }
 short Cluster::GetSide() const{
-	return side;
+  return side;
 }
 short Cluster::GetStrip() const{
-	return stripMax;
+  return stripMax;
 }
 short Cluster::GetStripMin() const{
-	return stripMin;
+  return stripMin;
 }
 short Cluster::GetADCRange() const{
-	return adcRange;
+  return adcRange;
 }
 double Cluster::GetEnergy() const{
-	return Energy;
+  return Energy;
 }
 unsigned long Cluster::GetTimestampMin() const{
-	return timestampMin;
+  return timestampMin;
 }
 unsigned long Cluster::GetTimestampMax() const{
-	return timestampMax;
+  return timestampMax;
 }
 short Cluster::GetSize() const{
-	return clusterMultiplicity;
+  return clusterMultiplicity;
 }
 short Cluster::GetMultiplicity() const{
-	return eventMultiplicity;
+  return eventMultiplicity;
 }
 unsigned long Cluster::GetTimestampDifference(unsigned long timestampIn) const{
-	unsigned long timestampDifMin;
-	unsigned long timestampDifMax;
+  unsigned long timestampDifMin;
+  unsigned long timestampDifMax;
 
-	timestampDifMin = abs(timestampMin-timestampIn);
-	timestampDifMax = abs(timestampMax-timestampIn);
+  timestampDifMin = abs(timestampMin-timestampIn);
+  timestampDifMax = abs(timestampMax-timestampIn);
 
-	if(timestampDifMin < timestampDifMax){
-		return timestampDifMin;
-	}
-	else if(timestampDifMax < timestampDifMin){
-		return timestampDifMax;
-	}
-	else if( timestampDifMin == timestampDifMax && timestampMin != 0){
-		return timestampDifMin;
-	}
-	else if( timestampMin == 0){
-		return 0;
-	} 
-	else{
-		return 0;
-	}
+  if(timestampDifMin < timestampDifMax){
+    return timestampDifMin;
+  }
+  else if(timestampDifMax < timestampDifMin){
+    return timestampDifMax;
+  }
+  else if( timestampDifMin == timestampDifMax && timestampMin != 0){
+    return timestampDifMin;
+  }
+  else if( timestampMin == 0){
+    return 0;
+  } 
+  else{
+    return 0;
+  }
 }
 void Cluster::SetMultiplicity(short multiplicity){
-	eventMultiplicity = multiplicity;
+  eventMultiplicity = multiplicity;
 }
 MergerOutputOld::MergerOutputOld(Cluster & clusterX, Cluster & clusterY){
 
-	if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
-		T = clusterX.GetTimestampMin();
-	}
-	else{
-		T = clusterY.GetTimestampMin();
-	}
+  if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
+    T = clusterX.GetTimestampMin();
+  }
+  else{
+    T = clusterY.GetTimestampMin();
+  }
 
-	Tfast = 0;
+  Tfast = 0;
 
-	Ex = clusterX.GetEnergy();
-	Ey = clusterY.GetEnergy();
+  Ex = clusterX.GetEnergy();
+  Ey = clusterY.GetEnergy();
 
-	E = (Ex + Ey)/2.0;
+  E = (Ex + Ey)/2.0;
 
-	x = clusterX.GetStripMin();
-	y = clusterY.GetStripMin();
-	z = clusterX.GetDSSD();
+  x = clusterX.GetStripMin();
+  y = clusterY.GetStripMin();
+  z = clusterX.GetDSSD();
 
-	nx = clusterX.GetMultiplicity();
-	ny = clusterY.GetMultiplicity();
-	nz = 0;
+  nx = clusterX.GetMultiplicity();
+  ny = clusterY.GetMultiplicity();
+  nz = 0;
 
-	if(clusterX.GetADCRange() == 0){
-		ID = 5;
-	}
-	else if(clusterY.GetADCRange() == 1){
-		ID = 4;
-	}
-	else{
-		ID==4;
-	}
+  if(clusterX.GetADCRange() == 0){
+    ID = 5;
+  }
+  else if(clusterY.GetADCRange() == 1){
+    ID = 4;
+  }
+  else{
+    ID==4;
+  }
 
 }
 ULong_t MergerOutputOld::GetTimestamp()const{
-	return T;
+  return T;
 }
 MergerOutputNewTrial::MergerOutputNewTrial(Cluster & clusterX, Cluster & clusterY){
 
-	if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
-		T = clusterX.GetTimestampMin();
-	}
-	else{
-		T = clusterY.GetTimestampMin();
-	}
+  if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
+    T = clusterX.GetTimestampMin();
+  }
+  else{
+    T = clusterY.GetTimestampMin();
+  }
 
-	Tfast = 0;
+  Tfast = 0;
 
-	Ex = clusterX.GetEnergy();
-	Ey = clusterY.GetEnergy();
+  Ex = clusterX.GetEnergy();
+  Ey = clusterY.GetEnergy();
 
-	E = (Ex + Ey)/2.0;
+  E = (Ex + Ey)/2.0;
 
-	xMin = clusterX.GetStripMin();
-	yMin = clusterY.GetStripMin();
+  xMin = clusterX.GetStripMin();
+  yMin = clusterY.GetStripMin();
 
-	xMax = clusterX.GetStrip();
-	yMax = clusterY.GetStrip();
-	z = clusterX.GetDSSD();
+  xMax = clusterX.GetStrip();
+  yMax = clusterY.GetStrip();
+  z = clusterX.GetDSSD();
 
-	nx = clusterX.GetMultiplicity();
-	ny = clusterY.GetMultiplicity();
-	nz = 0;
+  nx = clusterX.GetMultiplicity();
+  ny = clusterY.GetMultiplicity();
+  nz = 0;
 
-	if(clusterX.GetADCRange() == 0){
-		ID = 5;
-	}
-	else if(clusterY.GetADCRange() == 1){
-		ID = 4;
-	}
-	else{
-		ID==4;
-	}
+  if(clusterX.GetADCRange() == 0){
+    ID = 5;
+  }
+  else if(clusterY.GetADCRange() == 1){
+    ID = 4;
+  }
+  else{
+    ID==4;
+  }
 
 }
 ULong_t MergerOutputNewTrial::GetTimestamp()const{
-	return T;
+  return T;
 }
 MergerOutput::MergerOutput(Cluster & clusterX, Cluster & clusterY){
 
-	if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
-		T = clusterX.GetTimestampMin();
-	}
-	else{
-		T = clusterY.GetTimestampMin();
-	}
+  if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
+    T = clusterX.GetTimestampMin();
+  }
+  else{
+    T = clusterY.GetTimestampMin();
+  }
 
-	uint8_t dx = (clusterX.GetStrip()-clusterX.GetStripMin());
-	uint8_t dy = (clusterY.GetStrip()-clusterY.GetStripMin());
-	uint8_t dxCal;
-	uint8_t dyCal;
+  uint8_t dx = (clusterX.GetStrip()-clusterX.GetStripMin());
+  uint8_t dy = (clusterY.GetStrip()-clusterY.GetStripMin());
+  uint8_t dxCal;
+  uint8_t dyCal;
 
-	Tfast = dx + 0x10 * dy;
+  Tfast = dx + 0x10 * dy;
 
-	Ex = clusterX.GetEnergy();
-	Ey = clusterY.GetEnergy();
+  Ex = clusterX.GetEnergy();
+  Ey = clusterY.GetEnergy();
 
-	E = (Ex + Ey)/2.0;
+  E = (Ex + Ey)/2.0;
 
-	x = ((clusterX.GetStripMin() + clusterX.GetStrip())/2.0);
-	y = ((clusterY.GetStripMin() + clusterY.GetStrip())/2.0);
-	z = clusterX.GetDSSD();
+  x = ((clusterX.GetStripMin() + clusterX.GetStrip())/2.0);
+  y = ((clusterY.GetStripMin() + clusterY.GetStrip())/2.0);
+  z = clusterX.GetDSSD();
 
-	nx = clusterX.GetMultiplicity();
-	ny = clusterY.GetMultiplicity();
-	nz = 0;
+  nx = clusterX.GetMultiplicity();
+  ny = clusterY.GetMultiplicity();
+  nz = 0;
 
-	if(clusterX.GetADCRange() == 0){
-		ID = 5;
-	}
-	else if(clusterY.GetADCRange() == 1){
-		ID = 4;
-	}
-	else{
-		ID==4;
-	}
+  if(clusterX.GetADCRange() == 0){
+    ID = 5;
+  }
+  else if(clusterY.GetADCRange() == 1){
+    ID = 4;
+  }
+  else{
+    ID==4;
+  }
 
 }
 ULong_t MergerOutput::GetTimestamp()const{
-	return T;
+  return T;
+}
+ScalerOutput::ScalerOutput(){
+  T        = -1;
+  scaler   = -1;
+  infoCode = -1;
+  fee      = -1;
+}
+ScalerOutput::ScalerOutput(InformationDataItem & informationDataItem){
+#ifdef DEB_CORRELATION
+  std::cout << "Making scaler event with timestamp: " << informationDataItem.GetTimestamp() << std::endl;
+  std::cout << "\tand correlation scaler: " << informationDataItem.GetCorrScalerTimestamp() << std::endl;
+#endif
+  T        = informationDataItem.GetTimestamp()*10;
+  scaler   = informationDataItem.GetCorrScalerTimestamp();
+  infoCode = informationDataItem.GetInfoCode();
+  fee      = informationDataItem.GetFEE64ID();
+}
+ULong64_t ScalerOutput::GetTimestamp(){
+  return T;
+}
+ULong64_t ScalerOutput::GetScaler(){
+  return scaler;
 }
