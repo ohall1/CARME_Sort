@@ -326,7 +326,7 @@ short EventClustering::ImplantStoppingLayer(){
 				//If not the first detector, check for upstream events
 				for(int upstreamDet = 0; upstreamDet < stoppingLayer; upstreamDet++){
 					if(dssdImplantLists[upstreamDet][0].size() == 0 && dssdImplantLists[upstreamDet][1].size() == 0){
-						downstreamEvents = false;
+						upstreamEvents = false;
 						break;
 					}
 				}

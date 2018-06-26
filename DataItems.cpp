@@ -21,7 +21,7 @@ void ADCDataItem::BuildItem(std::pair < unsigned int, unsigned int> inData){
 	timestampLSB = (inData.second & 0x0FFFFFFF);				//Word 1, bits 0:27 - Timestamp LSB
 }
 void ADCDataItem::BuildTimestamp(unsigned long MSB){
-	if(timestampLSB <= 0x00000A0){
+	if(timestampLSB < 0x00000A0){
 		timestamp = ((MSB+1) << 28) | timestampLSB;
 	}
 	else{
@@ -95,7 +95,7 @@ void InformationDataItem::BuildItem(std::pair < unsigned int, unsigned int> inDa
 	}
 }
 void InformationDataItem::SetTimestamp(unsigned long MSB){
-	if(timestampLSB <= 0x00000A0){
+	if(timestampLSB < 0x00000A0){
 		timestamp = ((MSB+1) << 28) | timestampLSB;
 	}
 	else{

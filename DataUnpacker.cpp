@@ -30,8 +30,8 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 	timestampMSBStatus = false;
 
 	#ifdef HISTOGRAMMING
-		lowEnergyChannelADC = new TH2D("lowEnergyChannelADC","",1536,0,1536,5e2,0,65536);
-		highEnergyChannelADC = new TH2D("highEnergyChannelADC","",1536,0,1536,5e2,0,65536);
+		lowEnergyChannelADC = new TH2D("lowEnergyChannelADC","",Common::noFEE64*Common::noChannel,0,Common::noFEE64*Common::noChannel,5e2,0,65536);
+		highEnergyChannelADC = new TH2D("highEnergyChannelADC","",Common::noFEE64*Common::noChannel,0,Common::noFEE64*Common::noChannel,5e2,0,65536);
 		deltaCorrelationScaler = new TH1D("deltaCorrelationScaler","",10000,-5000,5000);
 	#endif
 

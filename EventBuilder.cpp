@@ -11,11 +11,11 @@ EventBuilder::EventBuilder(){
 	pulserEvents = 0;
 
 	#ifdef HISTOGRAMMING
-		pulserVsChannel = new TH2D("pulserVsChannel","",1536,0,1536,1e3,0,65536);
+		pulserVsChannel = new TH2D("pulserVsChannel","",Common::noFEE64*64,0,Common::noFEE64*64,1e3,0,65536);
 		//((FEE*64)+ChannelID  (256*6)), ADCData (2**16))
 
-		lowEnergyMultiplicity = new TH1I("lowEnergyMultiplicity","",1536,0,1536);
-		highEnergyMultiplicity = new TH1I("highEnergyMultiplicity","",1536,0,1536);
+		lowEnergyMultiplicity = new TH1I("lowEnergyMultiplicity","",Common::noFEE64*64,0,Common::noFEE64*64);
+		highEnergyMultiplicity = new TH1I("highEnergyMultiplicity","",Common::noFEE64*64,0,Common::noFEE64*64);
 	#endif
 	#ifdef OFFSETS
 		absPulserVsChannel = new TH2D("absPulserVsChannel","",Common::noFEE64*64,0,Common::noFEE64*64,2e3,0,32768);
@@ -142,7 +142,6 @@ void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
 	CorrectMultiplexer(adcItem);
 
 	ApplyCorrelationScalerOffset(adcItem);
-
 
  	if( adcItem.GetADCRange() == 0){
  		//Low energy event. Add to decay list
