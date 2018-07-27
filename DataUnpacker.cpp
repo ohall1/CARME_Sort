@@ -26,6 +26,7 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(std::string syncOffsetFile){
   totalDecayWords = 0;
   totalImplantWords = 0;
   totalScalerItems = 0;
+  totalDiscItems = 0;
   correlationScalerChangeCounter = 0;
   
   firstTimestamp = 0;
@@ -48,7 +49,7 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(std::string syncOffsetFile){
   highEnergyChannelADC = new TH2D("highEnergyChannelADC","",1536,0,1536,5e2,0,65536);
   deltaCorrelationScaler = new TH1D("deltaCorrelationScaler","",10000,-5000,5000);
   deltaCorrScalerTimestamp = new TH2D("deltaSYNC100Timestamp",";FEE-1;Time between consecutive SYNC100 data items [ns]",24,0,24,25E3,0,25E6);
-  syncOffsets = new TH2D("syncOffsets",";FEE-1;Timestamp [1.31072ms]",Common::noFEE64,0,Common::noFEE64,5000,0,65536E4);
+  syncOffsets = new TH2D("syncOffsets",";FEE number;Timestamp [ns]",Common::noFEE64,0,Common::noFEE64,10000,0,65536E4);
   infoCodes = new TH1D("infoCodes",";Info code;Counts",16,0,16);
 #endif
   
@@ -108,6 +109,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
   //Takes the data Words that have been read in and determines the data type and
   //unpacks the data accordingly.
   //Determines the data type of the two words. If 3 adc data and 2 is information data
+
   dataType = ( (wordsIn.first >>30) & 0x3);
 
   if (dataType ==3 ){
@@ -115,7 +117,6 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
     adcDataItem.BuildItem(wordsIn);
 
     if (timestampMSBStatus[adcDataItem.GetFEE64ID()-1] && correlationScalerStatus){   //If timestampMSB has been obtained from inforation data set the timestamp of the adc data
-
 #ifdef OFFSETS
       adcDataItem.BuildTimestamp(timestampMSB);
 
@@ -256,12 +257,27 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
       } 
 
     }
-    return true;
 
+    else if(informationDataItem.GetInfoCode() != 2 && informationDataItem.GetInfoCode() != 3 && informationDataItem.GetInfoCode() != 4 && informationDataItem.GetInfoCode() != 8){
+#ifdef DEB_UNPACKER      
+      std::cout << "!!!WARNING!!! Unrecognised info code for information event (dataType = " << dataType << ")." << std::endl;
+      std::cout << "\tWords in are: " << wordsIn.first << " " << wordsIn.second << " and give an information code of " << informationDataItem.GetInfoCode() << std::endl; 
+#endif
+      totalDiscItems++;
+      return true;
+    }
+    
+    return true;
+  
   }
   else if (dataType == 0){
     //Have reached the end of the data file break out of the while loop
     std::cout << "Reached the end of reading in the data" << std::endl;
+    return false;
+  }
+  else if(dataType != 2 && dataType != 3 && dataType != 0){
+    std::cout << "!!!Warning!!! Unrecognised data type for current data item." << std::endl;
+    std::cout << "\tWords in are: " << wordsIn.first << " " << wordsIn.second << " and give an data type of " << dataType << std::endl;
     return false;
   }
 }
@@ -334,6 +350,7 @@ void DataUnpacker::CloseUnpacker(){
   std::cout << "Which were built into " << myEventBuilder.GetDecayEvents() << " events." << std::endl;
   std::cout << "Total number of PUASE statements - " << totalPauseItem << std::endl;
   std::cout << "Total number of RESUME statements - " << totalResumeItem << std::endl;
+  std::cout << "Total number of Discriminator items - " << totalDiscItems << std::endl;
   std::cout << "Total number of SYNC100 pulses - " << totalSYNC100 << std::endl;
   std::cout << "Total number of scaler items - " << totalScalerItems << std::endl;
   std::cout << "SYNC100 pulses per FEE - " << std::endl;

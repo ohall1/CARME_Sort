@@ -60,6 +60,7 @@ private:
   unsigned long totalImplantWords;       
   unsigned long totalDecayWords;
   unsigned long totalScalerItems;
+  unsigned long totalDiscItems;
   unsigned int dataType;		        //Data type of data words
   
   bool correlationStatus;		        //Bool to keep track of whether correlation scaler has been measured
