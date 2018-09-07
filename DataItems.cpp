@@ -397,7 +397,7 @@ MergerOutputNewTrial::MergerOutputNewTrial(Cluster & clusterX, Cluster & cluster
 ULong_t MergerOutputNewTrial::GetTimestamp()const{
 	return T;
 }
-MergerOutput::MergerOutput(Cluster & clusterX, Cluster & clusterY){
+MergerOutput::MergerOutput(Cluster & clusterY, Cluster & clusterX){
 
 	if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
 		T = clusterX.GetTimestampMin();

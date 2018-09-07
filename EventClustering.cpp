@@ -358,10 +358,10 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 				//Loops through side 1 cluster list
 				#ifdef HISTOGRAMMING
 					if(equalEnergyRange == decayEnergyDifference){
-						lowEnergyExEy[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
+						lowEnergyExEy[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
 					}
 					else if(equalEnergyRange == implantEnergyDifference){
-						highEnergyExEy[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
+						highEnergyExEy[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
 					}
 				#endif
 				if(abs(clusterSide0It->GetEnergy()-clusterSide1It->GetEnergy()) <= equalEnergyRange){

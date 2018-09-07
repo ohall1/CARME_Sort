@@ -33,6 +33,7 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 		lowEnergyChannelADC = new TH2D("lowEnergyChannelADC","",Common::noFEE64*Common::noChannel,0,Common::noFEE64*Common::noChannel,5e2,0,65536);
 		highEnergyChannelADC = new TH2D("highEnergyChannelADC","",Common::noFEE64*Common::noChannel,0,Common::noFEE64*Common::noChannel,5e2,0,65536);
 		deltaCorrelationScaler = new TH1D("deltaCorrelationScaler","",10000,-5000,5000);
+		lowEnergyHitPattern = new TH1D("lowEnergyHitPattern","",Common::noFEE64*Common::noChannel,0,Common::noFEE64*Common::noChannel);
 	#endif
 
 	return myEventBuilderPoint;
@@ -73,6 +74,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			#ifdef HISTOGRAMMING
 				if(adcDataItem.GetADCRange() == 0){
 					lowEnergyChannelADC->Fill((((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID()),adcDataItem.GetADCData());
+					lowEnergyHitPattern->Fill(((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID());
 				}
 				else if(adcDataItem.GetADCRange() == 1){
 					highEnergyChannelADC->Fill((((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID()),adcDataItem.GetADCData());
@@ -91,6 +93,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			#ifdef HISTOGRAMMING
 				if(adcDataItem.GetADCRange() == 0){
 					lowEnergyChannelADC->Fill((((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID()),adcDataItem.GetADCData());
+					lowEnergyHitPattern->Fill(((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID());
 				}
 				else if(adcDataItem.GetADCRange() == 1){
 					highEnergyChannelADC->Fill((((adcDataItem.GetFEE64ID()-1)*Common::noChannel)+adcDataItem.GetChannelID()),adcDataItem.GetADCData());
@@ -133,7 +136,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			sync100Counter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
-				std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " SYNC100 information item\n" << std::endl;
+				//std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " SYNC100 information item. FEE#" << informationDataItem.GetFEE64ID() << "\n" <<std::endl;
 			#endif
 		}
 		else if(informationDataItem.GetInfoCode() == 8 && informationDataItem.GetFEE64ID() == Common::masterFEE64){		//Correlation scaler data item
@@ -214,6 +217,7 @@ void DataUnpacker::CloseUnpacker(){
 	std::cout << "Changes in the correlation scaler - " << correlationScalerChangeCounter << std::endl; 
 
 	#ifdef HISTOGRAMMING
+		lowEnergyHitPattern->Write();
 		lowEnergyChannelADC->Write();
 		highEnergyChannelADC->Write();
 		deltaCorrelationScaler->Write();

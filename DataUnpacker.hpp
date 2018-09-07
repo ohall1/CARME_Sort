@@ -62,6 +62,7 @@ class DataUnpacker{
 		TH1D * timestampADCData;
 		TH1D * timestampLowEnergy;
 		TH1D * timestampHighEnergy;
+		TH1D * lowEnergyHitPattern;
 		TH2D * lowEnergyChannelADC;
 		TH2D * highEnergyChannelADC;
 

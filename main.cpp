@@ -17,7 +17,6 @@
 #define HISTOGRAMMING
 #define MERGER_OUTPUT
 
-
 #include "Common.hpp"
 #include "DataReader.cpp"
 #include "DataUnpacker.cpp"
