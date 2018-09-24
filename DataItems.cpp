@@ -296,8 +296,18 @@ unsigned long Cluster::GetTimestampDifference(unsigned long timestampIn) const{
 	unsigned long timestampDifMin;
 	unsigned long timestampDifMax;
 
-	timestampDifMin = abs(timestampMin-timestampIn);
-	timestampDifMax = abs(timestampMax-timestampIn);
+	if(timestampIn <= timestampMin){
+		timestampDifMin = timestampMin - timestampIn;
+		timestampDifMax = timestampMax - timestampIn;
+	}
+	else if(timestampIn <= timestampMax){
+		timestampDifMin = timestampIn - timestampMin;
+		timestampDifMax = timestampMax - timestampIn;
+	}
+	else{
+		timestampDifMax = timestampIn - timestampMax;
+		timestampDifMin = timestampIn - timestampMin;
+	}
 
 	if(timestampDifMin < timestampDifMax){
 		return timestampDifMin;
