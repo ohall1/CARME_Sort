@@ -26,7 +26,7 @@ EventBuilder::EventBuilder(){
 void EventBuilder::InitialiseEvent(){
 
 	//Reset the ADC item counter to 0
-	for(int i = 0; i < 24; i++){
+	for(int i = 0; i < Common::noFEE64; i++){
 		for(int j = 0; j < 4; j++){
 			adcItemCounts[i][j] = 0;
 			adcLastTimestamp[i][j] = 0;
