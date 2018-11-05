@@ -23,6 +23,14 @@ EventClustering::EventClustering(){
 			hname[0] = '\0';
 			sprintf(hname,"xyMultiplicityDSSD%d",i);
 			xyMultiplicity[i] = new TH2I(hname,"",128,0,128,128,0,128);
+
+			hname[0] = '\0';
+			sprintf(hname,"lowEnergyXYDSSD%d",i);
+			lowEnergyXY[i] = new TH2D(hname,"",128,0,128,128,0,128);
+
+			hname[0] = '\0';
+			sprintf(hname,"highEnergyXYDSSD%d",i);
+			highEnergyXY[i] = new TH2D(hname,"",128,0,128,128,0,128);
 		}
 	#endif
 
@@ -396,9 +404,11 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<C
 						#ifdef HISTOGRAMMING
 							if(equalEnergyRange == decayEnergyDifference){
 								lowEnergyExEyPair[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
+								lowEnergyXY[dssd]->Fill(pairedCluster.GetX(),pairedCluster.GetY());
 							}
 							else if(equalEnergyRange == implantEnergyDifference){
 								highEnergyExEyPair[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
+								highEnergyXY[dssd]->Fill(pairedCluster.GetX(),pairedCluster.GetY());
 							}
 						#endif
 					#ifdef DEB_CLUSTER_PAIR
@@ -456,6 +466,12 @@ void EventClustering::CloseClustering(){
 		}
 		for(int i =0; i<Common::noDSSD;i++){
 			highEnergyExEyPair[i]->Write();
+		}
+		for(int i =0; i<Common::noDSSD;i++){
+			lowEnergyXY[i]->Write();
+		}
+		for(int i =0; i<Common::noDSSD;i++){
+			highEnergyXY[i]->Write();
 		}
 		for(int i =0; i<Common::noDSSD;i++){
 			xyMultiplicity[i]->Write();

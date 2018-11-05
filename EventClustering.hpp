@@ -80,6 +80,8 @@ class EventClustering{
 			TH2D * highEnergyExEy[Common::noDSSD];
 			TH2D * lowEnergyExEyPair[Common::noDSSD];
 			TH2D * highEnergyExEyPair[Common::noDSSD];
+			TH2D * lowEnergyXY[Common::noDSSD];
+			TH2D * highEnergyXY[Common::noDSSD];
 			TH2I * xyMultiplicity[Common::noDSSD];
 		#endif
 
