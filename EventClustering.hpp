@@ -18,10 +18,10 @@ class EventClustering{
 
 		std::multimap<CalibratedADCDataItem,int>::iterator clusterIt; 	//Iterator to loop through the maps to be clustered
 
-		std::list<Cluster> dssdDecayLists[Common::noDSSD][2];						//Array of lists to store decay clusters in
-		std::list<Cluster> dssdImplantLists[Common::noDSSD][2];						//Array of lists to store implant clusters in
-		std::list<Cluster>::iterator clusterSide0It;					//Iterator for side 0
-		std::list<Cluster>::iterator clusterSide1It;					//Iterator for clusters on side 1
+		std::deque<Cluster> dssdDecayLists[Common::noDSSD][2];						//Array of lists to store decay clusters in
+		std::deque<Cluster> dssdImplantLists[Common::noDSSD][2];						//Array of lists to store implant clusters in
+		std::deque<Cluster>::iterator clusterSide0It;					//Iterator for side 0
+		std::deque<Cluster>::iterator clusterSide1It;					//Iterator for clusters on side 1
 
 		short dssdSideMultiplicity[Common::noDSSD][2];					//Stores the multiplicity of each side of the detector
 
@@ -88,7 +88,7 @@ class EventClustering{
 		void ClusterMap(std::multimap<CalibratedADCDataItem,int> & eventMap);	//Cluster the maps once ready
 		void CloseCluster(Cluster & decayCluster);								//Close, store and reset cluster when no more events to add
 		short ImplantStoppingLayer();											//Find the stopping layer for an implant event
-		void PairClusters(int dssd, double equalEnergyRange,std::list<Cluster>  clusterLists[][2]);
+		void PairClusters(int dssd, double equalEnergyRange,std::deque<Cluster>  clusterLists[][2]);
 		void WriteToFile();
 
 	public:

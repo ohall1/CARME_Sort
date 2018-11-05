@@ -348,7 +348,7 @@ short EventClustering::ImplantStoppingLayer(){
 	//Has looped through all clusters in the event and doesnt have a positive implant
 	return -1;
 }
-void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::list<Cluster> clusterLists[][2]){
+void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<Cluster> clusterLists[][2]){
 	//Loop through the clusters in the event map and pair front and back clusters based on equal energy and time difference
 
 	if(clusterLists[dssd][0].size() > 0 && clusterLists[dssd][1].size() > 0){

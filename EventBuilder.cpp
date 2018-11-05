@@ -162,7 +162,7 @@ void EventBuilder::SetCorrelationScaler(long int corrOffset){
 long int EventBuilder::GetCorrelationScalerOffset(){
 	return correlationScalerOffset;
 }
-void EventBuilder::AddEventToBuffer(std::list<ADCDataItem> closedEvent){
+void EventBuilder::AddEventToBuffer(std::deque<ADCDataItem> closedEvent){
 	//Aqquire bufProtect mutex lock to modify list
 	std::unique_lock<std::mutex> addLock(bufProtect);
 	#ifdef DEB_EVENTBUILDER_THREAD
@@ -178,7 +178,7 @@ void EventBuilder::AddEventToBuffer(std::list<ADCDataItem> closedEvent){
 		bufferFull.wait(addLock);
 	}
 
-	eventsList.push_back(closedEvent);
+	eventsList.push(closedEvent);
 	#ifdef DEB_EVENTBUILDER_THREAD
 		std::cout << "Data pair added to back of buffer." << std::endl;
 	#endif
@@ -205,8 +205,8 @@ void EventBuilder::AddEventToBuffer(std::list<ADCDataItem> closedEvent){
 
 	return;
 }
-std::list<ADCDataItem> EventBuilder::GetEventFromBuffer(){
-	std::list<ADCDataItem> bufferOut;
+std::deque<ADCDataItem> EventBuilder::GetEventFromBuffer(){
+	std::deque<ADCDataItem> bufferOut;
 
 	//Aqquire bufProtect mutex lock to modify list
 	std::unique_lock<std::mutex> popLock(bufProtect);
@@ -225,7 +225,7 @@ std::list<ADCDataItem> EventBuilder::GetEventFromBuffer(){
 	}
 
 	bufferOut = eventsList.front();
-	eventsList.pop_front();
+	eventsList.pop();
 
 	#ifdef DEB_EVENTBUILDER_THREAD
 		std::cout << "Current list buffer size " << eventsList.size() << " items." << std::endl;

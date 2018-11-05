@@ -203,7 +203,7 @@ void DataReader::CloseInputFile(){
 	}
 }
 
-void DataReader::AddToBuffer(std::list<std::pair<unsigned int, unsigned int>> dataIn){
+void DataReader::AddToBuffer(std::deque<std::pair<unsigned int, unsigned int>> dataIn){
 
 	//Aqquire bufProtect mutex lock to modify list
 	std::unique_lock<std::mutex> addLock(bufProtect);
@@ -220,7 +220,7 @@ void DataReader::AddToBuffer(std::list<std::pair<unsigned int, unsigned int>> da
 		bufferFull.wait(addLock);
 	}
 
-	dataWordBuffer.push_back(dataIn);
+	dataWordBuffer.push(dataIn);
 	#ifdef DEB_THREAD
 		std::cout << "Data pair added to back of buffer." << std::endl;
 	#endif
@@ -249,9 +249,9 @@ void DataReader::AddToBuffer(std::list<std::pair<unsigned int, unsigned int>> da
 	return;
 }
 
-std::list<std::pair<unsigned int, unsigned int>> DataReader::ReadFromBuffer(){
+std::deque<std::pair<unsigned int, unsigned int>> DataReader::ReadFromBuffer(){
 
-	std::list <std::pair<unsigned int, unsigned int>> bufferOut;
+	std::deque <std::pair<unsigned int, unsigned int>> bufferOut;
 	bufferOut.clear();
 
 	//Aqquire bufProtect mutex lock to modify list
@@ -273,7 +273,7 @@ std::list<std::pair<unsigned int, unsigned int>> DataReader::ReadFromBuffer(){
 	}
 
 	bufferOut = dataWordBuffer.front();
-	dataWordBuffer.pop_front();
+	dataWordBuffer.pop();
 	//std::cout << "Data read buffer size. " << dataWordBuffer.size() <<std::endl;
 
 	#ifdef DEB_THREAD

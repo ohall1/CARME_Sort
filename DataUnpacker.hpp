@@ -27,8 +27,8 @@ class DataUnpacker{
 		bool dataCheck;
 
 
-		std::list <std::pair<unsigned int, unsigned int>> dataWordsList;
-		std::list <std::pair<unsigned int, unsigned int>>::iterator dataWordsListIt;
+		std::deque <std::pair<unsigned int, unsigned int>> dataWordsList;
+		std::deque <std::pair<unsigned int, unsigned int>>::iterator dataWordsListIt;
 		std::pair < unsigned int, unsigned int> dataWords;
 		unsigned int word0, word1;
 

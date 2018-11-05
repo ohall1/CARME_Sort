@@ -18,10 +18,10 @@ private:
 	ADCDataItem implantItem;
 
 	//Lists to store data events
-	std::list <ADCDataItem> decayEvents;		//list to store decay events
-	std::list <ADCDataItem> implantEvents;		//list to store implant events
+	std::deque <ADCDataItem> decayEvents;		//list to store decay events
+	std::deque <ADCDataItem> implantEvents;		//list to store implant events
 
-	std::list <std::list<ADCDataItem>> eventsList;			//List to store events to be calibrated
+	std::queue <std::deque<ADCDataItem>> eventsList;			//List to store events to be calibrated
 
 	unsigned long normalItems = 0;
 	unsigned long lateItems = 0;
@@ -46,7 +46,7 @@ private:
 		TH1I * lowEnergyMultiplicity;						//Multiplicity of low energy events
 		TH1I * highEnergyMultiplicity;						//Multiplicity of high energy events
 
-		std::list <ADCDataItem>::iterator decayEventsIt;	//Iterator for the decay events list
+		std::deque <ADCDataItem>::iterator decayEventsIt;	//Iterator for the decay events list
 	#endif
 	#ifdef OFFSETS
 		TH2D * absPulserVsChannel;							//Pulsers all put on a positive scale
@@ -67,7 +67,7 @@ private:
 	void CorrectMultiplexer(ADCDataItem & adcItem);				//Corrects the timestamp for the multiplexing of ADC data
 	void ApplyCorrelationScalerOffset(ADCDataItem & adcItem);	//Applys the correlation scaler offset to the timestamp
 	void CloseEvent();											//End of current event, send decay/implant events to be processed
-	void AddEventToBuffer(std::list <ADCDataItem> closedEvent);
+	void AddEventToBuffer(std::deque <ADCDataItem> closedEvent);
 
 public:
 	EventBuilder();
@@ -86,7 +86,7 @@ public:
 
 	long int GetCorrelationScalerOffset();					//Returns the correlation scaler offset
 
-	std::list<ADCDataItem> GetEventFromBuffer();							//Gets the event at the front of the buffer
+	std::deque<ADCDataItem> GetEventFromBuffer();							//Gets the event at the front of the buffer
 
 };
 #endif

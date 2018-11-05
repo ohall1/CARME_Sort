@@ -4,8 +4,10 @@
 
 #include <fstream>
 #include <list>
+#include <deque>
 #include <utility>
 #include <thread>
+#include <queue>
 #include <mutex>
 #include <thread>
 #include <condition_variable>
@@ -23,8 +25,8 @@ class DataReader{
 		std::list <std::string> AIDAFileList; //List of the files to be sorted
 
 		//Variables used to output the data words
-		std::list <std::pair<unsigned int, unsigned int>> dataWordList;					//List to store sorted data blocks
-		std::list <std::list <std::pair<unsigned int, unsigned int>>> dataWordBuffer;	//List to be used as a buffer between reader and unpacker
+		std::deque <std::pair<unsigned int, unsigned int>> dataWordList;					//List to store sorted data blocks
+		std::queue <std::deque <std::pair<unsigned int, unsigned int>>> dataWordBuffer;	//List to be used as a buffer between reader and unpacker
 		std::pair <unsigned int, unsigned int> dataWords;
 
 		//Variables used for synchronising data threads
@@ -59,7 +61,7 @@ class DataReader{
 		void ReadBlock();
 		void CloseInputFile();
 		void SetInputFileList(std::list <std::string> fileList);
-		void AddToBuffer(std::list<std::pair<unsigned int, unsigned int>> dataIn);
+		void AddToBuffer(std::deque<std::pair<unsigned int, unsigned int>> dataIn);
 
 	public:
 
@@ -69,7 +71,7 @@ class DataReader{
 
 		void InitialiseReader(std::list <std::string> inputFileList);
 		void BeginReader();
-		std::list<std::pair<unsigned int, unsigned int>> ReadFromBuffer();
+		std::deque<std::pair<unsigned int, unsigned int>> ReadFromBuffer();
 
 };
 #endif
