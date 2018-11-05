@@ -221,5 +221,7 @@ class MergerOutput{
 		MergerOutput(Cluster & clusterX, Cluster & clusterY);
 
 		ULong_t GetTimestamp() const;
+		double GetX() const;
+		double GetY() const;
 };
 #endif

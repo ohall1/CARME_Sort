@@ -450,3 +450,9 @@ MergerOutput::MergerOutput(Cluster & clusterY, Cluster & clusterX){
 ULong_t MergerOutput::GetTimestamp()const{
 	return T;
 }
+double MergerOutput::GetX()const{
+	return x;
+}
+double MergerOutput::GetY()const{
+	return y;
+}
