@@ -150,7 +150,7 @@ void CalibratedADCDataItem::SetSide(short sideIn){
 	side = sideIn;
 	return;
 }
-void CalibratedADCDataItem::SetStrip(short stripIn){
+void CalibratedADCDataItem::SetStrip(double stripIn){
 	strip = stripIn;
 	return;
 }
@@ -172,7 +172,7 @@ short CalibratedADCDataItem::GetDSSD() const{
 short CalibratedADCDataItem::GetSide() const{
 	return side;
 }
-short CalibratedADCDataItem::GetStrip() const{
+double CalibratedADCDataItem::GetStrip() const{
 	return strip;
 }
 short CalibratedADCDataItem::GetADCRange() const{
@@ -268,10 +268,10 @@ short Cluster::GetDSSD() const{
 short Cluster::GetSide() const{
 	return side;
 }
-short Cluster::GetStrip() const{
+double Cluster::GetStrip() const{
 	return stripMax;
 }
-short Cluster::GetStripMin() const{
+double Cluster::GetStripMin() const{
 	return stripMin;
 }
 short Cluster::GetADCRange() const{

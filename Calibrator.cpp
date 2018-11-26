@@ -127,7 +127,7 @@ void Calibrator::ProcessEvents(){
 
 	return;
 }
-unsigned int Calibrator::GetOrder(int channelID) const{
+double Calibrator::GetOrder(int channelID) const{
 	return feeChannelOrder[channelID];
 }
 void Calibrator::CalibrateData(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
@@ -145,7 +145,7 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 		calibratedItemOut.SetStrip(GetOrder(adcDataItemIn.GetChannelID()));
 			}
 	else if(feeStripMap[adcDataItemIn.GetFEE64ID()-1] == 2){
-		calibratedItemOut.SetStrip(127-GetOrder(adcDataItemIn.GetChannelID()));		
+		calibratedItemOut.SetStrip(127.-GetOrder(adcDataItemIn.GetChannelID()));		
 	}
 	else if(feeStripMap[adcDataItemIn.GetFEE64ID()-1] == -1){}
 	else{

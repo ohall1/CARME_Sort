@@ -75,7 +75,7 @@ class CalibratedADCDataItem{
 	private:
 		short dssd;
 		short side;
-		short strip;
+		double strip;
 		short adcRange;
 		double energy;
 		unsigned long timestamp;
@@ -89,14 +89,14 @@ class CalibratedADCDataItem{
 		void BuildItem(ADCDataItem &adcDataItem);
 		void SetDSSD(short dssdIn);
 		void SetSide(short sideIn);
-		void SetStrip(short stripIn);
+		void SetStrip(double stripIn);
 		void SetADCRange(short adcRangeIn);
 		void SetEnergy(double energyIn);
 		void SetTimestamp(unsigned long timestampIn);
 
 		short GetDSSD() const;
 		short GetSide() const;
-		short GetStrip() const;
+		double GetStrip() const;
 		short GetADCRange() const;
 		double GetEnergy() const;
 		unsigned long GetTimestamp() const;
@@ -111,8 +111,8 @@ class Cluster{
 
 		short dssd;
 		short side;
-		short stripMin;
-		short stripMax;
+		double stripMin;
+		double stripMax;
 		short adcRange;
 		double Energy;
 		unsigned long timestampMin;
@@ -130,8 +130,8 @@ class Cluster{
 		void ResetCluster();
 		short GetDSSD() const;
 		short GetSide() const;
-		short GetStrip() const;
-		short GetStripMin() const;
+		double GetStrip() const;
+		double GetStripMin() const;
 		short GetADCRange() const;
 		double GetEnergy() const;
 		short GetSize() const;
