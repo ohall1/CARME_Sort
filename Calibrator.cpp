@@ -2,7 +2,6 @@
 Calibrator::Calibrator(){};
 void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *eventBuilderPointIn){
 
-	ReadInVariables(variablesFile);
 	myEventBuilder = eventBuilderPointIn;
 	eventBuilderStatus = true;
 
@@ -12,6 +11,8 @@ void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *e
 			adcHighEnergyGain[i][j] = 0.7; 	//MeV/ch
 		}
 	}
+
+	ReadInVariables(variablesFile);
 }
 
 void Calibrator::ReadInVariables(std::string variablesFile){
@@ -81,6 +82,14 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 					channelADCOffsets[fee64-1][channelID] = value;
 				}
 
+			}
+			else if(dummyVar == "adcGain"){
+				iss >> fee64;
+				iss >> channelID;
+				iss >> value;
+				if(value != -9999.99 && fee64 <= Common::noFEE64){
+					adcLowEnergyGain[fee64-1][channelID] = value;
+				}
 			}
 			else if (dummyVar == "adcPolarity"){
 				iss >> fee64;
