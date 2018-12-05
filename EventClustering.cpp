@@ -385,8 +385,8 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
 						}
 
 						//Set the x and y multiplicity of the clusters
-						clusterSide0It->SetMultiplicity(dssdSideMultiplicity[0][dssd]);
-						clusterSide1It->SetMultiplicity(dssdSideMultiplicity[1][dssd]);
+						clusterSide0It->SetMultiplicity(dssdSideMultiplicity[dssd][0]);
+						clusterSide1It->SetMultiplicity(dssdSideMultiplicity[dssd][1]);
 						//Clusters paired on both time and energy
 						#ifdef OLD_OUTPUT
 							MergerOutputOld pairedCluster(*clusterSide0It, *clusterSide1It);
