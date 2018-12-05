@@ -421,7 +421,7 @@ MergerOutput::MergerOutput(Cluster & clusterY, Cluster & clusterX){
 	uint8_t dxCal;
 	uint8_t dyCal;
 
-	Tfast = dx + 0x10 * dy;
+	Tfast = dx + 0x100 * dy;
 
 	Ex = clusterX.GetEnergy();
 	Ey = clusterY.GetEnergy();
