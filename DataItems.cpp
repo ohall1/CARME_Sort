@@ -4,28 +4,28 @@ ADCDataItem::ADCDataItem(std::pair < unsigned int, unsigned int> inData){
 
 	dataType = 3;
 	unsigned int chIdentity = (inData.first >> 16) & 0xFFF; //Word 0, bits 16:27
-	fee64ID = (chIdentity >> 6) & 0x003F;  					//Top 6 bit of chIdentity (22:27) are FEE64 number
+	fee64ID = ((chIdentity >> 6) & 0x003F)+1;  					//Top 6 bit of chIdentity (22:27) are FEE64 number
 	channelID = chIdentity & 0x003f;						//Bottom 6 bits of chIdentity (16:21) are channel number
 	adcRange = (inData.first >> 28 ) & 0x0001;				//Bit 28 - Veto bit used as ADC range
 	adcData = (inData.first & 0xFFFF); 						//Bits 0:15 of Word 0 is ADC data
-	timestampLSB = (inData.second & 0x0FFFFFFF);				//Word 1, bits 0:27 - Timestamp LSB
+	timestampWR24 = (inData.second & 0x0FFFFFFF);				//Word 1, bits 0:27 - Timestamp LSB
 
 }
 void ADCDataItem::BuildItem(std::pair < unsigned int, unsigned int> inData){
 	dataType = 3;
 	unsigned int chIdentity = (inData.first >> 16) & 0xFFF; //Word 0, bits 16:27
-	fee64ID = (chIdentity >> 6) & 0x003F;  					//Top 6 bit of chIdentity (22:27) are FEE64 number
+	fee64ID = ((chIdentity >> 6) & 0x003F)+1;  					//Top 6 bit of chIdentity (22:27) are FEE64 number
 	channelID = chIdentity & 0x003f;						//Bottom 6 bits of chIdentity (16:21) are channel number
 	adcRange = (inData.first >> 28 ) & 0x0001;				//Bit 28 - Veto bit used as ADC range
 	adcData = (inData.first & 0xFFFF); 						//Bits 0:15 of Word 0 is ADC data
-	timestampLSB = (inData.second & 0x0FFFFFFF);				//Word 1, bits 0:27 - Timestamp LSB
+	timestampWR24 = (inData.second & 0x0FFFFFFF);				//Word 1, bits 0:27 - Timestamp LSB
 }
-void ADCDataItem::BuildTimestamp(unsigned long MSB){
-	if(timestampLSB < 0x00000A0){
-		timestamp = ((MSB+1) << 28) | timestampLSB;
+void ADCDataItem::BuildTimestamp(unsigned long WR48, unsigned long WR64){
+	if(timestampWR24 < 0x00000A0){
+		timestamp = (WR64) << 48 | ((WR48+1) << 28) | timestampWR24;
 	}
 	else{
-		timestamp = (MSB << 28) | timestampLSB;
+		timestamp = (WR64) << 48 | (WR48 << 28) | timestampWR24;
 	}
 }
 void ADCDataItem::SetTimestamp(unsigned long newTimestamp){
@@ -57,12 +57,14 @@ InformationDataItem::InformationDataItem(std::pair < unsigned int, unsigned int>
 
 	infoField = ( inData.first & 0x000FFFFF); 				//Word 0, bits 0:19 is the information field
 	infoCode = (inData.first >> 20) & 0x000F;				//Word 0, bits 20:23 - Information code
-	fee64ID = (inData.first >> 24) & 0x003F;				//Word 0, bits 24:29 - FEE64 module number
-	timestampLSB = (inData.second & 0x0FFFFFFF);			//Word 1, bits 0:27 - Timestamp LSB
+	fee64ID = ((inData.first >> 24) & 0x003F)+1;				//Word 0, bits 24:29 - FEE64 module number
+	timestampWR24 = (inData.second & 0x0FFFFFFF);			//Word 1, bits 0:27 - Timestamp LSB
 
 	if ( infoCode == 2 || infoCode == 3 || infoCode == 4){
-		timestampMSB = infoField;
-		timestamp = (timestampMSB << 28) | timestampLSB;
+		timestampWRUpper = infoField;
+	}
+	if	(infoCode == 5){
+		timestampWRUpper = (inData.first & 0x0000FFFF);
 	}
 
 	if ( infoCode == 8){
@@ -79,12 +81,14 @@ void InformationDataItem::BuildItem(std::pair < unsigned int, unsigned int> inDa
 
 	infoField = ( inData.first & 0x000FFFFF); 				//Word 0, bits 0:19 is the information field
 	infoCode = (inData.first >> 20) & 0x000F;				//Word 0, bits 20:23 - Information code
-	fee64ID = (inData.first >> 24) & 0x003F;				//Word 0, bits 24:29 - FEE64 module number
-	timestampLSB = (inData.second & 0x0FFFFFFF);			//Word 1, bits 0:27 - Timestamp LSB
+	fee64ID = ((inData.first >> 24) & 0x003F)+1;				//Word 0, bits 24:29 - FEE64 module number
+	timestampWR24 = (inData.second & 0x0FFFFFFF);			//Word 1, bits 0:27 - Timestamp LSB
 
 	if ( infoCode == 2 || infoCode == 3 || infoCode == 4){
-		timestampMSB = infoField;
-		timestamp = (timestampMSB << 28) | timestampLSB;
+		timestampWRUpper = infoField;
+	}
+	if	(infoCode == 5){
+		timestampWRUpper = (inData.first & 0x0000FFFF);
 	}
 
 	if ( infoCode == 8){
@@ -94,16 +98,16 @@ void InformationDataItem::BuildItem(std::pair < unsigned int, unsigned int> inDa
 
 	}
 }
-void InformationDataItem::SetTimestamp(unsigned long MSB){
-	if(timestampLSB < 0x00000A0){
-		timestamp = ((MSB+1) << 28) | timestampLSB;
+void InformationDataItem::SetTimestamp(unsigned long WR48, unsigned long WR64){
+	if(timestampWR24 < 0x00000A0){
+		timestamp = (WR64) << 48 | ((WR48+1) << 28) | timestampWR24;
 	}
 	else{
-		timestamp = (MSB << 28) | timestampLSB;
+		timestamp = (WR64) << 48 | (WR48 << 28) | timestampWR24;
 	}
 }
-unsigned long InformationDataItem::GetTimestampMSB(){
-	return timestampMSB;
+unsigned long InformationDataItem::GetTimestampWRUpper(){
+	return timestampWRUpper;
 }
 unsigned int InformationDataItem::GetInfoCode(){
 	return infoCode;
@@ -121,8 +125,8 @@ unsigned int InformationDataItem::GetFEE64ID(){
 unsigned long InformationDataItem::GetTimestamp(){
 	return timestamp;
 }
-unsigned long InformationDataItem::GetTimestampLSB(){
-	return timestampLSB;
+unsigned long InformationDataItem::GetTimestampWR24(){
+	return timestampWR24;
 }
 
 CalibratedADCDataItem::CalibratedADCDataItem(){};
@@ -136,7 +140,7 @@ CalibratedADCDataItem::CalibratedADCDataItem(ADCDataItem &adcDataItem){
 };
 void CalibratedADCDataItem::BuildItem(ADCDataItem &adcDataItem){
 	energy = adcDataItem.GetADCData();
-	timestamp = (adcDataItem.GetTimestamp())*10;	//Convwerts the timestamp to nanoseconds
+	timestamp = (adcDataItem.GetTimestamp());	//Convwerts the timestamp to nanoseconds
 	#ifdef DEB_CALIBRATOR
 		//std::cout << "\nadcDataItem " << adcDataItem.GetADCData() << " - Non-calibratedItem " << energy << std::endl;
 		//std::cout << "\nadcDataItem " << adcDataItem.GetTimestamp() << " - Non-calibratedItem " << timestamp << std::endl;

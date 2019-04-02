@@ -48,7 +48,7 @@ void EventBuilder::CorrectMultiplexer(ADCDataItem & adcItem){
 	itemADC = ((adcItem.GetChannelID()) / 16);
 	itemFEE = adcItem.GetFEE64ID()-1;
 	itemTimestamp = adcItem.GetTimestamp();
-	if((itemTimestamp-adcLastTimestamp[itemFEE][itemADC] > 250 ) && adcLastTimestamp[itemFEE][itemADC]!=0){
+	if((itemTimestamp-adcLastTimestamp[itemFEE][itemADC] > 2500 ) && adcLastTimestamp[itemFEE][itemADC]!=0){
 		//If two seperate ADC events within same window reset the adc counter
 		adcItemCounts[itemFEE][itemADC]=0;
 	}
@@ -56,7 +56,7 @@ void EventBuilder::CorrectMultiplexer(ADCDataItem & adcItem){
 	//normalItems++;
 	//timestampCorrection = (200 * adcItemCounts[itemFEE][itemADC]);
 
-	adcItem.SetTimestamp((itemTimestamp-(200 * adcItemCounts[itemFEE][itemADC])));
+	adcItem.SetTimestamp((itemTimestamp-(2000 * adcItemCounts[itemFEE][itemADC])));
  	adcItemCounts[itemFEE][itemADC]++;
  	return;
 
@@ -132,7 +132,7 @@ void EventBuilder::CloseEvent(){
 void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
 
 	//Check if event is still within event window
-	if((adcItem.GetTimestamp()-previousTimestamp)>=220 && previousTimestamp != 0){
+	if((adcItem.GetTimestamp()-previousTimestamp)>=2200 && previousTimestamp != 0){
 		//Gap between items greater than multiplexed time period. New item is the start of a new event close the old event
 		CloseEvent();
 		InitialiseEvent();
