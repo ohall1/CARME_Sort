@@ -132,7 +132,7 @@ void EventBuilder::CloseEvent(){
 void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
 
 	//Check if event is still within event window
-	if((adcItem.GetTimestamp()-previousTimestamp)>=220 && previousTimestamp != 0){
+	if((adcItem.GetTimestamp()-previousTimestamp)>200 && previousTimestamp != 0){
 		//Gap between items greater than multiplexed time period. New item is the start of a new event close the old event
 		CloseEvent();
 		InitialiseEvent();

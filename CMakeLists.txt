@@ -16,7 +16,7 @@
 # CMakeLists.txt for event package. It creates a library with dictionary and a main program
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
-   SET(CMAKE_BUILD_TYPE RinSizeRel)
+   SET(CMAKE_BUILD_TYPE Release)
    include(CheckCCompilerFlag)
    include(CheckCXXCompilerFlag)
 

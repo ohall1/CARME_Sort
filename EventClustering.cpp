@@ -161,7 +161,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 			&& ((clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent) || !decayMapCurrent)){
 			//If current event is adjacent to last strip added to the cluster or cluster currently has no events proceed
 
-			if(eventCluster.GetTimestampDifference(clusterIt->first.GetTimestamp())<=2000){
+			if(true){//eventCluster.GetTimestampDifference(clusterIt->first.GetTimestamp())<=4200){
 				//If the current event is within 2us of events within the cluster proceed
 
 				if(eventCluster.GetSide() == clusterIt->first.GetSide() && eventCluster.GetDSSD() == clusterIt->first.GetDSSD()){
@@ -312,7 +312,7 @@ short EventClustering::ImplantStoppingLayer(){
 	//2. No clusters downstream of the stopping layer
 	//3. A cluster in at least one side of all upstream detectors
 	//Loop through the implant lists to find the layer where these conditions are satisfied
-
+	#ifdef SIMPLE_LAYERS
 	for (int stoppingLayer = 0; stoppingLayer < Common::noDSSD; stoppingLayer++){
 		//Loops through detectors.
 		bool downstreamEvents = false;
@@ -345,6 +345,78 @@ short EventClustering::ImplantStoppingLayer(){
 			}
 		}
 	}
+	#endif
+	#ifdef CALCULATE_LAYERS
+	int finalLayer;
+
+	for (int stoppingLayer = 0; stoppingLayer < Common::noDSSD; stoppingLayer++){
+		//Loops through detectors.
+		bool downstreamEvents = false;
+		bool upstreamEvents = true;
+
+		if(dssdImplantLists[stoppingLayer][0].size() > 0 || dssdImplantLists[stoppingLayer][1].size() > 0){
+			//If an implant cluster in both sides
+			if(stoppingLayer < (Common::noDSSD)){
+				//Current layer is not the last layer
+				for(int downstreamDet = stoppingLayer + 1; downstreamDet < Common::noDSSD; downstreamDet++){
+					if(dssdImplantLists[downstreamDet][0].size() > 0 || dssdImplantLists[downstreamDet][1].size() > 0){
+						//Downstream dssd contain implant events. Not stopping layer
+						downstreamEvents = true;
+						break;
+					}
+				}
+			}
+			if(stoppingLayer > 0 && !downstreamEvents){
+				//If not the first detector, check for upstream events
+				for(int upstreamDet = 0; upstreamDet < stoppingLayer; upstreamDet++){
+					if(dssdImplantLists[upstreamDet][0].size() == 0 && dssdImplantLists[upstreamDet][1].size() == 0){
+						//upstreamEvents = false;
+						break;
+					}
+				}
+			}
+			if(!downstreamEvents && upstreamEvents){
+				//This is a stopping layer
+				/* if(dssdImplantLists[stoppingLayer][0].size() >1 || dssdImplantLists[stoppingLayer][1].size() >1){
+					std::cout << "y side strips " << std::endl;
+					for(auto implant = dssdImplantLists[stoppingLayer][0].begin(); implant != dssdImplantLists[stoppingLayer][0].end(); implant++){
+						std::cout << "StripMin:" << implant->GetStripMin() << " StripMax:" << implant->GetStrip() << " Energy:" << implant->GetEnergy() << std::endl;
+					}
+					std::cout << "x side strips" << std::endl;
+				for(auto implant = dssdImplantLists[stoppingLayer][1].begin(); implant != dssdImplantLists[stoppingLayer][1].end(); implant++){
+						std::cout << "StripMin:" << implant->GetStripMin() << " StripMax:" << implant->GetStrip() << " Energy:" << implant->GetEnergy() << std::endl;
+					}
+				}*/
+				finalLayer = stoppingLayer;
+				break;
+			}
+		}
+	}
+	if (finalLayer == 0 && 	dssdImplantLists[finalLayer][0].size() > 0 && dssdImplantLists[finalLayer][1].size() > 0){
+		return finalLayer;
+	}
+	else if(dssdImplantLists[finalLayer][0].size() >0 && dssdImplantLists[finalLayer][1].size() >0){
+		return finalLayer;
+	}
+	else if(dssdImplantLists[finalLayer][0].size() == 0 && dssdImplantLists[finalLayer][1].size() == 1){
+		for(int layer = 0; layer < finalLayer; layer++){
+			if(dssdImplantLists[layer][0].size() > 0){
+				dssdImplantLists[finalLayer][0].push_back(*dssdImplantLists[finalLayer][1].begin());
+				dssdImplantLists[finalLayer][0].begin()->SetStrip(dssdImplantLists[layer][0].begin()->GetStrip());
+				return finalLayer;
+			}
+		}
+	}
+	else if(dssdImplantLists[finalLayer][1].size() == 0 && dssdImplantLists[finalLayer][0].size() == 1){
+		for(int layer = 0; layer < finalLayer; layer++){
+			if(dssdImplantLists[layer][1].size() > 0){
+				dssdImplantLists[finalLayer][1].push_back(*dssdImplantLists[finalLayer][0].begin());
+				dssdImplantLists[finalLayer][1].begin()->SetStrip(dssdImplantLists[layer][1].begin()->GetStrip());
+				return finalLayer;
+			}
+		}
+	}
+	#endif
 	//Has looped through all clusters in the event and doesnt have a positive implant
 	return -1;
 }
@@ -378,8 +450,8 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
 						implantEnergyMatchCount++;
 					}
 
-					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<4000) ||
-						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<4000) ){
+					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<8000) ||
+						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<8000) ){
 						if(equalEnergyRange == implantEnergyDifference){
 							implantTimeMatchCounter++;
 						}

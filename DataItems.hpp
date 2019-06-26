@@ -141,6 +141,7 @@ class Cluster{
 		unsigned long GetTimestampDifference(unsigned long timestampIn) const;
 
 		void SetMultiplicity(short multiplicity);
+		void SetStrip(double strip);
 
 };
 class MergerOutputOld{
