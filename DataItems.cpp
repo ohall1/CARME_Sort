@@ -438,7 +438,14 @@ MergerOutput::MergerOutput(Cluster & clusterY, Cluster & clusterX){
 
 	nx = clusterX.GetMultiplicity();
 	ny = clusterY.GetMultiplicity();
-	nz = 0;
+
+	//Using the nz variable to store max time diff in front and back clusters
+	if(abs(clusterX.GetTimestampMin()-clusterY.GetTimestampMax()) < abs(clusterX.GetTimestampMax()-clusterY.GetTimestampMin())){
+		nz = abs(clusterX.GetTimestampMax()-clusterY.GetTimestampMin());
+	}
+	else{
+		nz = abs(clusterX.GetTimestampMin()-clusterY.GetTimestampMax());
+	}
 
 	if(clusterX.GetADCRange() == 0){
 		ID = 5;
