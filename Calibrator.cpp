@@ -9,6 +9,7 @@ void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *e
 		for(int j =0; j<Common::noChannel; j++){
 			adcLowEnergyGain[i][j] = 0.7;	//keV/ch
 			adcHighEnergyGain[i][j] = 0.7; 	//MeV/ch
+			adcHighEnergyOffset[i][j] = 0.0;
 		}
 	}
 
@@ -96,6 +97,22 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 				iss >> value;
 				if(fee64 <= Common::noFEE64){
 					feePolarityMap[fee64-1] = value;
+				}
+			}
+			else if(dummyVar == "adcGainLowGain"){
+				iss >> fee64;
+				iss >> channelID;
+				iss >> value;
+				if(value != -9999.99 && fee64 <= Common::noFEE64){
+					adcHighEnergyGain[fee64-1][channelID] = value;
+				}
+			}
+			else if(dummyVar == "adcOffsetLowGain"){
+				iss >> fee64;
+				iss >> channelID;
+				iss >> value;
+				if(value != -9999.99 && fee64 <= Common::noFEE64){
+					adcHighEnergyOffset[fee64-1][channelID] = value;
 				}
 			}
 			/*else{
@@ -189,8 +206,8 @@ bool Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataI
 	else if(adcDataItemIn.GetADCRange() == 1){
 		//High energy event
 		calibratedItemOut.SetADCRange(1);
-		calibratedItemOut.SetEnergy((	(double)adcDataItemIn.GetADCData()-adcZero)*(double)feePolarityMap[adcDataItemIn.GetFEE64ID()-1]
-										*adcHighEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
+		calibratedItemOut.SetEnergy(((	(double)adcDataItemIn.GetADCData()-adcZero)*(double)feePolarityMap[adcDataItemIn.GetFEE64ID()-1]
+										*adcHighEnergyGain[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()])+adcHighEnergyOffset[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]);
 
 		return true;
 	}

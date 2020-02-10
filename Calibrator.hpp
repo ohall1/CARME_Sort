@@ -40,6 +40,7 @@ class Calibrator{
 
 		double adcLowEnergyGain[Common::noFEE64][Common::noChannel];			//Gain applied to low energy channels. Defaults to 0.7keV/ch
 		double adcHighEnergyGain[Common::noFEE64][Common::noChannel];			//Gain applied to high energy channels. Defaults to 0.7MeV/ch
+		double adcHighEnergyOffset[Common::noFEE64][Common::noChannel];
 
 		void ReadInVariables(std::string variablesFile);
 		void SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut);

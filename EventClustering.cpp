@@ -291,6 +291,7 @@ void EventClustering::CloseCluster(Cluster & eventCluster){
 		case 1:
 			//implant event cluster, store with implant clusters
 			dssdImplantLists[eventCluster.GetDSSD()][eventCluster.GetSide()].push_back(eventCluster);
+			dssdSideMultiplicity[dssd][side] += eventCluster.GetSize();
 			eventCluster.ResetCluster();
 
 			#ifdef CLUSTER_DECAY_DEB
