@@ -10,6 +10,7 @@ void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *e
 			adcLowEnergyGain[i][j] = 0.7;	//keV/ch
 			adcHighEnergyGain[i][j] = 0.7; 	//MeV/ch
 			adcHighEnergyOffset[i][j] = 0.0;
+			stripActive[i][j] = true;
 		}
 	}
 
@@ -115,6 +116,11 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 					adcHighEnergyOffset[fee64-1][channelID] = value;
 				}
 			}
+			else if (dummyVar == "adcStripReject"){
+				iss >> fee64;
+				iss >> channelID;
+				stripActive[fee64-1][channelID] = false;
+			}
 			/*else{
 				std::cout << "Problem in reading in variables file. Unrecognised parameter type - " << dummyVar.data() << "."<<std::endl;
 				std::cout << "Program exiting" << std::endl;
@@ -178,6 +184,10 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 		std::cout << "Warning! FEE mapped to strip map improperly check variables file." << std::endl;
 		std::cout << "FEE " << adcDataItemIn.GetFEE64ID() << std::endl;
 		std::cout << "Channel " << adcDataItemIn.GetChannelID() << std::endl;
+	}
+	if(!stripActive[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]){
+		calibratedItemOut.SetStrip(250);
+		//std::cout << "vetoed strip" << adcDataItemIn.GetFEE64ID() << " " << adcDataItemIn.GetChannelID() << std::endl;
 	}
 	calibratedItemOut.SetSide(feeSideMap[adcDataItemIn.GetFEE64ID()-1]);
 }
