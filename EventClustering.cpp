@@ -378,8 +378,8 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
 						implantEnergyMatchCount++;
 					}
 
-					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<4000) ||
-						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<4000) ){
+					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<=4000) ||
+						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<=4000) ){
 						if(equalEnergyRange == implantEnergyDifference){
 							implantTimeMatchCounter++;
 						}
