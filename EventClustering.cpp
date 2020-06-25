@@ -423,6 +423,7 @@ short EventClustering::ImplantStoppingLayer(){
 }
 void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<Cluster> clusterLists[][2]){
 	//Loop through the clusters in the event map and pair front and back clusters based on equal energy and time difference
+	double frontBackTime;
 
 	if(clusterLists[dssd][0].size() > 0 && clusterLists[dssd][1].size() > 0){
 		//If clusters in both sides of the detector loop through and pair them
@@ -445,14 +446,20 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
 						highEnergyExEy[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
 					}
 				#endif
+				if(equalEnergyRange == decayEnergyDifference){
+					frontBackTime = decayTimeDifference;
+				}
+				else if(equalEnergyRange == implantEnergyDifference){
+					frontBackTime = implantTimeDifference;
+				}
 				if(abs(clusterSide0It->GetEnergy()-clusterSide1It->GetEnergy()) <= equalEnergyRange){
 					//Is the difference between the two clusters less than the equal energy cuts
 					if(equalEnergyRange == implantEnergyDifference){
 						implantEnergyMatchCount++;
 					}
 
-					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<8000) ||
-						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<8000) ){
+					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<=frontBackTime) ||
+						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<=frontBackTime) ){
 						if(equalEnergyRange == implantEnergyDifference){
 							implantTimeMatchCounter++;
 						}

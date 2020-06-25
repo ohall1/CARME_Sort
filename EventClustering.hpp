@@ -27,6 +27,8 @@ class EventClustering{
 
 		const double decayEnergyDifference = 150.0;						//Cluster energy difference in keV for decay clusters
 		const double implantEnergyDifference = 6000.0;					//Cluster energy difference in MeV for implant clusters
+		const double decayTimeDifference = 8000;						//Front back cluster time difference in ns
+		const double implantTimeDifference = 8000;						//Front back cluster time difference in ns
 		const double energyThreshold = 0.0;								//Thresholds used for checking decays
 
 		int implantStoppingCounter;
