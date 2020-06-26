@@ -156,6 +156,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 
 	for(clusterIt = eventMap.begin(); clusterIt != eventMap.end(); clusterIt++){
 		//Iterator that loops through the map of decays from the beginning to the end
+		if(clusterIt->first.GetStrip() > 128){continue;}
 
 		if(((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1)
 			&& ((clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent) || !decayMapCurrent)){
