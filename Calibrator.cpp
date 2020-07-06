@@ -185,7 +185,7 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 		std::cout << "FEE " << adcDataItemIn.GetFEE64ID() << std::endl;
 		std::cout << "Channel " << adcDataItemIn.GetChannelID() << std::endl;
 	}
-	if(!stripActive[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()]){
+	if(!stripActive[adcDataItemIn.GetFEE64ID()-1][adcDataItemIn.GetChannelID()] && adcDataItemIn.GetADCRange() == 0){
 		calibratedItemOut.SetStrip(250);
 		//std::cout << "vetoed strip" << adcDataItemIn.GetFEE64ID() << " " << adcDataItemIn.GetChannelID() << std::endl;
 	}
