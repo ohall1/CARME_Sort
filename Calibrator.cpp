@@ -31,7 +31,7 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 		feeSideMap[i] = -1;
 		feeStripMap[i] =-1; 			
 		feePolarityMap[i] = 0;
-		feeWaferNumber[i] = 0;
+		feeWaferNumber[i] = 0.;
 	}
 
 

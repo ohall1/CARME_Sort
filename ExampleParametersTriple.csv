@@ -1,0 +1,95 @@
+#mapfee64 -> DSSD: map_dssd <FEE> <DSSD no.>
+#-1	mean FEE not used. 0 means....							
+dssdMap	1	1											
+dssdMap	2	1
+dssdMap	3	1
+dssdMap	4	1
+dssdMap	5	2
+dssdMap	6	2
+dssdMap	7	2
+dssdMap	8	2
+dssdMap	9	1
+dssdMap	10	1
+dssdMap	11	1
+dssdMap	12	1
+dssdMap	13	2
+dssdMap	14	2
+dssdMap	15	2
+dssdMap	16	2
+
+#map fee64 -> side (n:0, p:1, not used:-1)						
+sideMap	1	1											
+sideMap	2	0
+sideMap	3	1
+sideMap	4	0											
+sideMap	5	1											
+sideMap	6	0
+sideMap	7	1
+sideMap	8	0
+sideMap	9	1											
+sideMap	10	1											
+sideMap	11	1
+sideMap	12	1
+sideMap	13	1											
+sideMap	14	1											
+sideMap	15	1
+sideMap	16	1
+
+#map strip: 01:00 left/top side, 02:00 right/bottom side (from beam view)			
+stripMap	1	1											
+stripMap	2	2
+stripMap	3	2
+stripMap	4	1
+stripMap	5	1
+stripMap	6	2											
+stripMap	7	2											
+stripMap	8	1
+stripMap	9	1											
+stripMap	10	1											
+stripMap	11	2
+stripMap	12	2
+stripMap	13	1
+stripMap	14	1
+stripMap	15	2											
+stripMap	16	2
+													
+#adc	polarity:	-1	for	p-side,	1	for	n-side	(polarity	of	signal	inverted	by	pre-amp)
+adcPolarity	1	-1											
+adcPolarity	2	1
+adcPolarity	3	-1
+adcPolarity	4	1											
+adcPolarity	5	-1											
+adcPolarity	6	1
+adcPolarity	7	-1
+adcPolarity	8	1											
+adcPolarity	9	-1											
+adcPolarity	10	-1											
+adcPolarity	11	-1
+adcPolarity	12	-1
+adcPolarity	13	-1											
+adcPolarity	14	-1											
+adcPolarity	15	-1
+adcPolarity	16	-1
+
+#FEE wafer number. If using the single all can be 0
+# n+n side 0
+# left triple 0, centre 1 and right 2
+waferNumber 1 1.
+waferNumber 2 0.
+waferNumber 3 1.
+waferNumber 4 0.
+waferNumber 5 1.
+waferNumber 6 0.
+waferNumber 7 1.
+waferNumber 8 0.
+waferNumber 9 2.
+waferNumber 10 0.
+waferNumber 11 2.
+waferNumber 12 0.
+waferNumber 13 2.
+waferNumber 14 0.
+waferNumber 15 2.
+waferNumber 16 0.
+
+
+#ADC offsets were calculated using the pulser walkthrough data of files May17/R29												
