@@ -17,20 +17,34 @@ EventClustering::EventClustering(){
 			lowEnergyExEyPair[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
 
 			hname[0] = '\0';
-			sprintf(hname,"highEnergyExEyDSSDPair%d",i);
-			highEnergyExEyPair[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+            sprintf(hname, "highEnergyExEyDSSDPair%d", i);
+            highEnergyExEyPair[i] = new TH2D(hname, "", 5e2, 0, 1e4, 5e2, 0, 1e4);
 
-			hname[0] = '\0';
-			sprintf(hname,"xyMultiplicityDSSD%d",i);
-			xyMultiplicity[i] = new TH2I(hname,"",128,0,128,128,0,128);
+            if(!Common::triple) {
+                hname[0] = '\0';
+                sprintf(hname, "xyMultiplicityDSSD%d", i);
+                xyMultiplicity[i] = new TH2I(hname, "", 128, 0, 128, 128, 0, 128);
 
-			hname[0] = '\0';
-			sprintf(hname,"lowEnergyXYDSSD%d",i);
-			lowEnergyXY[i] = new TH2D(hname,"",128,0,128,128,0,128);
+                hname[0] = '\0';
+                sprintf(hname, "lowEnergyXYDSSD%d", i);
+                lowEnergyXY[i] = new TH2D(hname, "", 128, 0, 128, 128, 0, 128);
 
-			hname[0] = '\0';
-			sprintf(hname,"highEnergyXYDSSD%d",i);
-			highEnergyXY[i] = new TH2D(hname,"",128,0,128,128,0,128);
+                hname[0] = '\0';
+                sprintf(hname, "highEnergyXYDSSD%d", i);
+                highEnergyXY[i] = new TH2D(hname, "", 128, 0, 128, 128, 0, 128);
+            } else{
+                hname[0] = '\0';
+                sprintf(hname, "xyMultiplicityDSSD%d", i);
+                xyMultiplicity[i] = new TH2I(hname, "", 384, 0, 384, 128, 0, 128);
+
+                hname[0] = '\0';
+                sprintf(hname, "lowEnergyXYDSSD%d", i);
+                lowEnergyXY[i] = new TH2D(hname, "", 384, 0, 384, 128, 0, 128);
+
+                hname[0] = '\0';
+                sprintf(hname, "highEnergyXYDSSD%d", i);
+                highEnergyXY[i] = new TH2D(hname, "", 384, 0, 384, 128, 0, 128);
+			}
 		}
 	#endif
 

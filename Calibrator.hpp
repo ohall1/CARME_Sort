@@ -35,6 +35,7 @@ class Calibrator{
 		int feeStripMap[Common::noFEE64]; 					//How does the FEE Map to the DSSD (1:Left/Bottom or 2: Right/Top)
 		int feePolarityMap[Common::noFEE64];					//What is the polarity of the FEE;
 		double channelADCOffsets[Common::noFEE64][Common::noChannel];			//Whats the channel ADC offset
+		double feeWaferNumber[Common::noFEE64];                //Which wafer is the FEE for
 
 		bool eventBuilderStatus;											//Bool to keep track of the status of the unpacker
 

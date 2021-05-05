@@ -31,6 +31,7 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 		feeSideMap[i] = -1;
 		feeStripMap[i] =-1; 			
 		feePolarityMap[i] = 0;
+		feeWaferNumber[i] = 0;
 	}
 
 
@@ -98,6 +99,13 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 					feePolarityMap[fee64-1] = value;
 				}
 			}
+            else if (dummyVar == "waferNumber"){
+                iss >> fee64;
+                iss >> value;
+                if(fee64 <= Common::noFEE64){
+                    feeWaferNumber[fee64-1] = value;
+                }
+            }
 			/*else{
 				std::cout << "Problem in reading in variables file. Unrecognised parameter type - " << dummyVar.data() << "."<<std::endl;
 				std::cout << "Program exiting" << std::endl;
@@ -151,10 +159,12 @@ void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem 
 
 	calibratedItemOut.SetDSSD(feeDSSDMap[adcDataItemIn.GetFEE64ID()-1]-1);
 	if(feeStripMap[adcDataItemIn.GetFEE64ID()-1] == 1){
-		calibratedItemOut.SetStrip(GetOrder(adcDataItemIn.GetChannelID()));
+		calibratedItemOut.SetStrip(GetOrder(adcDataItemIn.GetChannelID())
+		                                + (128 * feeWaferNumber[adcDataItemIn.GetFEE64ID()-1]));
 			}
 	else if(feeStripMap[adcDataItemIn.GetFEE64ID()-1] == 2){
-		calibratedItemOut.SetStrip(127.-GetOrder(adcDataItemIn.GetChannelID()));		
+		calibratedItemOut.SetStrip(127.-GetOrder(adcDataItemIn.GetChannelID())
+                                        + (128 * feeWaferNumber[adcDataItemIn.GetFEE64ID()-1]));
 	}
 	else if(feeStripMap[adcDataItemIn.GetFEE64ID()-1] == -1){}
 	else{
