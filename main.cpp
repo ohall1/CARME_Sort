@@ -67,7 +67,10 @@ int main(int argc, char **argv){
 						userOutFile = argv[++i];
 						std::cout << "User output file: " << userOutFile << std::endl;
 						break;
-
+					case 's':
+						dataspy = true;
+						std::cout << "Enabling data spy" << std::endl;
+						break;
 					default:
 						Usage(argv[0]);
 						return -1;
@@ -164,11 +167,11 @@ int main(int argc, char **argv){
 
 
 
-
+	std::cout << "Starting thread 1" << std::endl;
 	std::thread th1 (&DataReader::BeginReader,dataReaderPoint);
-
+	std::cout << "Starting thread 2" << std::endl;
 	std::thread th2 (&DataUnpacker::BeginDataUnpacker,dataUnpackerPoint,std::ref(myDataReader));
-
+	std::cout << "Starting thread 3" << std::endl;
 	std::thread th3 (&Calibrator::ProcessEvents,calibratorPoint);
 
 	th1.join();

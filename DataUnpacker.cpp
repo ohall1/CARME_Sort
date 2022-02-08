@@ -27,7 +27,8 @@ EventBuilder * DataUnpacker::InitialiseDataUnpacker(){
 	correlationScalerChangeCounter = 0;
 
 	correlationScalerStatus = false;
-	timestampMSBStatus = false;
+	timestampWR48Status = false;
+	timestampWR64Status = false;
 
 	#ifdef HISTOGRAMMING
 		lowEnergyChannelADC = new TH2D("lowEnergyChannelADC","",Common::noFEE64*Common::noChannel,0,Common::noFEE64*Common::noChannel,5e2,0,65536);
@@ -65,7 +66,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		//ADC data item - Unpack into ADCDataItem format
 		adcDataItem.BuildItem(wordsIn);
 
-		if (timestampMSBStatus && correlationScalerStatus){//If timestampMSB has been obtained from inforation data set the timestamp of the adc data
+		if (timestampWR48Status && timestampWR64Status){//If both upper parts of upper WR obtained continue
 
 		#ifdef OFFSETS
 			adcDataItem.BuildTimestamp(timestampMSB);
@@ -85,9 +86,9 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			myEventBuilder.AddADCEvent(adcDataItem);
 			totalDataWords++;
 		}
-		else if(timestampMSBStatus){
+		else if(timestampWR48Status && timestampWR64Status){
 		#endif
-			adcDataItem.BuildTimestamp(timestampMSB);
+			adcDataItem.BuildTimestamp(timestampWR48, timestampWR64);
 
 			//If histogramming turned on add event information to histograms
 			#ifdef HISTOGRAMMING
@@ -113,36 +114,44 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		informationDataItem.BuildItem(wordsIn);
 
 		if(informationDataItem.GetInfoCode() == 2){				//Pause information item
-			//timestampMSB = informationDataItem.GetTimestampMSB();
-			//timestampMSBStatus = true;
+			//timestampWR48 = informationDataItem.GetTimestampWRUpper();
+			//timestampWR48Status = true;
 			pauseItemCounter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
-				std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " PAUSE information item\n" << std::endl;
+				//std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " PAUSE information item\n" << std::endl;
 			#endif
 		}
 		else if(informationDataItem.GetInfoCode() == 3){		//Resume information item
-			//timestampMSB = informationDataItem.GetTimestampMSB();
-			//timestampMSBStatus = true;
+			//timestampWR48 = informationDataItem.GetTimestampWRUpper();
+			//timestampWR48Status = true;
 			resumeItemCounter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
-				std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " RESUME information item\n" << std::endl;
+				//std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " RESUME information item\n" << std::endl;
 			#endif
 		}
-		else if(informationDataItem.GetInfoCode() == 4){		//SYNC100 information item
-			timestampMSB = informationDataItem.GetTimestampMSB();
-			timestampMSBStatus = true;
+		else if(informationDataItem.GetInfoCode() == 4){		//SYNC100 information item WR47:28
+			timestampWR48 = informationDataItem.GetTimestampWRUpper();
+			timestampWR48Status = true;
 			sync100Counter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
 				//std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " SYNC100 information item. FEE#" << informationDataItem.GetFEE64ID() << "\n" <<std::endl;
 			#endif
 		}
+		else if(informationDataItem.GetInfoCode() == 5){			//SYNC100 information item WR 63:48
+			timestampWR64 = informationDataItem.GetTimestampWRUpper();
+			timestampWR64Status = true;
+			sync100Counter[informationDataItem.GetFEE64ID()-1]+= 1;
+			#ifdef DEB_UNPACKER
+				std::cout << "\nTimestampWR64  Updated - " << timestampWR64 << " SYNC100 information item. FEE#" << informationDataItem.GetFEE64ID() << "\n" <<std::endl;
+			#endif
+		}
 		else if(informationDataItem.GetInfoCode() == 8 && informationDataItem.GetFEE64ID() == Common::masterFEE64){		//Correlation scaler data item
 
-			if(timestampMSBStatus){//No MSB information in scaler so can't set timestamp in constructor
-				informationDataItem.SetTimestamp(timestampMSB);
+			if(timestampWR48Status && timestampWR64Status){//No MSB information in scaler so can't set timestamp in constructor
+				informationDataItem.SetTimestamp(timestampWR48, timestampWR64);
 
 				if(informationDataItem.GetCorrScalerIndex() == 0){ //Scaler is split across three data word pairs need to combine the three to get the scaler
 					correlationScalerData0 = informationDataItem.GetCorrScalerTimestamp();

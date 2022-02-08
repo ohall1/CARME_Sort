@@ -103,9 +103,12 @@ void DataReader::BeginReader(){
             dataSpyLength = ReadBlock();
             if (dataSpyLength == 0){
                 //No data to read. Sleep for 1ms
+				// Print sleeping
+				std::cout << "Sleeping" << std::endl;
                 usleep(1000);
                 continue;
             }
+			std::cout << "Have data: " << dataSpyLength << std::endl;
             dataWordList.clear();
             for(int itrData = 24; itrData < dataLength+24; itrData += 8){
                 word0 = (dataSpyData[itrData] & 0xFF) | (dataSpyData[itrData+1] & 0xFF) << 8 |

@@ -7,7 +7,7 @@ class ADCDataItem{
 
 	private:
 		unsigned long timestamp;    //Internal AIDA time stamp
-		unsigned long timestampLSB; // Least significant bits of timestamp
+		unsigned long timestampWR24; // Least significant bits of timestamp
 
 		unsigned int adcData;       //ADC value
 		unsigned int sampleLength;
@@ -24,7 +24,7 @@ class ADCDataItem{
 
 		void BuildItem(std::pair < unsigned int, unsigned int> inData);
 
-		void BuildTimestamp(unsigned long MSB);
+		void BuildTimestamp(unsigned long WR48, unsigned long WR64);
 
 		void SetTimestamp(unsigned long newTimestamp);
 		void SetADCRange(short range);
@@ -42,8 +42,8 @@ class InformationDataItem{
 	private:
 
 		unsigned long timestamp;    		//Internal AIDA time stamp
-		unsigned long timestampLSB; 		// Least significant bits of timestamp
-		unsigned long timestampMSB;			// Most significant bits of timestamp
+		unsigned long timestampWR24; 		// Lowest24 bits of WR timestamps
+		unsigned long timestampWRUpper;			// Upper bits of WR timestamp eitehr 47:28 or 63:48
 		unsigned long infoField;    		//Iformation field of AIDA data word
 
 		unsigned int sampleLength;
@@ -60,14 +60,14 @@ class InformationDataItem{
 		InformationDataItem(std::pair < unsigned int, unsigned int> inData);
 		void BuildItem(std::pair < unsigned int, unsigned int> inData);
 		unsigned int GetInfoCode();
-		unsigned long GetTimestampMSB();
+		unsigned long GetTimestampWRUpper();
 		unsigned int GetCorrScalerIndex();
 		unsigned long GetCorrScalerTimestamp();
 		unsigned int GetFEE64ID();
 		unsigned long GetTimestamp();
-		unsigned long GetTimestampLSB();
+		unsigned long GetTimestampWR24();
 
-		void SetTimestamp(unsigned long MSB);
+		void SetTimestamp(unsigned long WR48, unsigned long WR64);
 };
 
 class CalibratedADCDataItem{
