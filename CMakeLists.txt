@@ -28,7 +28,7 @@ project(aidasort)
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist Tree Net Graf3d Graf Gpad Thread)
+find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist Tree Net Graf3d Graf Gpad Thread RHTTP)
 
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
@@ -45,7 +45,7 @@ target_link_libraries(AIDASort ${ROOT_LIBRARIES})
 # Library threads
 find_package (Threads)
 # C++11
-set_property(TARGET AIDASort PROPERTY CXX_STANDARD 11)
+set_property(TARGET AIDASort PROPERTY CXX_STANDARD 14)
 set_property(TARGET AIDASort PROPERTY CXX_STANDARD_REQUIRED ON)
 # PIC
 set_property(TARGET AIDASort PROPERTY POSITION_INDEPENDENT_CODE ON)

@@ -41,6 +41,8 @@ int main(int argc, char **argv){
 	subRunStart = 0;
 	subRunEnd = 0;
 
+    bool dataspy = false;
+
 	//Define root files
 
 	std::list<std::string> AIDAFileList;
@@ -137,10 +139,10 @@ int main(int argc, char **argv){
 	confFile.close();
 
 	Common::fOutRoot = new TFile(userOutFile.data(),"RECREATE");
-	if (!Common::fOutRoot){
-		std::cout << "Problem opening output file check input for file name" << std::endl;
-		return -1;
-	}
+	if (!Common::fOutRoot) {
+        std::cout << "Problem opening output file check input for file name" << std::endl;
+        return -1;
+    }
 
 	//Initialise data reader
 	DataReader myDataReader;
@@ -156,9 +158,12 @@ int main(int argc, char **argv){
 	dataUnpackerPoint = &myDataUnpacker;
 	calibratorPoint = &myCalibrator;
 
-	myDataReader.InitialiseReader(AIDAFileList);
+	myDataReader.InitialiseReader(AIDAFileList, dataspy);
 	eventBuilderPoint = myDataUnpacker.InitialiseDataUnpacker();
 	myCalibrator.InitialiseCalibrator(aidaParameters, eventBuilderPoint);
+
+
+
 
 	std::thread th1 (&DataReader::BeginReader,dataReaderPoint);
 

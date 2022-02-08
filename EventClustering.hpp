@@ -10,6 +10,8 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH2I.h"
+#include "TSystem.h"
+#include "THttpServer.h"
 
 class EventClustering{
 	private:
@@ -38,6 +40,12 @@ class EventClustering{
 		bool decayMapCurrent;													//Bool to keep track of whether current map is a decay
 
 		short implantStoppingLayer;										//DSSD that an implant stops in
+
+        unsigned long long currentTimestamp;
+        std::list< std::tuple<int, double, double>> xVsExEvents;
+        std::list< std::tuple<int, double, double>> yVsEyEvents;
+        std::array<unsigned int, Common::noDSSD*128*128>xyEvents; //Access with [DSSD*128*128 + y*128 + x]
+        THttpServer* serv;
 
 		#ifdef OLD_OUTPUT
 		//OLD_OUPUT will use the original version of the merger where a search square is drawn around the implant
@@ -83,6 +91,13 @@ class EventClustering{
 			TH2D * lowEnergyXY[Common::noDSSD];
 			TH2D * highEnergyXY[Common::noDSSD];
 			TH2I * xyMultiplicity[Common::noDSSD];
+
+            TH2I * lowEnergyXYRate[Common::noDSSD];
+            TH2I * lowEnergyXYTotal[Common::noDSSD];
+            TH2D * lowEnergyExXRate[Common::noDSSD];
+            TH2D * lowEnergyEyYRate[Common::noDSSD];
+            TH2D * lowEnergyExXTotal[Common::noDSSD];
+            TH2D * lowEnergyEyYTotal[Common::noDSSD];
 		#endif
 
 		void ClusterMap(std::multimap<CalibratedADCDataItem,int> & eventMap);	//Cluster the maps once ready

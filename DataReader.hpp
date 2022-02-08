@@ -20,6 +20,16 @@ class DataReader{
 		static const int BLOCK_SIZE = 0x10000; //Max block size is 64kb
 		static const int MAIN_SIZE = BLOCK_SIZE - HEADER_SIZE; // Header is included in the block size
 
+        // Properties for dataspy
+        int id;                                               // ID of the dataSpy stream
+        bool isDataSpy;                                       // Bool for whether the source of the data will be from a dataspy source
+        int dataSpyI;                                         // Stores value returned by dataspyopen/close
+        int dataSpyLength;                                    // Stores value returned by dataspyread
+
+        long currentBlockID;
+        long lastBlockID;
+        long blocksSeen;
+
 		//Stream for reading in data file
 		std::ifstream inputFile;
 		std::list <std::string> AIDAFileList; //List of the files to be sorted
@@ -54,11 +64,12 @@ class DataReader{
 		//Char arrays that read in the block data
 		char blockHeader[HEADER_SIZE];
 		char blockData[MAIN_SIZE];
+        char dataSpyData[BLOCK_SIZE];
 
 		void OpenInputFile();
 
 		void CalculateFileSize();
-		void ReadBlock();
+		int ReadBlock();
 		void CloseInputFile();
 		void SetInputFileList(std::list <std::string> fileList);
 		void AddToBuffer(std::deque<std::pair<unsigned int, unsigned int>> dataIn);
@@ -69,8 +80,9 @@ class DataReader{
 		DataReader();
 		~DataReader(){};
 
-		void InitialiseReader(std::list <std::string> inputFileList);
+		void InitialiseReader(std::list <std::string> inputFileList, bool bDataSpy);
 		void BeginReader();
+        void UpdateDataSpy(bool value);
 		std::deque<std::pair<unsigned int, unsigned int>> ReadFromBuffer();
 
 };

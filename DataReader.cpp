@@ -1,20 +1,31 @@
 #include "DataReader.hpp"
+#include "dataspy/dataspy.c"
 
 DataReader::DataReader(){};
 
-void DataReader::InitialiseReader(std::list <std::string> inputFileList){
+void DataReader::InitialiseReader(std::list <std::string> inputFileList, bool bDataSpy){
 
 
 	//Check whether input file list is filled
-	if (inputFileList.size() <= 0){
-		std::cout << "No input files given, program ending" << std::endl;
-		dataFinishedCheck = true;
-		return;
-	}
-	else{
-		std::cout << "AIDASort sorting offline data" << std::endl;
-		SetInputFileList(inputFileList);
-	}
+    if (!bDataSpy) {
+        if (inputFileList.size() <= 0) {
+            std::cout << "No input files given, program ending" << std::endl;
+            dataFinishedCheck = true;
+            return;
+        } else {
+            std::cout << "AIDASort sorting offline data" << std::endl;
+            SetInputFileList(inputFileList);
+        }
+        isDataSpy = false;
+    }
+    else{
+        isDataSpy = true;
+        id = 0;
+        dataSpyI = dataSpyOpen(id);
+    }
+    currentBlockID = -1;
+    blocksSeen = 0;
+    lastBlockID = -1;
 }
 
 void DataReader::SetInputFileList(std::list <std::string> fileList){
@@ -23,7 +34,7 @@ void DataReader::SetInputFileList(std::list <std::string> fileList){
 }
 
 void DataReader::BeginReader(){
-	while(AIDAFileList.size()>0){//Loops over all AIDA files
+	while(!AIDAFileList.empty() && !isDataSpy){//Loops over all AIDA files
 		
 		OpenInputFile();//Opens the first AIDA file in the list
 		CalculateFileSize();
@@ -86,6 +97,44 @@ void DataReader::BeginReader(){
 		CloseInputFile();
 
 	}
+    if(isDataSpy){
+        while(isDataSpy){
+            //Infinite loop for now
+            dataSpyLength = ReadBlock();
+            if (dataSpyLength == 0){
+                //No data to read. Sleep for 1ms
+                usleep(1000);
+                continue;
+            }
+            dataWordList.clear();
+            for(int itrData = 24; itrData < dataLength+24; itrData += 8){
+                word0 = (dataSpyData[itrData] & 0xFF) | (dataSpyData[itrData+1] & 0xFF) << 8 |
+                        (dataSpyData[itrData+2] & 0xFF) << 16 | (dataSpyData[itrData+3] & 0xFF) << 24;
+
+                word1 = (dataSpyData[itrData+4] & 0xFF) | (dataSpyData[itrData+5] & 0xFF) << 8 |
+                        (dataSpyData[itrData+6] & 0xFF) << 16 | (dataSpyData[itrData+7] & 0xFF) << 24;
+#ifdef DEB
+                if(itrData < 17+24){
+                std::cout << "itrData - " << itrData << " Word0 - " << word0 << std::endl;
+                std::cout << "Word1 - " << word1 << std::endl;
+                std::cout << 1* (dataSpyData[itrData] & 0xFF) << " block 1" <<std::endl;
+                std::cout << 1* (dataSpyData[itrData+1] & 0xFF) << " block 2" <<std::endl;
+                std::cout << 1* (dataSpyData[itrData+2] & 0xFF) << " block 3" <<std::endl;
+                std::cout << 1* (dataSpyData[itrData+3] & 0xFF) << " block 4" <<std::endl;
+                }
+#endif
+                if (word0 == 0xFFFFFFFF || word1 == 0xFFFFFFFF) continue;
+                //Pass on data words to the buffer
+                dataWords.first = word0;
+                dataWords.second = word1;
+
+                dataWordList.push_back(dataWords);
+
+            }
+            AddToBuffer(dataWordList);
+
+        }
+    }
 
 	//All files should have been emptied and closed
 	std::cout << "All data files read in." <<std::endl;
@@ -147,44 +196,68 @@ void DataReader::CalculateFileSize(){
 
 }
 
-void DataReader::ReadBlock(){
+int DataReader::ReadBlock(){
+    if(!isDataSpy) {
+        inputFile.read((char *) &blockHeader, sizeof(blockHeader));
+        inputFile.read((char *) &blockData, sizeof(blockData));
 
-	inputFile.read((char*)&blockHeader,sizeof(blockHeader));
-	inputFile.read((char*)&blockData,sizeof(blockData));
+        dataLength = (blockHeader[20] & 0xFF) | (blockHeader[21] & 0xFF) << 8 |
+                     (blockHeader[22] * 0xFF) << 16 | (blockHeader[23] << 24);
 
-	dataLength = (blockHeader[20] & 0xFF) | (blockHeader[21] & 0xFF) << 8 |
-				 (blockHeader[22] * 0xFF) << 16 | (blockHeader[23] << 24);
+#ifdef DEB
+        unsigned char headerID[8];
+        headerID[0] = blockHeader[0];
+        headerID[1] = blockHeader[1];
+        headerID[2] = blockHeader[2];
+        headerID[3] = blockHeader[3];
+        headerID[4] = blockHeader[4];
+        headerID[5] = blockHeader[5];
+        headerID[6] = blockHeader[6];
+        headerID[7] = blockHeader[7];
 
-	#ifdef DEB
-		unsigned char headerID[8];
-		headerID[0] = blockHeader[0];
-		headerID[1] = blockHeader[1];
-		headerID[2] = blockHeader[2];
-		headerID[3] = blockHeader[3];
-		headerID[4] = blockHeader[4];
-		headerID[5] = blockHeader[5];
-		headerID[6] = blockHeader[6];
-		headerID[7] = blockHeader[7];
+        unsigned int headerSequence = (blockHeader[8] & 0xFF) << 24 | (blockHeader[9] & 0xFF) << 16 |
+                                      (blockHeader[10] & 0xFF) << 8 | (blockHeader[11] & 0xFF);
 
-		unsigned int headerSequence = (blockHeader[8] & 0xFF) << 24 | (blockHeader[9] & 0xFF) << 16 |
-									  (blockHeader[10] & 0xFF) << 8 | (blockHeader[11] & 0xFF);
+        unsigned short int headerMyEndian; // 2 byte. Should be 256 for correct endianess
+        headerMyEndian = (blockHeader[16] & 0xFF) << 8 | (blockHeader[17] & 0xFF);
 
-		unsigned short int headerMyEndian; // 2 byte. Should be 256 for correct endianess
-		headerMyEndian = (blockHeader[16] & 0xFF) << 8 | (blockHeader[17] & 0xFF);
-
-		unsigned short int headerDataEndian; //2 byte again
-		headerDataEndian = (blockHeader[18] & 0xFF) << 8 | (blockHeader[19] & 0xFF);
+        unsigned short int headerDataEndian; //2 byte again
+        headerDataEndian = (blockHeader[18] & 0xFF) << 8 | (blockHeader[19] & 0xFF);
 
 
 
-		std::cout << "Header ID test: " << headerID <<std::endl;
-		std::cout << "Header sequence: 0x" << std::hex << headerSequence << std::dec << std::endl;
-		std::cout << "Header MyEndian - DataEndian Should be 256 - " << headerMyEndian << " - " << headerDataEndian << std::endl;
+        std::cout << "Header ID test: " << headerID <<std::endl;
+        std::cout << "Header sequence: 0x" << std::hex << headerSequence << std::dec << std::endl;
+        std::cout << "Header MyEndian - DataEndian Should be 256 - " << headerMyEndian << " - " << headerDataEndian << std::endl;
 
-	#endif
+#endif
 
-	return;
+        return dataLength;
+    }
+    else{
+        dataSpyLength = dataSpyRead(id, (char*)dataSpyData, sizeof(dataSpyData));
+        currentBlockID = (dataSpyData[8] & 0xFF) << 24 | (dataSpyData[9] & 0xFF) << 16 |
+                         (dataSpyData[10] & 0xFF) << 8 | (dataSpyData[11] & 0xFF);
+        if(currentBlockID > lastBlockID){
+            blocksSeen++;
+            lastBlockID = currentBlockID;
+            if(currentBlockID > 0 && currentBlockID % 10 == 0){
+                //Can print valid fraction of that 2GB chunk
+                std::cout << "Fraction of current 2GB chunk observed: " <<
+                          (double)blocksSeen/(double)currentBlockID << std::endl;
 
+            }
+        }
+        else if(currentBlockID == lastBlockID){
+            return 0;
+        }
+        else if(currentBlockID < lastBlockID){
+            lastBlockID = currentBlockID;
+            blocksSeen = 1;
+            std::cout << "New 2GB chunk of data being processed" << std::endl;
+        }
+        return dataSpyLength;
+    }
 }
 
 void DataReader::CloseInputFile(){
@@ -303,4 +376,9 @@ std::deque<std::pair<unsigned int, unsigned int>> DataReader::ReadFromBuffer(){
 
 	return bufferOut;
 
+}
+
+void DataReader::UpdateDataSpy(bool value) {
+    isDataSpy = value;
+    //There shouldn't be an issue as isDataSpy is only read after it is first initialised
 }

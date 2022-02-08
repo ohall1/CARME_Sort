@@ -1,8 +1,8 @@
 #Include Single AIDA File
-AIDAFile	/mnt/c/Users/oscar/Documents/Code/data/R6_237
+AIDAFile	/mnt/d/Documents/Code/data/R6_237
 
 #Include multiple AIDA files format "String before run number" <run number> <sub-run start> <sub-run end>
 #AIDAList R 6 17 20
 
 #AIDA Parameters file
-AIDAConfig /mnt/c/Users/oscar/Documents/Code/AIDASort/ExampleParameters.csv
+AIDAConfig /home/oscar/code/carme/CARME_Sort/ExampleParameters.csv
