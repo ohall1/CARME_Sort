@@ -36,11 +36,18 @@ include(${ROOT_USE_FILE})
 include_directories(${CMAKE_SOURCE_DIR} ${ROOT_INCLUDE_DIRS})
 add_definitions(${ROOT_CXX_FLAGS} -lTreePlayer )
 #ROOT_GENERATE_DICTIONARY(G__data2Tree data2Tree.hpp BRIKENTreeData.h LINKDEF data2TreeLinkDef.hpp)
+#include_directories("/MIDAS/Linux")
+#link_directories("/MIDAS/Linux/lib64")
+#add_library(libdataspy STATIC IMPORTED)
+#set_property(TARGET libdataspy PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libdataspy.so)
 
+#add_library(mylib SHARED IMPORTED)
+#set_target_properties( mylib PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libdataspy.so )
+message("Path" ${CMAKE_SOURCE_DIR})
 
 #---Create  a main program using the library
 add_executable(AIDASort main.cpp)
-target_link_libraries(AIDASort ${ROOT_LIBRARIES})
+TARGET_LINK_LIBRARIES(AIDASort ${ROOT_LIBRARIES} rt)
 
 # Library threads
 find_package (Threads)

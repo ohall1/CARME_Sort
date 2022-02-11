@@ -48,15 +48,24 @@ void EventBuilder::CorrectMultiplexer(ADCDataItem & adcItem){
 	itemADC = ((adcItem.GetChannelID()) / 16);
 	itemFEE = adcItem.GetFEE64ID()-1;
 	itemTimestamp = adcItem.GetTimestamp();
-	if((itemTimestamp-adcLastTimestamp[itemFEE][itemADC] > 2000 ) && adcLastTimestamp[itemFEE][itemADC]!=0){
+	if((itemTimestamp-adcLastTimestamp[itemFEE][itemADC] > 2500 ) && adcLastTimestamp[itemFEE][itemADC]!=0){
 		//If two seperate ADC events within same window reset the adc counter
 		adcItemCounts[itemFEE][itemADC]=0;
 	}
-	adcLastTimestamp[itemFEE][itemADC]=itemTimestamp;
+	#ifdef DEB_EVENTBUILDER
+		std::cout << "updating timestamp " << std::endl;
+	#endif
+	adcLastTimestamp[itemFEE][itemADC] = itemTimestamp;
 	//normalItems++;
 	//timestampCorrection = (200 * adcItemCounts[itemFEE][itemADC]);
+	#ifdef DEB_EVENTBUILDER
+		std::cout << " Setting timestamp" << std::endl;
+	#endif
 
 	adcItem.SetTimestamp((itemTimestamp-(2000 * adcItemCounts[itemFEE][itemADC])));
+	#ifdef DEB_EVENTBUILDER
+		std::cout << "updating counter " << std::endl;
+	#endif
  	adcItemCounts[itemFEE][itemADC]++;
  	return;
 
@@ -87,7 +96,7 @@ void EventBuilder::CloseEvent(){
 		AddEventToBuffer(implantEvents);
 		totalImplantEvents++;
 	}
-	else if(decayEvents.size() > 128*Common::noDSSD){//Half the number of channels per dssd
+	else if(decayEvents.size() > 64*Common::noDSSD){//Half the number of channels per dssd
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Size of decay list > 800. Event being defined as a pulser event. Multiplicity = " << decayEvents.size() << "\n" << std::endl;
@@ -103,7 +112,7 @@ void EventBuilder::CloseEvent(){
 			lowEnergyMultiplicity->Fill(decayEvents.size());
 		#endif
 		#ifdef OFFSETS
-			for(decayEventsIt = decayEvents.begin(); decayEventsIt != decayEvents.end(); decayEventsIt++){
+			for(auto decayEventsIt = decayEvents.begin(); decayEventsIt != decayEvents.end(); decayEventsIt++){
 				//Allows all channels to be plotted on one histogram
 				absPulserVsChannel->Fill((((decayEventsIt->GetFEE64ID()-1)*64)+decayEventsIt->GetChannelID()),abs(decayEventsIt->GetADCData()-32768.0));
 			}
@@ -115,11 +124,14 @@ void EventBuilder::CloseEvent(){
 			std::cout << "Event defined as a decay event. Decays passed onto calibrator. Decay size = " <<decayEvents.size() << "\n" << std::endl;
 		#endif
 		#ifdef HISTOGRAMMING
-			lowEnergyMultiplicity->Fill(decayEvents.size());
+			//lowEnergyMultiplicity->Fill(decayEvents.size());
 		#endif
 		AddEventToBuffer(decayEvents);
 		totalDecayEvents++;
 	}
+	#ifdef DEB_EVENTBUILDER
+		std::cout << "Decay event size: " << decayEvents.size() << " Implant event size: " << implantEvents.size() << std::endl;
+	#endif
 
 	totalDecayWords +=decayEvents.size();
 	totalImplantWords+=implantEvents.size();
@@ -132,16 +144,27 @@ void EventBuilder::CloseEvent(){
 void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
 
 	//Check if event is still within event window
-	if((adcItem.GetTimestamp()-previousTimestamp)>2000 && previousTimestamp != 0){
+	if((adcItem.GetTimestamp()-previousTimestamp)>=2200 && previousTimestamp != 0){
 		//Gap between items greater than multiplexed time period. New item is the start of a new event close the old event
 		CloseEvent();
+		#ifdef DEB_EVENTBUILDER
+			std::cout << "Event closed initialising new event" << std::endl;
+		#endif
 		InitialiseEvent();
+		#ifdef DEB_EVENTBUILDER
+			std::cout << "Event initialised" << std::endl;
+		#endif
 	}
 	previousTimestamp = adcItem.GetTimestamp();
-
+	#ifdef DEB_EVENTBUILDER
+		std::cout << "Previous timestamp obtained" << std::endl;
+	#endif
 	CorrectMultiplexer(adcItem);
+	#ifdef DEB_EVENTBUILDER
+		std::cout << "Multiplexer corected" << std::endl;
+	#endif
+	//ApplyCorrelationScalerOffset(adcItem);
 
-	ApplyCorrelationScalerOffset(adcItem);
 
  	if( adcItem.GetADCRange() == 0){
  		//Low energy event. Add to decay list

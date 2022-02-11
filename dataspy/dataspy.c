@@ -10,24 +10,18 @@
 #include <string.h>
 
 
-#if (defined SOLARIS || defined POSIX)
+
 
 #include <unistd.h>
 #include <sys/mman.h>
 #include <fcntl.h>
 
-#ifdef __cplusplus
 extern "C" {
-#endif
    int shm_open(const char *, int, mode_t);
-#ifdef __cplusplus
-}
-#endif
 
-#else
-#include <sys/types.h>
-#include <sys/shm.h>
-#endif
+}
+
+
 
 #include "dataspy.h"
 
@@ -38,12 +32,9 @@ extern "C" {
 #define SHM_KEY 110205   /* base Key */
 
 
-#if (defined SOLARIS || defined POSIX)
-   int shmkey = SHM_KEY;
-   char object_name[16];
-#else
-   key_t shmkey = SHM_KEY;
-#endif
+
+  int shmkey = SHM_KEY;
+  char object_name[16];
 
 void * shm_bufferarea[MAX_ID];
 int shmid[MAX_ID];
@@ -72,7 +63,7 @@ int dataSpyOpen (int id)
       return -1;
     }
  
-#if (defined SOLARIS || defined POSIX)
+
 
 /*    create a file mapped object (MASTER) or obtain ID of existing object */
 
@@ -84,14 +75,8 @@ int dataSpyOpen (int id)
         exit(1);
     }
 
-#else
 
-  shmid[id] = shmget(shmkey+id, 0, SHM_R);
-  if (shmid[id] == -1) {perror("shmget"); return -1;}
-  
-#endif
 
-#if (defined SOLARIS || defined POSIX)
 
 /*    attach the memory segment */
 
@@ -103,15 +88,7 @@ int dataSpyOpen (int id)
 
     close(shmid[id]);
 
-#else
 
-    shm_bufferarea[id] = shmat(shmid[id], (void *) 0, SHM_RDONLY);
-    if (shm_bufferarea[id] == (void *) -1) {
-         perror("shmat");
-         exit(1);
-    }
-
-#endif
 
   printf("dataSpy Shared buffer area %d (/SHM_%d) located at 0x%x\n", id, shmkey+id,shm_bufferarea[id]);
   
@@ -146,17 +123,13 @@ int dataSpyClose (int id)
       return -1;
     }
 
-#if (defined SOLARIS || defined POSIX)
+
 
 /*    detach the memory segment */
 
     (void) munmap(shm_bufferarea[id], (size_t) SHMSIZE);
 
-#else
 
-    (void) shmdt(shm_bufferarea[id]);
-
-#endif
 
 
   

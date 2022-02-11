@@ -12,6 +12,12 @@
 #include <thread>
 #include <condition_variable>
 
+#include "TSystem.h"
+
+extern int dataSpyOpen   (int id);
+extern int dataSpyClose  (int id);
+extern int dataSpyRead   (int id, char *data, int length);
+
 class DataReader{
 	private:
 

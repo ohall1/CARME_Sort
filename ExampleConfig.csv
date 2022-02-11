@@ -1,5 +1,5 @@
 #Include Single AIDA File
-AIDAFile	/TapeData/22Feb/R4_8
+AIDAFile	/TapeData/22Feb/R20_5
 
 #Include multiple AIDA files format "String before run number" <run number> <sub-run start> <sub-run end>
 #AIDAList R 6 17 20

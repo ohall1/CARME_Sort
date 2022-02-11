@@ -1,13 +1,13 @@
 #mapfee64 -> DSSD: map_dssd <FEE> <DSSD no.>
 #-1	mean FEE not used. 0 means....							
 dssdMap	1	1											
-dssdMap	2	2											
-dssdMap	3	6											
-dssdMap	4	5											
-dssdMap	5	6											
-dssdMap	6	5											
-dssdMap	7	5											
-dssdMap	8	6											
+dssdMap	2	1											
+dssdMap	3	1											
+dssdMap	4	1											
+dssdMap	5	2											
+dssdMap	6	2											
+dssdMap	7	2											
+dssdMap	8	2											
 										
 
 #map fee64 -> side (n:0, p:1, not used:-1)						
@@ -23,12 +23,12 @@ sideMap	8	0
 
 #map strip: 01:00 left/top side, 02:00 right/bottom side (from beam view)			
 stripMap	1	1											
-stripMap	2	1											
+stripMap	2	2											
 stripMap	3	1											
-stripMap	4	1											
-stripMap	5	2											
+stripMap	4	2											
+stripMap	5	1											
 stripMap	6	2											
-stripMap	7	2											
+stripMap	7	1											
 stripMap	8	2											
 								
 #adc	polarity:	-1	for	p-side,	1	for	n-side	(polarity	of	signal	inverted	by	pre-amp)

@@ -1,4 +1,5 @@
 #include "DataReader.hpp"
+
 #include "dataspy/dataspy.c"
 
 DataReader::DataReader(){};
@@ -12,7 +13,8 @@ void DataReader::InitialiseReader(std::list <std::string> inputFileList, bool bD
             std::cout << "No input files given, program ending" << std::endl;
             dataFinishedCheck = true;
             return;
-        } else {
+        } 
+		else {
             std::cout << "AIDASort sorting offline data" << std::endl;
             SetInputFileList(inputFileList);
         }
@@ -21,7 +23,9 @@ void DataReader::InitialiseReader(std::list <std::string> inputFileList, bool bD
     else{
         isDataSpy = true;
         id = 0;
+		std::cout << "Opening dataspy " << id <<std::endl;
         dataSpyI = dataSpyOpen(id);
+		std::cout << "Dataspy open" << std::endl;
     }
     currentBlockID = -1;
     blocksSeen = 0;
@@ -104,13 +108,13 @@ void DataReader::BeginReader(){
             if (dataSpyLength == 0){
                 //No data to read. Sleep for 1ms
 				// Print sleeping
-				std::cout << "Sleeping" << std::endl;
+				//std::cout << "Sleeping" << std::endl;
+				//gSystem->ProcessEvents();
                 usleep(1000);
                 continue;
             }
-			std::cout << "Have data: " << dataSpyLength << std::endl;
             dataWordList.clear();
-            for(int itrData = 24; itrData < dataLength+24; itrData += 8){
+            for(int itrData = 24; itrData < dataSpyLength; itrData += 8){
                 word0 = (dataSpyData[itrData] & 0xFF) | (dataSpyData[itrData+1] & 0xFF) << 8 |
                         (dataSpyData[itrData+2] & 0xFF) << 16 | (dataSpyData[itrData+3] & 0xFF) << 24;
 
@@ -127,6 +131,7 @@ void DataReader::BeginReader(){
                 }
 #endif
                 if (word0 == 0xFFFFFFFF || word1 == 0xFFFFFFFF) continue;
+				if (word0 == 0 && word1 == 0) continue;
                 //Pass on data words to the buffer
                 dataWords.first = word0;
                 dataWords.second = word1;
@@ -241,13 +246,14 @@ int DataReader::ReadBlock(){
         dataSpyLength = dataSpyRead(id, (char*)dataSpyData, sizeof(dataSpyData));
         currentBlockID = (dataSpyData[8] & 0xFF) << 24 | (dataSpyData[9] & 0xFF) << 16 |
                          (dataSpyData[10] & 0xFF) << 8 | (dataSpyData[11] & 0xFF);
+						 //std::cout << currentBlockID << std::endl;
         if(currentBlockID > lastBlockID){
             blocksSeen++;
             lastBlockID = currentBlockID;
             if(currentBlockID > 0 && currentBlockID % 10 == 0){
                 //Can print valid fraction of that 2GB chunk
-                std::cout << "Fraction of current 2GB chunk observed: " <<
-                          (double)blocksSeen/(double)currentBlockID << std::endl;
+                //std::cout << "Fraction of current 2GB chunk observed: " <<
+                       //   (double)blocksSeen/(double)currentBlockID << std::endl;
 
             }
         }
@@ -257,7 +263,7 @@ int DataReader::ReadBlock(){
         else if(currentBlockID < lastBlockID){
             lastBlockID = currentBlockID;
             blocksSeen = 1;
-            std::cout << "New 2GB chunk of data being processed" << std::endl;
+            //std::cout << "New 2GB chunk of data being processed" << std::endl;
         }
         return dataSpyLength;
     }
@@ -291,7 +297,7 @@ void DataReader::AddToBuffer(std::deque<std::pair<unsigned int, unsigned int>> d
 	while(dataWordBuffer.size()>=100){
 		bufferFullCheck = true;
 		#ifdef DEB_THREAD
-			std::cout << "Buffer list is fulle. BufferFulCheck = " << bufferFullCheck <<std::endl;
+			std::cout << "Buffer list is full. BufferFulCheck = " << bufferFullCheck <<std::endl;
 		#endif
 		bufferFull.wait(addLock);
 	}

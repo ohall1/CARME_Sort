@@ -24,15 +24,9 @@ typedef struct s_buffer_header {
     int buffer_spare1;
     int buffer_spare2;
     int buffer_spare3;
-#ifdef WIN32
-    int buffer_currentage;
-    int padding1;
-    int buffer_age[MAX_BUFFERS];
-    int padding2[MAX_BUFFERS];
-#else
+
     long long buffer_currentage;
     long long buffer_age[MAX_BUFFERS];
-#endif
     int buffer_status[MAX_BUFFERS];
 }  BUFFER_HEADER; 
 

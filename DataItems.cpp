@@ -103,7 +103,8 @@ void InformationDataItem::SetTimestamp(unsigned long WR48, unsigned long WR64){
 		timestamp = (WR64) << 48 | ((WR48+1) << 28) | timestampWR24;
 	}
 	else{
-		timestamp = (WR64) << 48 | (WR48 << 28) | timestampWR24;	}
+		timestamp = (WR64) << 48 | (WR48 << 28) | timestampWR24;
+	}
 }
 unsigned long InformationDataItem::GetTimestampWRUpper(){
 	return timestampWRUpper;

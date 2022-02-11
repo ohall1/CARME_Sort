@@ -81,7 +81,6 @@ EventClustering::EventClustering(){
 void EventClustering::InitialiseClustering(){
 	decayMap.clear();
 	implantMap.clear();
-
 	#ifdef OLD_OUTPUT
 		outputEvents.clear();
 	#endif
@@ -104,6 +103,7 @@ void EventClustering::InitialiseClustering(){
 	implantStoppingLayer = -5;
 }
 void EventClustering::AddEventToMap(CalibratedADCDataItem &dataItem){
+
 	if(dataItem.GetADCRange() == 0){
 		//Store decay items in a map that organises them by DSSD->Side->Strip
 		decayMap.emplace(dataItem,1);
@@ -373,7 +373,6 @@ short EventClustering::ImplantStoppingLayer(){
 }
 void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<Cluster> clusterLists[][2]){
 	//Loop through the clusters in the event map and pair front and back clusters based on equal energy and time difference
-    //gSystem->ProcessEvents();
 
 	if(clusterLists[dssd][0].size() > 0 && clusterLists[dssd][1].size() > 0){
 		//If clusters in both sides of the detector loop through and pair them
@@ -402,8 +401,8 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
 						implantEnergyMatchCount++;
 					}
 
-					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<=4000) ||
-						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<=4000) ){
+					if((clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMin())<4000) ||
+						 (clusterSide0It->GetTimestampDifference(clusterSide1It->GetTimestampMax())<4000) ){
 						if(equalEnergyRange == implantEnergyDifference){
 							implantTimeMatchCounter++;
 						}
@@ -439,7 +438,7 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
                                         for(int z = 0; z < Common::noDSSD; z++) {
                                             for (int x = 0; x < 128; x++) {
                                                 for (int y = 0; y < 128; y++) {
-                                                    lowEnergyEyYRate[z]->SetBinContent(x + 1, y + 1, xyEvents[z * 128 * 128 + y * 128 + x]);
+                                                    lowEnergyXYRate[z]->SetBinContent(x + 1, y + 1, xyEvents[z * 128 * 128 + y * 128 + x]);
                                                 }
                                             }
                                         }
@@ -458,7 +457,7 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
                                     }
                                 gSystem->ProcessEvents();
                                 }
-                                //gSystem->ProcessEvents();
+                                gSystem->ProcessEvents();
                                 lowEnergyXYTotal[dssd]->Fill(pairedCluster.x, pairedCluster.y);
                                 xyEvents[dssd * 128 * 128 + (int)pairedCluster.y * 128 + (int)pairedCluster.x]++;
 

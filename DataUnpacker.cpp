@@ -69,7 +69,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		if (timestampWR48Status && timestampWR64Status){//If both upper parts of upper WR obtained continue
 
 		#ifdef OFFSETS
-			adcDataItem.BuildTimestamp(timestampMSB);
+			adcDataItem.BuildTimestamp(timestampWR48, timestampWR64);
 
 			//If histogramming turned on add event information to histograms
 			#ifdef HISTOGRAMMING
@@ -89,6 +89,12 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		else if(timestampWR48Status && timestampWR64Status){
 		#endif
 			adcDataItem.BuildTimestamp(timestampWR48, timestampWR64);
+			if(adcDataItem.GetFEE64ID() < 0){
+				return true;
+			}
+			else if(adcDataItem.GetFEE64ID() > 8){
+				return true;
+			}
 
 			//If histogramming turned on add event information to histograms
 			#ifdef HISTOGRAMMING
@@ -131,13 +137,13 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 				//std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " RESUME information item\n" << std::endl;
 			#endif
 		}
-		else if(informationDataItem.GetInfoCode() == 4){		//SYNC100 information item WR47:28
+		else if(informationDataItem.GetInfoCode() == 4){		//SYNC100 information item WR 47:28
 			timestampWR48 = informationDataItem.GetTimestampWRUpper();
 			timestampWR48Status = true;
 			sync100Counter[informationDataItem.GetFEE64ID()-1] += 1;
 
 			#ifdef DEB_UNPACKER
-				//std::cout << "\nTimestamp MSB Updated - " << timestampMSB << " SYNC100 information item. FEE#" << informationDataItem.GetFEE64ID() << "\n" <<std::endl;
+				std::cout << "\nTimestampWR48  Updated - " << timestampWR48 << " SYNC100 information item. FEE#" << informationDataItem.GetFEE64ID() << "\n" <<std::endl;
 			#endif
 		}
 		else if(informationDataItem.GetInfoCode() == 5){			//SYNC100 information item WR 63:48
@@ -148,9 +154,12 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 				std::cout << "\nTimestampWR64  Updated - " << timestampWR64 << " SYNC100 information item. FEE#" << informationDataItem.GetFEE64ID() << "\n" <<std::endl;
 			#endif
 		}
-		else if(informationDataItem.GetInfoCode() == 8 && informationDataItem.GetFEE64ID() == Common::masterFEE64){		//Correlation scaler data item
+		else if(informationDataItem.GetInfoCode() == 8){		//Correlation scaler data item
 
-			if(timestampWR48Status && timestampWR64Status){//No MSB information in scaler so can't set timestamp in constructor
+			//Scaler item input
+			informationDataItem.SetTimestamp(timestampWR48, timestampWR64);
+			std::cout << "Scaler item FEE: " << informationDataItem.GetFEE64ID() << " Timestamp: " << informationDataItem.GetTimestamp() << std::endl;
+			/*if(timestampWR48Status && timestampWR64Status){//No MSB information in scaler so can't set timestamp in constructor
 				informationDataItem.SetTimestamp(timestampWR48, timestampWR64);
 
 				if(informationDataItem.GetCorrScalerIndex() == 0){ //Scaler is split across three data word pairs need to combine the three to get the scaler
@@ -188,7 +197,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 						std::cout << "Correlation scaler " << correlationScaler << " Offset = " << correlationScalerOffset << std::endl;
 					#endif
 				}
-			} 
+			}*/ 
 
 		}
 		return true;
@@ -196,7 +205,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 	}
 	else if (dataType == 0){
 		//Have reached the end of the data file break out of the while loop
-		std::cout << "Reached the end of reading in the data" << std::endl;
+		std::cout << "Reached the end of the files" << std::endl;
 		return false;
 	}
 }
