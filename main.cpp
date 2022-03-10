@@ -14,8 +14,8 @@
 //ROOT Libraries
 #include "TFile.h"
 
-#define MERGER_OUTPUT
 #define HISTOGRAMMING
+#define OFFSETS
 
 #include "Common.hpp"
 #include "DataReader.cpp"
@@ -27,6 +27,9 @@
 
 void Usage(char *progname){
 	std::cout << "Usage: AIDASort -c configFile -o OutputFile" << std::endl;
+	std::cout << "Optional extra arguments:" << std::endl;
+	std::cout << "-s Ignore the specified input files and instead start a dataspy session" << std::endl;
+	std::cout << "-m Mute the online monitor. Will not start the 8085 server. Use for offline analysis." << std::endl;
 	exit;
 }
 
@@ -40,6 +43,7 @@ int main(int argc, char **argv){
 	runNum=0;
 	subRunStart = 0;
 	subRunEnd = 0;
+	bool monitor = true;
 
     bool dataspy = false;
 
@@ -72,6 +76,12 @@ int main(int argc, char **argv){
 						dataspy = true;
 						std::cout << "Data spy option enabled" << std::endl;
 						break;
+					
+					case 'm':
+						monitor = false;
+						std::cout << "Online monitor disabled. 8085 server will not start" << std::endl;
+						break;
+
 
 					default:
 						Usage(argv[0]);
@@ -165,6 +175,7 @@ int main(int argc, char **argv){
 	myDataReader.InitialiseReader(AIDAFileList, dataspy);
 	eventBuilderPoint = myDataUnpacker.InitialiseDataUnpacker();
 	myCalibrator.InitialiseCalibrator(aidaParameters, eventBuilderPoint);
+	myCalibrator.StartMonitor(monitor);
 
 	std::thread th1 (&DataReader::BeginReader,dataReaderPoint);
 

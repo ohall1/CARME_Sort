@@ -158,8 +158,9 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 
 			//Scaler item input
 			informationDataItem.SetTimestamp(timestampWR48, timestampWR64);
-			std::cout << "Scaler item FEE: " << informationDataItem.GetFEE64ID() << " Timestamp: " << informationDataItem.GetTimestamp() << std::endl;
-			/*if(timestampWR48Status && timestampWR64Status){//No MSB information in scaler so can't set timestamp in constructor
+			//std::cout << "Scaler item FEE: " << informationDataItem.GetFEE64ID() << " Timestamp: " << informationDataItem.GetTimestamp() << std::endl;
+			
+			/*if(timestampWR48Status && timestampWR64Status){//No MBS information in scaler so can't set timestamp in constructor
 				informationDataItem.SetTimestamp(timestampWR48, timestampWR64);
 
 				if(informationDataItem.GetCorrScalerIndex() == 0){ //Scaler is split across three data word pairs need to combine the three to get the scaler
@@ -205,7 +206,7 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 	}
 	else if (dataType == 0){
 		//Have reached the end of the data file break out of the while loop
-		std::cout << "Reached the end of the files" << std::endl;
+		std::cout << "Reached the end of the files" << std::endl;		
 		return false;
 	}
 }

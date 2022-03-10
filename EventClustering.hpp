@@ -2,6 +2,7 @@
 #define _EVENTCLUSTERING_HPP
 
 #include "Common.hpp"
+#include <fstream>
 
 #include <map>
 
@@ -27,15 +28,22 @@ class EventClustering{
 
 		short dssdSideMultiplicity[Common::noDSSD][2];					//Stores the multiplicity of each side of the detector
 
-		const double decayEnergyDifference = 450.0;						//Cluster energy difference in keV for decay clusters
+		const double decayEnergyDifference = 650.0;						//Cluster energy difference in keV for decay clusters
 		const double implantEnergyDifference = 1000.0;					//Cluster energy difference in MeV for implant clusters
 		const double energyThreshold = 0.0;								//Thresholds used for checking decays
+		const double lowRutherford = 2500.;
+		const double highRutherford = 3500.;
+		unsigned long rate1s;
+		unsigned long rate20s;
+		bool onlineMonitor;
+		std::ofstream outFile;
 
 		int implantStoppingCounter;
 		int implantPairCounter;
 		int implantWindowCounter;
 		int implantEnergyMatchCount;
 		int implantTimeMatchCounter;
+		bool dssdPNisX[Common::noDSSD];
 
 		bool decayMapCurrent;													//Bool to keep track of whether current map is a decay
 
@@ -44,6 +52,12 @@ class EventClustering{
         unsigned long long currentTimestamp;
         std::list< std::tuple<int, double, double>> xVsExEvents;
         std::list< std::tuple<int, double, double>> yVsEyEvents;
+		std::multimap<ULong_t, std::tuple<int, double, double>> xVsExMap;
+		std::multimap<ULong_t, std::tuple<int, double, double>>::iterator xVsExMapIt;
+		std::multimap<ULong_t, std::tuple<int, double, double>>::iterator xVsExMapLowIt;
+		std::multimap<ULong_t, std::tuple<int, double, double>> yVsEyMap;
+		std::multimap<ULong_t, std::tuple<int, double, double>>::iterator yVsEyMapIt;
+		std::multimap<ULong_t, std::tuple<int, double, double>>::iterator yVsEyMapLowIt;
         std::array<unsigned int, Common::noDSSD*128*128>xyEvents; //Access with [DSSD*128*128 + y*128 + x]
         THttpServer* serv;
 
@@ -64,13 +78,13 @@ class EventClustering{
 		#endif
 		#ifdef MERGER_OUTPUT
 			TTree * outputTree;										//Tree to store output
-
+		#endif
 			MergerOutput mergerOutput;									//Variable to be used as the old output
 			std::multimap<ULong_t, MergerOutput> outputEvents;		//Map to time order paired clusters in each event before being written to map
 			std::multimap<ULong_t, MergerOutput>::iterator eventsIt;	//Iterator for output event map
 
 
-		#endif
+
 
 		#ifdef DEB_IMPLANT_STOPPING
 			int positiveStopping = 0;
@@ -98,6 +112,12 @@ class EventClustering{
             TH2D * lowEnergyEyYRate[Common::noDSSD];
             TH2D * lowEnergyExXTotal[Common::noDSSD];
             TH2D * lowEnergyEyYTotal[Common::noDSSD];
+
+			TH1D * lowEnergyEyTotal[Common::noDSSD];
+			TH1D * lowEnergyExTotal[Common::noDSSD];
+			TH1D * lowEnergyEyRate[Common::noDSSD];
+			TH1D * lowEnergyExRate[Common::noDSSD];
+
 		#endif
 
 		void ClusterMap(std::multimap<CalibratedADCDataItem,int> & eventMap);	//Cluster the maps once ready
@@ -113,7 +133,9 @@ class EventClustering{
 		void InitialiseClustering();
 		void AddEventToMap(CalibratedADCDataItem & dataItem);		//Add event to the applicable map to the event type
 		void ProcessMaps();											//Reached the end of the event process the maps
-		void CloseClustering();										//At end of program close clustering
+		void CloseClustering();
+		int StartMonitor(bool monitor);										//At end of program close clustering
+		int InitialisePNArray(bool pnArray[Common::noDSSD]);
 
 };
 

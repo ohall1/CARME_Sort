@@ -217,8 +217,9 @@ class MergerOutput{
   		Int_t nz;   //Pointless variable required by BRIKEN merger
 		UChar_t ID;
 
-		MergerOutput(){};
+		MergerOutput();
 		MergerOutput(Cluster & clusterX, Cluster & clusterY);
+		int BuildItem(Cluster & clusterX, Cluster & clusterY);
 
 		ULong_t GetTimestamp() const;
 		double GetX() const;

@@ -451,6 +451,60 @@ MergerOutput::MergerOutput(Cluster & clusterY, Cluster & clusterX){
 	}
 
 }
+MergerOutput::MergerOutput(){
+		T = 0;
+		Tfast = 0;
+  		E = -9;
+  		Ex = -9;
+ 		Ey = -9;
+ 		x = -9;
+ 		y = -9;
+		z = -9;
+ 		nx = 0;
+ 		ny = 0;
+  		nz = 0;   //Pointless variable required by BRIKEN merger
+		ID = 0;
+}
+int MergerOutput::BuildItem(Cluster & clusterY, Cluster & clusterX){
+
+	if(clusterX.GetTimestampMin() < clusterY.GetTimestampMin()){
+		T = clusterX.GetTimestampMin();
+	}
+	else{
+		T = clusterY.GetTimestampMin();
+	}
+
+	uint8_t dx = (clusterX.GetStrip()-clusterX.GetStripMin());
+	uint8_t dy = (clusterY.GetStrip()-clusterY.GetStripMin());
+	uint8_t dxCal;
+	uint8_t dyCal;
+
+	Tfast = dx + 0x100 * dy;
+
+	Ex = clusterX.GetEnergy();
+	Ey = clusterY.GetEnergy();
+
+	E = (Ex + Ey)/2.0;
+
+	x = ((clusterX.GetStripMin() + clusterX.GetStrip())/2.0);
+	y = ((clusterY.GetStripMin() + clusterY.GetStrip())/2.0);
+	z = clusterX.GetDSSD();
+
+	nx = clusterX.GetMultiplicity();
+	ny = clusterY.GetMultiplicity();
+	nz = 0;
+
+	if(clusterX.GetADCRange() == 0){
+		ID = 5;
+	}
+	else if(clusterY.GetADCRange() == 1){
+		ID = 4;
+	}
+	else{
+		ID==4;
+	}
+	return 0;
+}
 ULong_t MergerOutput::GetTimestamp()const{
 	return T;
 }

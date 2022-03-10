@@ -6,19 +6,19 @@ EventClustering::EventClustering(){
 		for (int i = 0; i < Common::noDSSD;i++){
 			char hname[50];
 			sprintf(hname,"lowEnergyExEyDSSD%d",i);
-			lowEnergyExEy[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+			lowEnergyExEy[i] = new TH2D(hname,"",1e3,0,2e4,1e3,0,2e4);
 
 			hname[0] = '\0';
 			sprintf(hname,"highEnergyExEyDSSD%d",i);
-			highEnergyExEy[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+			highEnergyExEy[i] = new TH2D(hname,"",1e3,0,2e4,1e3,0,2e4);
 
 			hname[0] = '\0';
 			sprintf(hname,"lowEnergyExEyPairDSSD%d",i);
-			lowEnergyExEyPair[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+			lowEnergyExEyPair[i] = new TH2D(hname,"",1e3,0,2e4,1e3,0,2e4);
 
 			hname[0] = '\0';
 			sprintf(hname,"highEnergyExEyDSSDPair%d",i);
-			highEnergyExEyPair[i] = new TH2D(hname,"",5e2,0,1e4,5e2,0,1e4);
+			highEnergyExEyPair[i] = new TH2D(hname,"",1e3,0,2e4,1e3,0,2e4);
 
 			hname[0] = '\0';
 			sprintf(hname,"xyMultiplicityDSSD%d",i);
@@ -35,9 +35,13 @@ EventClustering::EventClustering(){
             hname[0] = '\0';
             sprintf(hname,"lowEnergyXYRateDSSD%d",i);
             lowEnergyXYRate[i] = new TH2I(hname, "", 128,0,128,128,0,128);
+			lowEnergyXYRate[i]->GetXaxis()->SetTitle("Strip number (x)");
+			lowEnergyXYRate[i]->GetYaxis()->SetTitle("Strip number (y)");
             hname[0] = '\0';
             sprintf(hname,"lowEnergyXYTotalDSSD%d",i);
             lowEnergyXYTotal[i] = new TH2I(hname, "", 128,0,128,128,0,128);
+			lowEnergyXYTotal[i]->GetXaxis()->SetTitle("Strip number (x)");
+			lowEnergyXYTotal[i]->GetYaxis()->SetTitle("Strip number (y)");
             hname[0] = '\0';
             sprintf(hname,"lowEnergyExXRateDSSD%d",i);
             lowEnergyExXRate[i] = new TH2D(hname, "", 128,0,128,1000,0,20e3);
@@ -50,9 +54,28 @@ EventClustering::EventClustering(){
             hname[0] = '\0';
             sprintf(hname,"lowEnergyEyYTotalDSSD%d",i);
             lowEnergyEyYTotal[i] = new TH2D(hname, "", 128,0,128,1000,0,20e3);
+			hname[0] = '\0';
+            sprintf(hname,"lowEnergyEyTotalDSSD%d",i);
+			lowEnergyEyTotal[i] = new TH1D(hname, "", 250,0,20e3);
+			lowEnergyEyTotal[i]->GetXaxis()->SetTitle("Energy [MeV]");
+			lowEnergyEyTotal[i]->GetYaxis()->SetTitle("Counts");
+			hname[0] = '\0';
+            sprintf(hname,"lowEnergyExTotalDSSD%d",i);
+			lowEnergyExTotal[i] = new TH1D(hname, "", 250,0,20e3);
+			lowEnergyExTotal[i]->GetXaxis()->SetTitle("Energy [MeV]");
+			lowEnergyExTotal[i]->GetYaxis()->SetTitle("Counts");
 
+			sprintf(hname,"lowEnergyEyRateDSSD%d",i);
+			lowEnergyEyRate[i] = new TH1D(hname, "", 250,0,20e3);
+			lowEnergyEyRate[i]->GetXaxis()->SetTitle("Energy [MeV]");
+			lowEnergyEyRate[i]->GetYaxis()->SetTitle("Counts");
+
+			            sprintf(hname,"lowEnergyExRateDSSD%d",i);
+			lowEnergyExRate[i] = new TH1D(hname, "", 250,0,20e3);
+			lowEnergyExRate[i]->GetXaxis()->SetTitle("Energy [MeV]");
+			lowEnergyExRate[i]->GetYaxis()->SetTitle("Counts");
 		}
-    serv = new THttpServer("http:8085");
+    
 
 #endif
 
@@ -77,6 +100,15 @@ EventClustering::EventClustering(){
     currentTimestamp = 0;
 
 };
+int EventClustering::StartMonitor(bool monitor){
+	onlineMonitor = monitor;
+	if(monitor){
+		serv = new THttpServer("http:8085");
+		
+		outFile.open("/home/npg/rates.txt");
+	}
+	return 0;
+}
 
 void EventClustering::InitialiseClustering(){
 	decayMap.clear();
@@ -87,9 +119,9 @@ void EventClustering::InitialiseClustering(){
 	#ifdef NEW_OUTPUT
 		outputEvents.clear();
 	#endif
-	#ifdef MERGER_OUTPUT
-		outputEvents.clear();
-	#endif
+	
+	outputEvents.clear();
+	
 	decayMapCurrent = false;
 
 	for (int i = 0; i < Common::noDSSD; i++){
@@ -419,14 +451,24 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
 							MergerOutputNewTrial pairedCluster(*clusterSide0It, *clusterSide1It);
 							outputEvents.emplace(pairedCluster.GetTimestamp(),pairedCluster);
 						#endif
-						#ifdef MERGER_OUTPUT
-							MergerOutput pairedCluster(*clusterSide0It, *clusterSide1It);
-							outputEvents.emplace(pairedCluster.GetTimestamp(),pairedCluster);
-						#endif
+						MergerOutput pairedCluster;
+						if(dssdPNisX[dssd]){
+							pairedCluster.BuildItem(*clusterSide0It, *clusterSide1It);
+						}
+						else{
+							pairedCluster.BuildItem(*clusterSide1It, *clusterSide0It);
+						}
+						outputEvents.emplace(pairedCluster.GetTimestamp(),pairedCluster);
+						
 
 						#ifdef HISTOGRAMMING
 							if(equalEnergyRange == decayEnergyDifference){
-								lowEnergyExEyPair[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
+								if(dssdPNisX[dssd]){
+									lowEnergyExEyPair[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
+								}
+								else{
+									lowEnergyExEyPair[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
+								}
 								lowEnergyXY[dssd]->Fill(pairedCluster.GetX(),pairedCluster.GetY());
                                 //Have a paired CARME event add it to the CARME histograms
                                 if(pairedCluster.GetTimestamp() > currentTimestamp){
@@ -441,18 +483,80 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
                                                     lowEnergyXYRate[z]->SetBinContent(x + 1, y + 1, xyEvents[z * 128 * 128 + y * 128 + x]);
                                                 }
                                             }
+											/*
+											double AvgBeamPosition=0;
+											if(xyEvents[127*128+9]>0) {
+												for(int y = 110; y < 127; y++){
+													if(xyEvents[y*128+9]>0){
+														double pixelsRatio = xyEvents[y*128+9]/xyEvents[127*128+9];
+														std::clog<<xyEvents[127*128+9]<<std::endl;
+														double pixelPosRatio = pow(pixelsRatio, -0.25);
+														double strip_difference = 0.78125 * (129-y); 
+
+														double pixel_position = (strip_difference / (1. - (1/pixelPosRatio))) - (0.78125/2);
+														double beam_position = pixel_position - strip_difference;
+														AvgBeamPosition += beam_position;
+													}
+												}
+											AvgBeamPosition*=1./16;
+											std::clog<<AvgBeamPosition<<std::endl;
+											}
+											*/
                                         }
                                         std::fill(std::begin(xyEvents), std::end(xyEvents), 0);
 
-                                        for(auto & xVsExEvent : xVsExEvents){
+                                        //for(auto & xVsExEvent : xVsExEvents){
                                             //Sort out the dssd allocation
-                                            lowEnergyExXRate[std::get<0>(xVsExEvent)]->Fill(std::get<1>(xVsExEvent), std::get<2>(xVsExEvent));
-                                        }
+                                            //lowEnergyExXRate[std::get<0>(xVsExEvent)]->Fill(std::get<1>(xVsExEvent), std::get<2>(xVsExEvent));
+                                        //}
                                         xVsExEvents.clear();
 
-                                        for(auto & yVsEyEvent : yVsEyEvents){
-                                            lowEnergyEyYRate[std::get<0>(yVsEyEvent)]->Fill(std::get<1>(yVsEyEvent), std::get<2>(yVsEyEvent));
-                                        }
+
+										//----------------------------------------------------------------------
+										//Clear events more than 20s old
+										//----------------------------------------------------------------------
+										for(int i = 0; i< Common::noDSSD; i++){
+											lowEnergyExXRate[i]->Reset();
+											lowEnergyEyYRate[i]->Reset();
+											lowEnergyExRate[i]->Reset();
+											lowEnergyEyRate[i]->Reset();
+										}
+										xVsExMapLowIt = xVsExMap.lower_bound(currentTimestamp-20000000000);
+										if(xVsExMapLowIt != xVsExMap.begin()){
+											xVsExMap.erase(xVsExMap.begin(), std::prev(xVsExMapLowIt));
+										}
+										for(xVsExMapIt = xVsExMap.begin(); xVsExMapIt != xVsExMap.end(); xVsExMapIt++){
+											lowEnergyExXRate[std::get<0>(xVsExMapIt->second)]->Fill(std::get<1>(xVsExMapIt->second), std::get<2>(xVsExMapIt->second));
+											lowEnergyExRate[std::get<0>(xVsExMapIt->second)]->Fill(std::get<2>(xVsExMapIt->second));
+										}
+
+										//----------------------------------------------------------------------
+										//Clear events more than 20s old
+										//----------------------------------------------------------------------
+										yVsEyMapLowIt = yVsEyMap.lower_bound(currentTimestamp-20000000000);
+										if(yVsEyMapLowIt != yVsEyMap.begin()){
+											yVsEyMap.erase(yVsEyMap.begin(), std::prev(yVsEyMapLowIt));
+										}
+										rate1s = 0;
+										rate20s = 0;
+										for(yVsEyMapIt = yVsEyMap.begin(); yVsEyMapIt != yVsEyMap.end(); yVsEyMapIt++){
+											lowEnergyEyYRate[std::get<0>(yVsEyMapIt->second)]->Fill(std::get<1>(yVsEyMapIt->second), std::get<2>(yVsEyMapIt->second));
+											lowEnergyEyRate[std::get<0>(yVsEyMapIt->second)]->Fill(std::get<2>(yVsEyMapIt->second));
+
+											if(std::get<2>(yVsEyMapIt->second) >= lowRutherford && std::get<2>(yVsEyMapIt->second) <= highRutherford){
+												rate20s++;
+												if (yVsEyMapIt->first > (currentTimestamp - 1000000000)){
+													rate1s++;
+												}
+											}
+										}
+										if(onlineMonitor){
+											outFile << rate1s << "\t" << rate20s << "\n";
+										}
+
+                                        //for(auto & yVsEyEvent : yVsEyEvents){
+                                            //lowEnergyEyYRate[std::get<0>(yVsEyEvent)]->Fill(std::get<1>(yVsEyEvent), std::get<2>(yVsEyEvent));
+                                        //}
                                         yVsEyEvents.clear();
                                     }
                                 gSystem->ProcessEvents();
@@ -462,13 +566,23 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
                                 xyEvents[dssd * 128 * 128 + (int)pairedCluster.y * 128 + (int)pairedCluster.x]++;
 
                                 lowEnergyExXTotal[dssd]->Fill(pairedCluster.x, pairedCluster.Ex);
-                                xVsExEvents.emplace_back(std::make_tuple((int)pairedCluster.z,pairedCluster.x, pairedCluster.Ex));
+                                //xVsExEvents.emplace_back(std::make_tuple((int)pairedCluster.z,pairedCluster.x, pairedCluster.Ex));
+								xVsExMap.emplace(pairedCluster.GetTimestamp(),std::make_tuple((int)pairedCluster.z,pairedCluster.x, pairedCluster.Ex));
 
-                                lowEnergyEyYRate[dssd]->Fill(pairedCluster.y, pairedCluster.Ey);
-                                yVsEyEvents.emplace_back(std::make_tuple((int)pairedCluster.z,pairedCluster.y, pairedCluster.Ey));
+                                lowEnergyEyYTotal[dssd]->Fill(pairedCluster.y, pairedCluster.Ey);
+                                //yVsEyEvents.emplace_back(std::make_tuple((int)pairedCluster.z,pairedCluster.y, pairedCluster.Ey));
+								yVsEyMap.emplace(pairedCluster.GetTimestamp(),std::make_tuple((int)pairedCluster.z,pairedCluster.y, pairedCluster.Ey));
+
+								lowEnergyEyTotal[dssd]->Fill(pairedCluster.Ey);
+								lowEnergyExTotal[dssd]->Fill(pairedCluster.Ex);
 							}
 							else if(equalEnergyRange == implantEnergyDifference){
-								highEnergyExEyPair[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
+								if(dssdPNisX[dssd]){
+									highEnergyExEyPair[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
+								}
+								else{
+									highEnergyExEyPair[dssd]->Fill(clusterSide0It->GetEnergy(),clusterSide1It->GetEnergy());
+								}
 								highEnergyXY[dssd]->Fill(pairedCluster.GetX(),pairedCluster.GetY());
 							}
 						#endif
@@ -555,6 +669,18 @@ void EventClustering::CloseClustering(){
         for(int i = 0; i < Common::noDSSD;i++) {
             lowEnergyEyYTotal[i]->Write();
         }
+		for(int i = 0; i < Common::noDSSD;i++) {
+            lowEnergyEyTotal[i]->Write();
+        }
+		for(int i = 0; i < Common::noDSSD;i++) {
+            lowEnergyExTotal[i]->Write();
+        }
+		for(int i = 0; i < Common::noDSSD;i++) {
+            lowEnergyEyRate[i]->Write();
+        }
+		for(int i = 0; i < Common::noDSSD;i++) {
+            lowEnergyExRate[i]->Write();
+        }
 	#endif
 
 	#ifdef OLD_OUTPUT
@@ -588,4 +714,10 @@ void EventClustering::WriteToFile(){
 			outputTree->Fill();
 		}
 	#endif
+}
+int EventClustering::InitialisePNArray(bool pnArray[Common::noDSSD]){
+	for(int i = 0; i < Common::noDSSD; i++){
+		dssdPNisX[i] = pnArray[i];
+	}
+	return 0;
 }

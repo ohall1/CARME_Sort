@@ -96,7 +96,7 @@ void EventBuilder::CloseEvent(){
 		AddEventToBuffer(implantEvents);
 		totalImplantEvents++;
 	}
-	else if(decayEvents.size() > 64*Common::noDSSD){//Half the number of channels per dssd
+	else if(decayEvents.size() > 32*Common::noFEE64){//Half the number of channels per dssd
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
 			std::cout << "Size of decay list > 800. Event being defined as a pulser event. Multiplicity = " << decayEvents.size() << "\n" << std::endl;
@@ -243,8 +243,8 @@ std::deque<ADCDataItem> EventBuilder::GetEventFromBuffer(){
 		#ifdef DEB_EVENTBUILDER_THREAD
 			std::cout << "Buffer list is empty, thread waiting. bufferEmptyCheck = " << bufferEmptyCheck << std::endl;
 		#endif
-
-		bufferEmpty.wait(popLock);
+		gSystem->ProcessEvents();
+		bufferEmpty.wait_for(popLock, std::chrono::milliseconds(100));
 	}
 
 	bufferOut = eventsList.front();

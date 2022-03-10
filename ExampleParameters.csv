@@ -4,10 +4,7 @@ dssdMap	1	1
 dssdMap	2	1											
 dssdMap	3	1											
 dssdMap	4	1											
-dssdMap	5	2											
-dssdMap	6	2											
-dssdMap	7	2											
-dssdMap	8	2											
+dssdMap	5	-1																					
 										
 
 #map fee64 -> side (n:0, p:1, not used:-1)						
@@ -15,31 +12,26 @@ sideMap	1	1
 sideMap	2	1											
 sideMap	3	0											
 sideMap	4	0											
-sideMap	5	1											
-sideMap	6	1											
-sideMap	7	0											
-sideMap	8	0											
+sideMap	5	-1											
+									
 
 
 #map strip: 01:00 left/top side, 02:00 right/bottom side (from beam view)			
-stripMap	1	1											
-stripMap	2	2											
-stripMap	3	1											
-stripMap	4	2											
+stripMap	1	2											
+stripMap	2	1											
+stripMap	3	2											
+stripMap	4	1											
 stripMap	5	1											
-stripMap	6	2											
-stripMap	7	1											
-stripMap	8	2											
+										
 								
 #adc	polarity:	-1	for	p-side,	1	for	n-side	(polarity	of	signal	inverted	by	pre-amp)
 adcPolarity	1	-1											
 adcPolarity	2	-1											
 adcPolarity	3	1											
 adcPolarity	4	1											
-adcPolarity	5	-1											
-adcPolarity	6	-1											
-adcPolarity	7	1											
-adcPolarity	8	1											
+adcPolarity	5	-1
+
+					
 
 #ADC offsets were calculated using the pulser walkthrough data of files May17/R29												
 adcOffset	1	0	168.755	0.999946
@@ -362,195 +354,3 @@ adcOffset	5	60	93.3888	0.999936
 adcOffset	5	61	280.166	0.999957
 adcOffset	5	62	-172.032	1
 adcOffset	5	63	237.568	1
-adcOffset	6	0	113.05	0.999934
-adcOffset	6	1	181.862	0.999946
-adcOffset	6	2	-155.648	0.999929
-adcOffset	6	3	-4.9152	0.99995
-adcOffset	6	4	67.1744	0.999952
-adcOffset	6	5	70.4512	0.999961
-adcOffset	6	6	296.55	0.999898
-adcOffset	6	7	-54.0672	0.999912
-adcOffset	6	8	50.7904	0.999886
-adcOffset	6	9	-129.434	0.999886
-adcOffset	6	10	8.192	0.999929
-adcOffset	6	11	-73.728	0.999929
-adcOffset	6	12	-155.648	0.999937
-adcOffset	6	13	11.4688	0.999944
-adcOffset	6	14	40.96	0.999949
-adcOffset	6	15	-8.192	0.999937
-adcOffset	6	16	-217.907	0.999945
-adcOffset	6	17	-90.112	1
-adcOffset	6	18	57.344	0.999949
-adcOffset	6	19	-139.264	1
-adcOffset	6	20	27.8528	0.999951
-adcOffset	6	21	-18.0224	0.999924
-adcOffset	6	22	-129.434	0.999927
-adcOffset	6	23	135.987	0.999951
-adcOffset	6	24	-1.6384	0.999932
-adcOffset	6	25	-106.496	1
-adcOffset	6	26	-122.88	0.999937
-adcOffset	6	27	-40.96	1
-adcOffset	6	28	-113.05	0.999961
-adcOffset	6	29	0	0
-adcOffset	6	30	73.728	0.999929
-adcOffset	6	31	-47.5136	0.999961
-adcOffset	6	32	122.88	1
-adcOffset	6	33	194.97	0.999934
-adcOffset	6	34	234.291	0.999951
-adcOffset	6	35	63.8976	0.99994
-adcOffset	6	36	106.496	1
-adcOffset	6	37	34.4064	0.999898
-adcOffset	6	38	299.827	0.999956
-adcOffset	6	39	-70.4512	0.99995
-adcOffset	6	40	165.478	0.999957
-adcOffset	6	41	214.63	0.999946
-adcOffset	6	42	80.2816	0.99994
-adcOffset	6	43	132.71	0.999957
-adcOffset	6	44	-8.192	0.999929
-adcOffset	6	45	181.862	0.999886
-adcOffset	6	46	-139.264	1
-adcOffset	6	47	224.461	0.99995
-adcOffset	6	48	201.523	0.999957
-adcOffset	6	49	260.506	0.999932
-adcOffset	6	50	-31.1296	0.999946
-adcOffset	6	51	244.122	0.99988
-adcOffset	6	52	116.326	0.999952
-adcOffset	6	53	60.6208	0.999994
-adcOffset	6	54	139.264	1
-adcOffset	6	55	0	0
-adcOffset	6	56	-122.88	0.999929
-adcOffset	6	57	-8.192	1
-adcOffset	6	58	240.845	0.999978
-adcOffset	6	59	-139.264	1
-adcOffset	6	60	34.4064	0.999946
-adcOffset	6	61	47.5136	0.999941
-adcOffset	6	62	152.371	0.999946
-adcOffset	6	63	-188.416	0.999937
-adcOffset	7	0	57.344	1
-adcOffset	7	1	260.506	0.99996
-adcOffset	7	2	73.728	1
-adcOffset	7	3	44.2368	0.999944
-adcOffset	7	4	-162.202	0.999962
-adcOffset	7	5	-40.96	1
-adcOffset	7	6	145.818	0.99994
-adcOffset	7	7	247.398	0.999952
-adcOffset	7	8	-83.5584	0.999932
-adcOffset	7	9	-63.8976	0.999952
-adcOffset	7	10	191.693	0.999961
-adcOffset	7	11	-54.0672	0.999956
-adcOffset	7	12	149.094	0.999977
-adcOffset	7	13	80.2816	0.99996
-adcOffset	7	14	165.478	0.999968
-adcOffset	7	15	-37.6832	0.999812
-adcOffset	7	16	-54.0672	0.999951
-adcOffset	7	17	4.9152	0.999961
-adcOffset	7	18	-54.0672	0.999956
-adcOffset	7	19	155.648	0.999932
-adcOffset	7	20	470.221	0.999951
-adcOffset	7	21	-4.9152	0.999945
-adcOffset	7	22	234.291	0.999945
-adcOffset	7	23	234.291	0.999945
-adcOffset	7	24	132.71	0.999946
-adcOffset	7	25	339.149	0.99996
-adcOffset	7	26	194.97	0.999955
-adcOffset	7	27	-57.344	0.999924
-adcOffset	7	28	-27.8528	0.999846
-adcOffset	7	29	54.0672	0.999807
-adcOffset	7	30	119.603	0.999957
-adcOffset	7	31	-73.728	1
-adcOffset	7	32	168.755	0.999964
-adcOffset	7	33	-113.05	0.99992
-adcOffset	7	34	99.9424	0.999952
-adcOffset	7	35	135.987	0.999946
-adcOffset	7	36	119.603	0.999961
-adcOffset	7	37	-37.6832	0.999945
-adcOffset	7	38	70.4512	0.999946
-adcOffset	7	39	188.416	0.999951
-adcOffset	7	40	106.496	0.999932
-adcOffset	7	41	122.88	1
-adcOffset	7	42	-83.5584	0.999941
-adcOffset	7	43	168.755	0.999952
-adcOffset	7	44	37.6832	0.999807
-adcOffset	7	45	57.344	1
-adcOffset	7	46	453.837	0.999938
-adcOffset	7	47	-99.9424	0.99995
-adcOffset	7	48	8.192	1
-adcOffset	7	49	63.8976	0.999926
-adcOffset	7	50	70.4512	0.999946
-adcOffset	7	51	-103.219	0.999961
-adcOffset	7	52	237.568	1
-adcOffset	7	53	24.576	0.999959
-adcOffset	7	54	260.506	0.99995
-adcOffset	7	55	316.211	0.999774
-adcOffset	7	56	388.301	0.999951
-adcOffset	7	57	47.5136	0.99995
-adcOffset	7	58	168.755	0.999979
-adcOffset	7	59	139.264	1
-adcOffset	7	60	204.8	1
-adcOffset	7	61	188.416	1
-adcOffset	7	62	57.344	1
-adcOffset	7	63	217.907	0.999945
-adcOffset	8	0	86.8352	0.999961
-adcOffset	8	1	0	0
-adcOffset	8	2	149.094	0.999937
-adcOffset	8	3	67.1744	0.999935
-adcOffset	8	4	273.613	0.99995
-adcOffset	8	5	-135.987	0.99996
-adcOffset	8	6	57.344	1
-adcOffset	8	7	50.7904	0.999939
-adcOffset	8	8	139.264	0.999932
-adcOffset	8	9	-8.192	0.999832
-adcOffset	8	10	-37.6832	0.999944
-adcOffset	8	11	126.157	0.999951
-adcOffset	8	12	-8.192	0.999958
-adcOffset	8	13	342.426	0.999932
-adcOffset	8	14	67.1744	0.999954
-adcOffset	8	15	208.077	0.999936
-adcOffset	8	16	8.192	1
-adcOffset	8	17	253.952	1
-adcOffset	8	18	70.4512	0.999961
-adcOffset	8	19	286.72	1
-adcOffset	8	20	-96.6656	0.999969
-adcOffset	8	21	40.96	0.999951
-adcOffset	8	22	-417.792	0.999954
-adcOffset	8	23	0	0
-adcOffset	8	24	-116.326	0.999932
-adcOffset	8	25	-40.96	1
-adcOffset	8	26	247.398	0.99992
-adcOffset	8	27	214.63	0.999891
-adcOffset	8	28	57.344	1
-adcOffset	8	29	-14.7456	0.999854
-adcOffset	8	30	8.192	1
-adcOffset	8	31	106.496	1
-adcOffset	8	32	-257.229	0.999961
-adcOffset	8	33	-83.5584	0.999996
-adcOffset	8	34	-54.0672	0.999812
-adcOffset	8	35	80.2816	0.999934
-adcOffset	8	36	-24.576	1
-adcOffset	8	37	224.461	0.999944
-adcOffset	8	38	-378.47	0.999755
-adcOffset	8	39	116.326	0.999871
-adcOffset	8	40	135.987	0.999939
-adcOffset	8	41	319.488	1
-adcOffset	8	42	34.4064	0.99992
-adcOffset	8	43	-86.8352	0.99995
-adcOffset	8	44	-139.264	1
-adcOffset	8	45	309.658	0.999944
-adcOffset	8	46	-57.344	1
-adcOffset	8	47	11.4688	0.99995
-adcOffset	8	48	99.9424	0.999957
-adcOffset	8	49	109.773	0.99995
-adcOffset	8	50	116.326	0.999965
-adcOffset	8	51	31.1296	0.99996
-adcOffset	8	52	-113.05	0.999929
-adcOffset	8	53	181.862	0.999937
-adcOffset	8	54	-1.6384	0.99995
-adcOffset	8	55	-188.416	0.999778
-adcOffset	8	56	-96.6656	0.999954
-adcOffset	8	57	-31.1296	0.999952
-adcOffset	8	58	-188.416	1
-adcOffset	8	59	-83.5584	0.999947
-adcOffset	8	60	0	0
-adcOffset	8	61	-421.069	0.999895
-adcOffset	8	62	11.4688	0.999955
-adcOffset	8	63	-21.2992	0.99997

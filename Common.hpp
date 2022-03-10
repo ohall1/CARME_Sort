@@ -4,8 +4,8 @@
 namespace Common{
 	//Variables that will be used throughout the program by all threads
 
-	const int noFEE64 = 8;			//Not just the number in use but the highest number ID that is used
-	const int noDSSD = 2;			//Total number of DSSD you are implanting in
+	const int noFEE64 = 5;			//Not just the number in use but the highest number ID that is used
+	const int noDSSD = 1;			//Total number of DSSDs
 	const int noChannel = 64;		//Will remain fixed. Number of channels per FEE
 	const int masterFEE64 = 1;
 

@@ -4,12 +4,14 @@ void Calibrator::InitialiseCalibrator(std::string variablesFile, EventBuilder *e
 
 	myEventBuilder = eventBuilderPointIn;
 	eventBuilderStatus = true;
-
 	for(int i =0; i < Common::noFEE64 ; i++){
 		for(int j =0; j<Common::noChannel; j++){
 			adcLowEnergyGain[i][j] = 0.7;	//keV/ch
 			adcHighEnergyGain[i][j] = 0.7; 	//MeV/ch
 		}
+	}
+	for(int i = 0; i < Common::noDSSD; i++){
+		dssdPNisX[i] = true;
 	}
 
 	ReadInVariables(variablesFile);
@@ -98,6 +100,11 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 					feePolarityMap[fee64-1] = value;
 				}
 			}
+			else if (dummyVar == "dssdPNisX"){
+				iss >> dssd;
+				iss >> value;
+				dssdPNisX[dssd-1] = value;
+			}
 			/*else{
 				std::cout << "Problem in reading in variables file. Unrecognised parameter type - " << dummyVar.data() << "."<<std::endl;
 				std::cout << "Program exiting" << std::endl;
@@ -108,6 +115,7 @@ void Calibrator::ReadInVariables(std::string variablesFile){
 		}
 	}// Variables all read in
 	variables.close();
+	myClustering.InitialisePNArray(dssdPNisX);
 }
 void Calibrator::ProcessEvents(){
 	
@@ -201,4 +209,10 @@ bool Calibrator::CalibrateEnergy(ADCDataItem & adcDataItemIn, CalibratedADCDataI
 void Calibrator::CloseCalibrator(){
 	std::cout << "Calibrator thread finished" <<std::endl;
 	myClustering.CloseClustering();
+}
+int Calibrator::StartMonitor(bool monitor){
+	if(monitor){
+		myClustering.StartMonitor(monitor);
+	}
+	return 0;
 }
