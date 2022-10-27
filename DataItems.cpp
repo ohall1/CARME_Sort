@@ -11,6 +11,15 @@ ADCDataItem::ADCDataItem(std::pair < unsigned int, unsigned int> inData){
 	timestampWR24 = (inData.second & 0x0FFFFFFF);				//Word 1, bits 0:27 - Timestamp LSB
 
 }
+
+ADCDataItem::ADCDataItem(unsigned long timestampIn, int FEEin, short adcRangeIn){
+	dataType = 3;
+	fee64ID = FEEin;
+	timestamp = timestampIn;
+	adcRange = adcRangeIn;
+	channelID = 0;
+	adcData = 0;
+}
 void ADCDataItem::BuildItem(std::pair < unsigned int, unsigned int> inData){
 	dataType = 3;
 	unsigned int chIdentity = (inData.first >> 16) & 0xFFF; //Word 0, bits 16:27
@@ -449,6 +458,21 @@ MergerOutput::MergerOutput(Cluster & clusterY, Cluster & clusterX){
 	else{
 		ID==4;
 	}
+
+}
+MergerOutput::MergerOutput(int xIn, unsigned long timestamp){
+	T = timestamp;
+	Tfast = 0;
+	E = 0;
+	Ex = 0;
+	Ey = 0;
+	x = xIn;
+	y = 0;
+	z = 0;
+	nx = 0;
+	ny = 0;
+	nz = 0;
+	ID = 6;
 
 }
 MergerOutput::MergerOutput(){

@@ -149,8 +149,17 @@ double Calibrator::GetOrder(int channelID) const{
 }
 void Calibrator::CalibrateData(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){
 
-	SetGeometry(adcDataItemIn, calibratedItemOut);
-	eventBuilderStatus = CalibrateEnergy(adcDataItemIn, calibratedItemOut);
+	if(adcDataItemIn.GetADCRange() <= 2){
+		SetGeometry(adcDataItemIn, calibratedItemOut);
+		eventBuilderStatus = CalibrateEnergy(adcDataItemIn, calibratedItemOut);
+	}
+	else{
+		calibratedItemOut.SetDSSD(0);
+		calibratedItemOut.SetStrip(adcDataItemIn.GetFEE64ID());
+		calibratedItemOut.SetSide(0);
+		calibratedItemOut.SetEnergy(0);
+		calibratedItemOut.SetADCRange(3);
+	}
 
 }
 void Calibrator::SetGeometry(ADCDataItem & adcDataItemIn, CalibratedADCDataItem & calibratedItemOut){

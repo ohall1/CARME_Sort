@@ -22,6 +22,7 @@ private:
 	//Lists to store data events
 	std::deque <ADCDataItem> decayEvents;		//list to store decay events
 	std::deque <ADCDataItem> implantEvents;		//list to store implant events
+	std::deque <ADCDataItem> correlationEvents; //lsit to store correlation events
 
 	std::queue <std::deque<ADCDataItem>> eventsList;			//List to store events to be calibrated
 

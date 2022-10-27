@@ -36,6 +36,7 @@ void EventBuilder::InitialiseEvent(){
 	//Clear the event lists
 	decayEvents.clear();
 	implantEvents.clear();
+	correlationEvents.clear();
 
 	//Reset previousTimestamp to zero
 	previousTimestamp = 0;
@@ -83,7 +84,13 @@ void EventBuilder::CloseEvent(){
 	//First check: If multiplicity of decay map is greater than 800 define as a pulser event
 	//Second check: If size of implant map > 0 - Define as implant event. Will currently veto all decays
 	//Thir check: If implant map == 0 and decay map > 0 define as decay event
-
+	if(!correlationEvents.empty()){
+		#ifdef DEB_EVENTBUILDER
+			std::cout << "End of event window." <<std::endl;
+			std::cout << "Event hasd correlation events. Correlation size = " << correlationEvents.size() << "\n" << std::endl;
+		#endif
+		AddEventToBuffer(correlationEvents);
+	}
 	if(implantEvents.size() > 1){//Need at least two events to make a front back pair
 		#ifdef DEB_EVENTBUILDER
 			std::cout << "End of event window." <<std::endl;
@@ -159,7 +166,9 @@ void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
 	#ifdef DEB_EVENTBUILDER
 		std::cout << "Previous timestamp obtained" << std::endl;
 	#endif
-	CorrectMultiplexer(adcItem);
+	if (adcItem.GetADCRange() <= 2){
+		CorrectMultiplexer(adcItem);
+	}
 	#ifdef DEB_EVENTBUILDER
 		std::cout << "Multiplexer corected" << std::endl;
 	#endif
@@ -174,6 +183,11 @@ void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
  		//High energy event. Add to implant list
  		implantEvents.push_back(adcItem);
  	}
+	else if( adcItem.GetADCRange() == 3){
+		 //Correlation event. Add to correlation list
+		 correlationEvents.push_back(adcItem);
+	//	 std::cout << "push back evemt" << std::endl;
+	 }
 
  	return;
 

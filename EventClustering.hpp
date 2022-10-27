@@ -18,6 +18,7 @@ class EventClustering{
 	private:
 		std::multimap<CalibratedADCDataItem,int> decayMap;			//Map to store the calibrated decay events
 		std::multimap<CalibratedADCDataItem,int> implantMap;		//Map to store the calibrated implant events
+		std::multimap<CalibratedADCDataItem,int> correlationMap;	//Map to store the correlation data items
 
 		std::multimap<CalibratedADCDataItem,int>::iterator clusterIt; 	//Iterator to loop through the maps to be clustered
 
@@ -28,7 +29,7 @@ class EventClustering{
 
 		short dssdSideMultiplicity[Common::noDSSD][2];					//Stores the multiplicity of each side of the detector
 
-		const double decayEnergyDifference = 650.0;						//Cluster energy difference in keV for decay clusters
+		const double decayEnergyDifference = 1000.0;						//Cluster energy difference in keV for decay clusters
 		const double implantEnergyDifference = 1000.0;					//Cluster energy difference in MeV for implant clusters
 		const double energyThreshold = 0.0;								//Thresholds used for checking decays
 		const double lowRutherford = 2500.;

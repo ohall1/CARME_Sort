@@ -21,6 +21,7 @@ class ADCDataItem{
 		ADCDataItem();
 		~ADCDataItem(){};
 		ADCDataItem(std::pair < unsigned int, unsigned int> inData);
+		ADCDataItem(unsigned long timestampIn, int FEEin, short adcRangeIn);
 
 		void BuildItem(std::pair < unsigned int, unsigned int> inData);
 
@@ -218,6 +219,7 @@ class MergerOutput{
 		UChar_t ID;
 
 		MergerOutput();
+		MergerOutput(int xIn, unsigned long timestamp);
 		MergerOutput(Cluster & clusterX, Cluster & clusterY);
 		int BuildItem(Cluster & clusterX, Cluster & clusterY);
 

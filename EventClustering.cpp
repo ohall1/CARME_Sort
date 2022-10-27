@@ -113,6 +113,7 @@ int EventClustering::StartMonitor(bool monitor){
 void EventClustering::InitialiseClustering(){
 	decayMap.clear();
 	implantMap.clear();
+	correlationMap.clear();
 	#ifdef OLD_OUTPUT
 		outputEvents.clear();
 	#endif
@@ -143,6 +144,9 @@ void EventClustering::AddEventToMap(CalibratedADCDataItem &dataItem){
 	else if(dataItem.GetADCRange() == 1){
 		//Store implant items in a map that organises them by DSSD->Side->Strip
 		implantMap.emplace(dataItem,1);
+	}
+	else if(dataItem.GetADCRange() == 3){
+		correlationMap.emplace(dataItem, 1);
 	}
 }
 void EventClustering::ProcessMaps(){
@@ -188,6 +192,12 @@ void EventClustering::ProcessMaps(){
 		ClusterMap(decayMap);
 		for(int dssd = 0; dssd < Common::noDSSD; dssd++){
 			PairClusters(dssd, decayEnergyDifference,dssdDecayLists);
+		}
+	}
+		if(correlationMap.size() > 0){
+		for(auto it = correlationMap.begin(); it != correlationMap.end(); it++){
+			MergerOutput corEvent(it->first.GetStrip(), it->first.GetTimestamp());
+			outputEvents.emplace(corEvent.GetTimestamp(),corEvent);
 		}
 	}
 
@@ -278,7 +288,7 @@ void EventClustering::ClusterMap(std::multimap<CalibratedADCDataItem,int> & even
 				#endif
 
 		}
-		else if (((clusterIt->first.GetStrip()-eventCluster.GetStrip()) > 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) < -1)
+		else if (((clusterIt->first.GetStrip()-eventCluster.GetStrip()) == 1 || (clusterIt->first.GetStrip()-eventCluster.GetStrip()) == -1)
 				&& ((clusterIt->first.GetEnergy()>energyThreshold && decayMapCurrent)||!decayMapCurrent)){
 			//Cluster is finished
 

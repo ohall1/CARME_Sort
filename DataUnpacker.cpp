@@ -156,8 +156,12 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 		}
 		else if(informationDataItem.GetInfoCode() == 8){		//Correlation scaler data item
 
-			//Scaler item input
-			informationDataItem.SetTimestamp(timestampWR48, timestampWR64);
+			//Scaler item input			
+			if (informationDataItem.GetFEE64ID() == 1){
+				informationDataItem.SetTimestamp(timestampWR48, timestampWR64);
+				ADCDataItem correlationItem(informationDataItem.GetTimestamp(), informationDataItem.GetFEE64ID(), 3);
+				myEventBuilder.AddADCEvent(correlationItem);
+		  	}
 			//std::cout << "Scaler item FEE: " << informationDataItem.GetFEE64ID() << " Timestamp: " << informationDataItem.GetTimestamp() << std::endl;
 			
 			/*if(timestampWR48Status && timestampWR64Status){//No MBS information in scaler so can't set timestamp in constructor
