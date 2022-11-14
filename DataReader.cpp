@@ -7,8 +7,9 @@ DataReader::DataReader(){};
 void DataReader::InitialiseReader(std::list <std::string> inputFileList, bool bDataSpy){
 
 
-	//Check whether input file list is filled
+	//Check whether the program will be reading from the dataspy or from file
     if (!bDataSpy) {
+        //Check whether input file list is filled
         if (inputFileList.size() <= 0) {
             std::cout << "No input files given, program ending" << std::endl;
             dataFinishedCheck = true;
@@ -21,6 +22,7 @@ void DataReader::InitialiseReader(std::list <std::string> inputFileList, bool bD
         isDataSpy = false;
     }
     else{
+        //Dataspy will be used. Set the necessary parameters and call the dataSpyOpen function
         isDataSpy = true;
         id = 0;
 		std::cout << "Opening dataspy " << id <<std::endl;
@@ -38,6 +40,7 @@ void DataReader::SetInputFileList(std::list <std::string> fileList){
 }
 
 void DataReader::BeginReader(){
+    //If not running from dataspy loop over all files
 	while(!AIDAFileList.empty() && !isDataSpy){//Loops over all AIDA files
 		
 		OpenInputFile();//Opens the first AIDA file in the list
@@ -80,7 +83,7 @@ void DataReader::BeginReader(){
 						continue;
 					}
 					else{
-						//Pass on data words to the buffer
+						//Pass on data words to the list which will be passed to buffer
 						dataWords.first = word0;
 						dataWords.second = word1;
 
@@ -91,7 +94,7 @@ void DataReader::BeginReader(){
 
 
 				}//End loop over data words
-
+                //Pass the list to the buffer
 				AddToBuffer(dataWordList);
 				
 			}//End loop over data blocks
@@ -104,6 +107,7 @@ void DataReader::BeginReader(){
     if(isDataSpy){
         while(isDataSpy){
             //Infinite loop for now
+            //At some point a condition could be added to allow a break to be added
             dataSpyLength = ReadBlock();
             if (dataSpyLength == 0){
                 //No data to read. Sleep for 1ms
@@ -114,6 +118,7 @@ void DataReader::BeginReader(){
                 continue;
             }
             dataWordList.clear();
+            //Loop starts from 24 to skip the header
             for(int itrData = 24; itrData < dataSpyLength; itrData += 8){
                 word0 = (dataSpyData[itrData] & 0xFF) | (dataSpyData[itrData+1] & 0xFF) << 8 |
                         (dataSpyData[itrData+2] & 0xFF) << 16 | (dataSpyData[itrData+3] & 0xFF) << 24;
@@ -135,10 +140,11 @@ void DataReader::BeginReader(){
                 //Pass on data words to the buffer
                 dataWords.first = word0;
                 dataWords.second = word1;
-
+                //Add words to list to be passed to buffer
                 dataWordList.push_back(dataWords);
 
             }
+            //Pass list to buffer
             AddToBuffer(dataWordList);
 
         }
@@ -153,13 +159,14 @@ void DataReader::BeginReader(){
 	dataWordList.clear();
 	dataWordList.push_back(dataWords);
 	AddToBuffer(dataWordList);
-
+    //If buffer was empty notify other threads there is now data to process
 	if(bufferEmptyCheck){
 		bufferEmpty.notify_all();
 	}
 }
 
 void DataReader::OpenInputFile(){
+    //Take first file from the list to read
 	currentInputFile = AIDAFileList.front(); 
 	AIDAFileList.pop_front();
 	inputFile.open(currentInputFile.data());
@@ -258,6 +265,7 @@ int DataReader::ReadBlock(){
             }
         }
         else if(currentBlockID == lastBlockID){
+            //If this block has already been read, pass back length of zero so it is not double processed
             return 0;
         }
         else if(currentBlockID < lastBlockID){

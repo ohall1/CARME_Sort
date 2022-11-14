@@ -62,7 +62,7 @@ void EventBuilder::CorrectMultiplexer(ADCDataItem & adcItem){
 	#ifdef DEB_EVENTBUILDER
 		std::cout << " Setting timestamp" << std::endl;
 	#endif
-
+    //Timestamp correction is done by subtracting 2us * the number of preceeding events from the ASIC
 	adcItem.SetTimestamp((itemTimestamp-(2000 * adcItemCounts[itemFEE][itemADC])));
 	#ifdef DEB_EVENTBUILDER
 		std::cout << "updating counter " << std::endl;
@@ -184,9 +184,9 @@ void EventBuilder::AddADCEvent(ADCDataItem & adcItem){
  		implantEvents.push_back(adcItem);
  	}
 	else if( adcItem.GetADCRange() == 3){
-		 //Correlation event. Add to correlation list
-		 correlationEvents.push_back(adcItem);
-	//	 std::cout << "push back evemt" << std::endl;
+        //Correlation event. Add to correlation list
+        // correlationEvents.push_back(adcItem);
+	    //std::cout << "push back evemt" << std::endl;
 	 }
 
  	return;

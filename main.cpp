@@ -177,6 +177,7 @@ int main(int argc, char **argv){
 	myCalibrator.InitialiseCalibrator(aidaParameters, eventBuilderPoint);
 	myCalibrator.StartMonitor(monitor);
 
+    //Launch the three threads for the data reader, data unpacker and calibrator
 	std::thread th1 (&DataReader::BeginReader,dataReaderPoint);
 
 	std::thread th2 (&DataUnpacker::BeginDataUnpacker,dataUnpackerPoint,std::ref(myDataReader));

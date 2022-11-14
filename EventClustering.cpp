@@ -472,6 +472,7 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
 						
 
 						#ifdef HISTOGRAMMING
+                        //This is where the majority of the histograms are filled and updated
 							if(equalEnergyRange == decayEnergyDifference){
 								if(dssdPNisX[dssd]){
 									lowEnergyExEyPair[dssd]->Fill(clusterSide1It->GetEnergy(),clusterSide0It->GetEnergy());
@@ -481,6 +482,7 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
 								}
 								lowEnergyXY[dssd]->Fill(pairedCluster.GetX(),pairedCluster.GetY());
                                 //Have a paired CARME event add it to the CARME histograms
+                                //Operators wanted the histograms to show 10s of acitivity
                                 if(pairedCluster.GetTimestamp() > currentTimestamp){
                                     if(currentTimestamp == 0){
                                         currentTimestamp = pairedCluster.GetTimestamp()+1000000000;
@@ -513,6 +515,7 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
 											}
 											*/
                                         }
+                                        //After filling the histogram. Clear the vector to allow it to be filled again
                                         std::fill(std::begin(xyEvents), std::end(xyEvents), 0);
 
                                         //for(auto & xVsExEvent : xVsExEvents){
@@ -569,6 +572,7 @@ void EventClustering::PairClusters(int dssd, double equalEnergyRange,std::deque<
                                         //}
                                         yVsEyEvents.clear();
                                     }
+                                //Process events is required for the histograms on the webserver to update
                                 gSystem->ProcessEvents();
                                 }
                                 gSystem->ProcessEvents();

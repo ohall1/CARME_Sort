@@ -155,9 +155,11 @@ bool DataUnpacker::UnpackWords(std::pair < unsigned int, unsigned int> wordsIn){
 			#endif
 		}
 		else if(informationDataItem.GetInfoCode() == 8){		//Correlation scaler data item
+            //For each scaler NIM signal into the FEE we will get three info code 8 items in order to pass through the full timestamp
 
 			//Scaler item input			
 			if (informationDataItem.GetFEE64ID() == 1){
+                //Jordan wanted to have the scaler values go through to the root output so to do this we created a fake ADC data item that would be passed through the program
 				informationDataItem.SetTimestamp(timestampWR48, timestampWR64);
 				ADCDataItem correlationItem(informationDataItem.GetTimestamp(), informationDataItem.GetFEE64ID(), 3);
 				myEventBuilder.AddADCEvent(correlationItem);
